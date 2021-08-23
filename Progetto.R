@@ -1,4 +1,9 @@
-### Importazione delle librerie
+####OPTIONS####
+
+options(scipen = 999)
+set.seed(123456)
+
+####LIBRERIE####
 
 library(dplyr)
 library(ggplot2)
@@ -7,11 +12,20 @@ library(magrittr)
 library(pander)
 library(tidyverse)
 library(wesanderson)
+library(forcats)
+library(lubridate)
+library(RQuantLib)
+
+####DIRECTORIES####
 
 
-### Importazione dei Dataset
+####EXECUTION FULL PIPELINE####
 
-raw_1_cli_fid <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_1_cli_fid.csv", sep=";", na.strings = c("NA", ""))
+#PIPELINE_scripts 
+
+#### Importazione dei Dataset ####
+
+df_1_cli_fid <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_1_cli_fid.csv", sep=";", na.strings = c("NA", ""))
 
 df_2_cli_account <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_2_cli_account.csv", sep=";", na.strings = c("NA", ""))
 
@@ -25,47 +39,49 @@ df_6_camp_event <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_6_camp_event.cs
 
 df_7_tic <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_7_tic.csv", na.strings = c("NA", ""), stringsAsFactors = FALSE)
 
-### Preparazione dei Dataset
+#### Preparazione dei Dataset ####
 
-#### FIRST LOOK of df_1 ####
+### Dataset n°1 ###
 
-str(df_1_cli_fid)
+#come sono divisi i miei clienti?
+#primo sguardo al dataset
+
+str(df_1_cli_fid)  #come sono fatti i nostri dati
 summary(df_1_cli_fid)
 
-#### START CLEANING df_1 ####
+## START CLEANING df_1 ##
+
+#ricreare il dataset
 
 df_1_cli_fid_clean <- df_1_cli_fid
 
-#### CLEANING DUPLICATE VALUES in df_1 ####
-
 ## check for duplicates
-df_1_cli_fid_clean %>%
+df_1_cli_fid_clean %>% 
   summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
             , TOT_ID_FIDs = n_distinct(ID_FID)
             , TOT_ID_CLIFIDs = n_distinct(paste0(as.character(ID_CLI),"-",as.character(ID_FID)))
             , TOT_ROWs = n())
 
-#!!! NOTE:  no duplicates for combination CLI-FID !!!#
+#ci sono più registrazioni di carte fedeltà di ciascun cliente e questo non ci sorprende
 
-#### CLEANING DATA TYPES in df_1 ####
-
-## formatting dates ##
+## formattazione delle date ##
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(DT_ACTIVE = as.Date(DT_ACTIVE))
 
-## formatting boolean as factor ##
+## Formattazione delle categorie numeriche in fattori ##
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(TYP_CLI_FID = as.factor(TYP_CLI_FID)) %>%
   mutate(STATUS_FID = as.factor(STATUS_FID))
 
-#### CONSISTENCY CHECK on df1: number of fidelity subscriptions per client ####
-
-## count the subscriptions for each client
+##quante sottoscrizioni ho per ciascun cliente?
+## Numero di programmi fedeltà per numero di clienti ##
 num_fid_x_cli <- df_1_cli_fid_clean %>%
   group_by(ID_CLI) %>%
   summarize(NUM_FIDs =  n_distinct(ID_FID)
             , NUM_DATEs = n_distinct(DT_ACTIVE)
   )
+
+
 
 tot_id_cli <- n_distinct(num_fid_x_cli$ID_CLI)
 
@@ -77,12 +93,12 @@ dist_num_fid_x_cli <- num_fid_x_cli %>%
 
 dist_num_fid_x_cli
 
-#!!! NOTE: there are clients with multiple fidelity subscriptions !!!#
-
-## let examine in details clients with multiple subscriptions
+##Ci sono clienti con molteplici programmi fedeltà##
+# let examine in details clients with multiple subscriptions#
 
 num_fid_x_cli %>% filter(NUM_FIDs == 3)
 
+#andiamo a vedere nel dettaglio per esempio un cliente#
 # each subscription can have different dates
 df_1_cli_fid %>% filter(ID_CLI == 621814)
 # there could be subscriptions at the same dates [possibly for technical reasons]
@@ -90,11 +106,14 @@ df_1_cli_fid %>% filter(ID_CLI == 320880)
 
 #### RESHAPING df_1 ####
 
-## combining information
+## combining information ##
 
 # from first subscription  --> registration date, store for registration
 # from last subscription   --> type of fidelity, status
 # from subscriptions count --> number of subscriptions made
+
+#ID 1 è l'ID relativo alla registrazione online, gli altri sono negozi
+
 
 df_1_cli_fid_first <- df_1_cli_fid_clean %>%
   group_by(ID_CLI) %>%
