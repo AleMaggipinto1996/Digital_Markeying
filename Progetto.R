@@ -131,6 +131,8 @@ df_1_cli_fid_last <- df_1_cli_fid_clean %>%
   ungroup() %>%
   as.data.frame()
 
+#ricombinare le informazioni per avere un dataset completo
+
 df_1_cli_fid_clean <- df_1_cli_fid_last %>%
   select(ID_CLI
          , ID_FID
@@ -149,11 +151,11 @@ df_1_cli_fid_clean <- df_1_cli_fid_last %>%
               mutate(NUM_FIDs = as.factor(NUM_FIDs))
             , by = 'ID_CLI')
 
-#### EXPLORE COLUMNS of df_1 ####
+## EXPLORE COLUMNS of df_1 ##
 
 ### variable LAST_COD_FID ###
 
-## compute distribution
+## come si distribuiscono i nostri clienti
 df1_dist_codfid <- df_1_cli_fid_clean %>%
   group_by(LAST_COD_FID) %>%
   summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
@@ -174,8 +176,16 @@ plot_df1_dist_codfid <- (
 
 plot_df1_dist_codfid
 
-#### ???? TO DO df_1 ???? ####
-# EXPLORE the remaining df_1_cli_fid_clean relevant variables
+#si vede una sproporzione elevata tra quelli che hanno
+#una fidelizzazione standard e quelli premium
+
+#biz vuol dire categorizzazione tra clienti business e non
+#ovvero clienti e aziende vere e proprie
+
+#è importante capire il modo migliore per presentare i dati
+
+#### ????  da fare####
+######### EXPLORE the remaining df_1_cli_fid_clean relevant variables###########
 
 #### FINAL REVIEW df_1_clean ####
 
@@ -200,7 +210,6 @@ df_2_cli_account_clean %>%
   summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
             , TOT_ROWs = n())
 
-#!!! NOTE:  no duplicates !!!#
 
 #### CLEANING DATA TYPES in df_2 ####
 
