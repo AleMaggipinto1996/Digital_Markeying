@@ -1,3 +1,4 @@
+#----------------------------------------
 ####OPTIONS####
 
 options(scipen = 999)
@@ -15,60 +16,89 @@ library(wesanderson)
 library(forcats)
 library(lubridate)
 library(RQuantLib)
+library(rfm)
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+library(funModeling)
+library(arules)
+library(arulesViz)
+library(tidyr)
 
 ####DIRECTORIES####
+#working_dir =
+#data_dir =
+#setwd(working_dir)
+
+#------------------------------------
 
 
-####EXECUTION FULL PIPELINE####
 
-#PIPELINE_scripts 
 
-#### Importazione dei Dataset ####
 
+#-------------------------------
+
+### DATA PREPROCESSING
+
+#-------------------------------
+
+
+#### iMPORTAZIONE DEI Dataset ####
+
+#informazioni carta fedeltà di ciascun cliente
 df_1_cli_fid <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_1_cli_fid.csv", sep=";", na.strings = c("NA", ""))
 
+#informazioni account cliente
 df_2_cli_account <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_2_cli_account.csv", sep=";", na.strings = c("NA", ""))
 
+#indirizzo cliente
 df_3_cli_address <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_3_cli_address.csv", sep=";", na.strings = c(""))
 
+#privacy clienti
 df_4_cli_privacy <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_4_cli_privacy.csv", sep=";", na.strings = c("NA", ""))
 
+#email campaign
 df_5_camp_cat <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_5_camp_cat.csv", sep=";", na.strings = c("NA", ""))
 
+#email events
 df_6_camp_event <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_6_camp_event.csv", sep=";", na.strings = c("NA", ""))
 
+#operazioni acquisto/rimborso di ogni cliente
 df_7_tic <- read.csv2("~/Documents/DMktg_DSLab_Data_1/raw_7_tic.csv", na.strings = c("NA", ""), stringsAsFactors = FALSE)
 
-#### Preparazione dei Dataset ####
+
+
+#### PREPARAZIONE DEI DATASET ####
 
 ### Dataset n°1 ###
 
-#come sono divisi i miei clienti?
-#primo sguardo al dataset
+###primo sguardo al dataset
 
 str(df_1_cli_fid)  #come sono fatti i nostri dati
 summary(df_1_cli_fid)
 
+#si vede che la maggior parte dei clienti hanno un account ed è attivo
+
 ## START CLEANING df_1 ##
 
-#ricreare il dataset
+### Ricreare il dataset
 
 df_1_cli_fid_clean <- df_1_cli_fid
 
-## check for duplicates
-df_1_cli_fid_clean %>% 
-  summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
+### Check for duplicates (non duplicati per CLI-FID)
+df_1_cli_fid_clean %>% summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
             , TOT_ID_FIDs = n_distinct(ID_FID)
             , TOT_ID_CLIFIDs = n_distinct(paste0(as.character(ID_CLI),"-",as.character(ID_FID)))
             , TOT_ROWs = n())
 
 #ci sono più registrazioni di carte fedeltà di ciascun cliente e questo non ci sorprende
 
-## formattazione delle date ##
+### Formattazione delle date 
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(DT_ACTIVE = as.Date(DT_ACTIVE))
 
-## Formattazione delle categorie numeriche in fattori ##
+### Formattazione delle categorie numeriche in fattori ##
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(TYP_CLI_FID = as.factor(TYP_CLI_FID)) %>%
   mutate(STATUS_FID = as.factor(STATUS_FID))
