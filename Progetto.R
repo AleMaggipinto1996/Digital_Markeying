@@ -815,6 +815,7 @@ summary(df_3_cli_address_clean)
 
 
 
+
 #### FIRST LOOK of df_4 ####
 
 str(df_4_cli_privacy)
@@ -863,14 +864,82 @@ cons_idcli_df1_df4
 
 #### EXPLORE COLUMNS of df_4 ####
 
-#### ???? TO DO df_4 ???? ####
 # EXPLORE the df_4_cli_privacy_clean relevant variables
+
+### variabile Privacy 1 ###
+
+## compute distribution
+df_4_cli_privacy_clean_flag1_distrib <- df_4_cli_privacy_clean %>%
+  group_by(FLAG_PRIVACY_1) %>%
+  dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  arrange(desc(PERCENT))
+
+df_4_cli_privacy_clean_flag1_distrib
+
+## plot distribution
+plot_df_4_cli_privacy_clean_flag1_distrib <- (
+  ggplot(data=df_4_cli_privacy_clean_flag1_distrib
+         , aes(x=FLAG_PRIVACY_1, y=PERCENT)) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df_4_cli_privacy_clean_flag1_distrib
+
+### Variabile Privacy 2 ###
+
+## compute distribution
+df_4_cli_privacy_clean_flag2_distrib <- df_4_cli_privacy_clean %>%
+  group_by(FLAG_PRIVACY_2) %>%
+  dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  arrange(desc(PERCENT))
+
+df_4_cli_privacy_clean_flag2_distrib
+
+## plot distribution
+plot_df_4_cli_privacy_clean_flag2_distrib <- (
+  ggplot(data=df_4_cli_privacy_clean_flag2_distrib
+         , aes(x=FLAG_PRIVACY_2, y=PERCENT)) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df_4_cli_privacy_clean_flag2_distrib
+
+### variabile direct_marketing ###
+
+## compute distribution
+df_4_cli_privacy_clean_flag_mkt_distrib <- df_4_cli_privacy_clean %>%
+  group_by(FLAG_DIRECT_MKT) %>%
+  dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  arrange(desc(PERCENT))
+
+df_4_cli_privacy_clean_flag_mkt_distrib
+
+## plot distribution
+plot_df_4_cli_privacy_clean_flag_mkt_distrib <- (
+  ggplot(data=df_4_cli_privacy_clean_flag_mkt_distrib
+         , aes(x=FLAG_DIRECT_MKT, y=PERCENT)) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df_4_cli_privacy_clean_flag_mkt_distrib
 
 
 #### FINAL REVIEW df_4_clean ####
 
 str(df_4_cli_privacy_clean)
 summary(df_4_cli_privacy_clean)
+
+
+
 
 
 
