@@ -431,26 +431,27 @@ plot_df1_dist_codfid_neg
 str(df_1_cli_fid_clean)
 summary(df_1_cli_fid_clean)
 
-
+#________________________________________________
 
 #### FIRST LOOK of df_2 ####
 
 str(df_2_cli_account)
 summary(df_2_cli_account)
 
+#ci sono persone che hanno aggiunto telefoni e poi NA,
+#che bisognerebbe convertire in 0
+
+#la maggior parte hanno l'account 4
+
+
 #### START CLEANING df_2 ####
 
 df_2_cli_account_clean <- df_2_cli_account
-
-#### CLEANING DUPLICATE VALUES in df_2 ####
 
 ## check for duplicates
 df_2_cli_account_clean %>%
   summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
             , TOT_ROWs = n())
-
-
-#### CLEANING DATA TYPES in df_2 ####
 
 ## format boolean as factor ##
 df_2_cli_account_clean <- df_2_cli_account_clean %>%
@@ -511,12 +512,12 @@ tot_emailproviders
 
 #!!! NOTE: too many different values for EMAIL_PROVIDER to be an useful category !!!#
 
-#### ???? TO DO df_2 ???? ####
-# COMPUTE THE DISTRIBUTION for the remaining df_2_cli_fid_clean variables
 
-#### RESHAPING df_2 ####
+#### EMAIL_PROVIDER ####
+#______________________________________
+##mantieni i valori EMAIL_PROVIDER più frequenti e 
+##aggiungi un livello di fattore comune "ALTRO" per i restanti
 
-## keep the most frequent EMAIL_PROVIDER values and add a common factor level "OTHER" for the remaining ##
 df_2_dist_emailprovider %>%
   arrange(desc(PERCENT)) %>%
   mutate(PERCENT_COVERED = cumsum(TOT_CLIs)/sum(TOT_CLIs)) %>%
@@ -566,7 +567,8 @@ plot_df2_dist_emailproviderclean <- (
 
 plot_df2_dist_emailproviderclean
 
-#### ???? TO DO df_2 ???? ####
+#_____________________________________________________
+
 # EXPLORE the remaining df_2_cli_account_clean relevant variables
 
 #### FINAL REVIEW df_2_clean ####
