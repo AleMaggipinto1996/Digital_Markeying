@@ -566,15 +566,117 @@ plot_df2_dist_emailproviderclean <- (
 )
 
 plot_df2_dist_emailproviderclean
+#è usata soprattutto @gmail
 
 #_____________________________________________________
 
 # EXPLORE the remaining df_2_cli_account_clean relevant variables
 
+
+### variabile occupazione cliente ###
+
+df_2_dist_typJob <- df_2_cli_account_clean %>%
+  group_by(TYP_JOB) %>%
+  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  as.data.frame()
+
+df_2_dist_typJob
+
+# la maggior parte della colonna ha dati mancanti
+# uniamo non dichiarati con quelli mancanti
+
+df_2_typJob_miss <- df_2_dist_typJob %>% 
+  filter(TYP_JOB == "(missing)")
+
+df_2_typJob_nondic <- df_2_dist_typJob %>% 
+  filter(TYP_JOB == "Non Dichiara") %>%
+  mutate(TOT_CLIs = TOT_CLIs + df_2_typJob_miss[, "TOT_CLIs"])
+
+df_2_dist_typJob <- df_2_dist_typJob %>% 
+  filter(TYP_JOB != "Non Dichiara" & TYP_JOB != "(missing)") %>%
+  bind_rows(df_2_typJob_nondic) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs))
+
+df_2_dist_typJob
+
+n_cli = sum((df_2_dist_typJob %>% filter(TYP_JOB != "Non Dichiara"))$TOT_CLIs)
+
+#mostriamo l'occupazione dei clienti togliendo la percentuale di quelli non dichiarati
+
+plot_df_2_dist_typJob <- df_2_dist_typJob %>%
+  filter(TYP_JOB != "Non Dichiara") %>%
+  group_by(TYP_JOB) %>%
+  dplyr::summarize(PERCENT = TOT_CLIs / n_cli) %>%
+  ggplot(aes(PERCENT, TYP_JOB)) +
+  ggtitle("Occupazione clienti") +
+  geom_bar(stat = "identity", fill = "#005c99", color = "#005c99") +
+  xlab("Percentuale clienti") +
+  ylab("Occupazione clienti") +
+  scale_x_continuous(breaks = seq(0,1,0.1), labels = scales::percent_format(scale = 100)) +
+  theme_grey() +
+  theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold")) +
+  theme(axis.text = element_text(size = 10, face = "italic")) +
+  theme(axis.title = element_text(size = 13))
+
+plot_df_2_dist_typJob
+
+
+### variabile W_PHONE ###
+
+## compute distribution
+df_2_cli_phone <- df_2_cli_account_clean %>%
+  group_by(W_PHONE) %>%
+  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT))
+
+df_2_cli_phone
+
+## plot distribution
+
+plot_df_2_cli_phone <- (
+  ggplot(data=df_2_cli_phone
+         , aes(x=W_PHONE, y=TOT_CLIs)
+  ) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df_2_cli_phone
+
+
+### variabile W_PHONE ###
+
+## compute distribution
+df_2_cli_type <- df_2_cli_account_clean %>%
+  group_by(TYP_CLI_ACCOUNT) %>%
+  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT))
+
+df_2_cli_type
+
+## plot distribution
+
+plot_df_2_cli_type <- (
+  ggplot(data=df_2_cli_type
+         , aes(x=TYP_CLI_ACCOUNT, y=TOT_CLIs)
+  ) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df_2_cli_type
+
 #### FINAL REVIEW df_2_clean ####
 
 str(df_2_cli_account_clean)
 summary(df_2_cli_account_clean)
+
+
 
 
 
@@ -598,6 +700,7 @@ df_3_cli_address_clean %>%
 
 df_3_cli_address_clean <- df_3_cli_address_clean %>%
   distinct()
+
 
 #### CLEANING DATA TYPES in df_3 ####
 
