@@ -98,20 +98,22 @@ df_1_cli_fid_clean %>% summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(DT_ACTIVE = as.Date(DT_ACTIVE))
 
-### Formattazione delle categorie numeriche in fattori ##
+### Formattazione boleani in fattori ##
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(TYP_CLI_FID = as.factor(TYP_CLI_FID)) %>%
   mutate(STATUS_FID = as.factor(STATUS_FID))
 
+### Numero di programmi fedeltà per numero di clienti ##
 ##quante sottoscrizioni ho per ciascun cliente?
-## Numero di programmi fedeltà per numero di clienti ##
+
 num_fid_x_cli <- df_1_cli_fid_clean %>%
   group_by(ID_CLI) %>%
   summarize(NUM_FIDs =  n_distinct(ID_FID)
             , NUM_DATEs = n_distinct(DT_ACTIVE)
   )
 
-
+#ci sono clienti che vedendo la data hanno probabilmente sbagliato/cambiato la fidelizzazione più volte
+#nello stesso giorno
 
 tot_id_cli <- n_distinct(num_fid_x_cli$ID_CLI)
 
@@ -123,7 +125,7 @@ dist_num_fid_x_cli <- num_fid_x_cli %>%
 
 dist_num_fid_x_cli
 
-##Ci sono clienti con molteplici programmi fedeltà##
+## Ci sono clienti con molteplici programmi fedeltà ##
 # let examine in details clients with multiple subscriptions#
 
 num_fid_x_cli %>% filter(NUM_FIDs == 3)
@@ -214,8 +216,58 @@ plot_df1_dist_codfid
 
 #è importante capire il modo migliore per presentare i dati
 
-#### ????  da fare####
+
 ######### EXPLORE the remaining df_1_cli_fid_clean relevant variables###########
+
+### variable LAST_DT_ACTIVE ###
+
+## compute distribution
+df1_dist_codfid <- df_1_cli_fid_clean %>%
+  group_by(substring(LAST_DT_ACTIVE,1,4)) %>%
+  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT)) %>% 
+  rename(Year = `substring(LAST_DT_ACTIVE, 1, 4)`)
+
+df1_dist_codfid
+
+## plot distribution
+
+plot_df1_dist_codfid <- (
+  ggplot(data=df1_dist_codfid
+         , aes(x=Year, y=TOT_CLIs)
+  ) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df1_dist_codfid
+
+### variable FIRST_DT_ACTIVE ###
+
+## compute distribution
+df1_dist_codfid <- df_1_cli_fid_clean %>%
+  group_by(substring(FIRST_DT_ACTIVE,1,4)) %>%
+  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT)) %>% 
+  rename(Year = `substring(FIRST_DT_ACTIVE, 1, 4)`)
+
+df1_dist_codfid
+
+## plot distribution
+
+plot_df1_dist_codfid <- (
+  ggplot(data=df1_dist_codfid
+         , aes(x=Year, y=TOT_CLIs)
+  ) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df1_dist_codfid
 
 #### FINAL REVIEW df_1_clean ####
 
