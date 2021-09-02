@@ -957,6 +957,19 @@ df_5_camp_cat_clean <- df_5_camp_cat
 df_5_camp_cat_clean <- df_5_camp_cat_clean %>%
   select(-CHANNEL_CAMP)
 
+## variabile TYP_CAMP ##
+
+## compute distribution
+df_5_camp_cat_type_camp <- df_5_camp_cat_clean %>%
+  group_by(TYP_CAMP) %>%
+  dplyr::summarize(TOT_IDs = n_distinct(ID_CAMP)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  arrange(desc(PERCENT))
+
+df_5_camp_cat_type_camp
+
+
+
 #### FINAL REVIEW df_5_clean ####
 
 str(df_5_camp_cat_clean)
