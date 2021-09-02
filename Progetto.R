@@ -27,8 +27,8 @@ library(arulesViz)
 library(tidyr)
 
 ####DIRECTORIES####
-#working_dir =
-#data_dir =
+#working_dir = 
+#data_dir = 
 #setwd(working_dir)
 
 #------------------------------------
@@ -376,7 +376,7 @@ plot_df1_dist_codfid_n <- (
 
 plot_df1_dist_codfid_n
 
-### variable LAST_TYP_CLI_FID ###
+### variable LAST_TYP_CLI_FID ???? ###
 
 ## compute distribution
 df1_dist_codfid_main <- df_1_cli_fid_clean %>%
@@ -647,7 +647,7 @@ plot_df_2_cli_phone <- (
 plot_df_2_cli_phone
 
 
-### variabile W_PHONE ###
+### variabile TYP_ACCOUNT ###
 
 ## compute distribution
 df_2_cli_type <- df_2_cli_account_clean %>%
