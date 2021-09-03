@@ -183,6 +183,20 @@ df_1_cli_fid_clean <- df_1_cli_fid_last %>%
               mutate(NUM_FIDs = as.factor(NUM_FIDs))
             , by = 'ID_CLI')
 
+### variabile Negozio Online / Negozio Fisico ###
+
+#creo una nuova colonna 0/1 è 1 se si tratta di negozi online, 
+#è 0 se si tratta di negozi fisici
+
+NegOnline <- as.data.frame(df_1_cli_fid_clean$FIRST_ID_NEG)
+colnames(NegOnline)<- "NegOnline"
+
+NegOnline <- NegOnline %>% mutate(NegOnline = as.factor(if_else(NegOnline!= 1, "0", as.character(NegOnline))))
+
+df_1_cli_fid_clean$NegOnline <- NegOnline$NegOnline
+
+
+
 ## EXPLORE COLUMNS of df_1 ##
 
 ### variable LAST_COD_FID ###
@@ -414,26 +428,20 @@ plot_df1_p_codfid_main
 
 
 ### variabile Negozio Online / Negozio Fisico ###
-#come visualizzare negozi == 1  e tutti gli altri??
-
-#creo una nuova colonna 0/1 è 1 se si tratta di negozi online, 
-#è 0 se si tratta di negozi fisici
-
-
 
 ## compute distribution
-df1_dist_codfid_neg <- df_1_cli_fid_clean %>%
-  group_by(FIRST_ID_NEG) %>%
+df1_p_codfid_neg <- df_1_cli_fid_clean %>%
+  group_by(NegOnline) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df1_dist_codfid_neg
+df1_p_codfid_neg
 
 ## plot distribution
 
-plot_df1_dist_codfid_neg <- (
-  ggplot(data=df1_dist_codfid_neg
+plot_df1_p_codfid_neg <- (
+  ggplot(data=df1_p_codfid_neg
          , aes(x=FIRST_ID_NEG, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -441,7 +449,7 @@ plot_df1_dist_codfid_neg <- (
     theme_minimal()
 )
 
-plot_df1_dist_codfid_neg
+plot_df1_p_codfid_neg
 
 
 #### FINAL REVIEW df_1_clean ####
@@ -509,6 +517,8 @@ cons_idcli_df1_df2 <- df_1_cli_fid_clean %>%
 cons_idcli_df1_df2
 
 #!!! NOTE: all ID_CLI in df_1 are also in df_2 and vice-versa !!!#
+
+#### considero solo dataset persone ####
 
 #### EXPLORE COLUMNS of df_2 ####
 
