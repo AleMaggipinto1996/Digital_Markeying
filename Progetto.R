@@ -216,26 +216,38 @@ plot_df1_dist_codfid
 
 #è importante capire il modo migliore per presentare i dati
 
+##### SEPARIAMO IN DUE DATASET AZIENDE/PERSONE ####
 
-######### EXPLORE the remaining df_1_cli_fid_clean relevant variables###########
+df_1_aziende <- df_1_cli_fid_clean %>%  
+  filter(LAST_COD_FID == 'PREMIUM BIZ' | LAST_COD_FID == 'STANDARD BIZ')
+
+df_1_persone <- df_1_cli_fid_clean %>%  
+  filter(LAST_COD_FID == 'PREMIUM' | LAST_COD_FID == 'STANDARD')
+
+#_________________________________________
+
+############# nei vari dataset consideriamo la parte che riguarda le persone fisiche ###########à
+
+#_________________________________________
+
 
 ### variable LAST_DT_ACTIVE per MESI ###
 
 ## compute distribution 
-df1_dist_codfid_ld <- df_1_cli_fid_clean %>%
+df1_persone_codfid_ld <- df_1_persone %>%
   group_by(substring(LAST_DT_ACTIVE,1,7)) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT)) %>% 
   rename(Mesi = `substring(LAST_DT_ACTIVE, 1, 7)`)
 
-df1_dist_codfid_ld
+df1_persone_codfid_ld
 
 
 ## plot distribution
 
-plot_df1_dist_codfid_ld <- (
-  ggplot(data=df1_dist_codfid_ld
+plot_df1_persone_codfid_ld <- (
+  ggplot(data=df1_persone_codfid_ld
          , aes(x=Mesi, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -243,26 +255,26 @@ plot_df1_dist_codfid_ld <- (
     theme_minimal()
 )
 
-plot_df1_dist_codfid_ld
+plot_df1_persone_codfid_ld
 
 
 ### variable LAST_DT_ACTIVE per ANNI ###
 
 ## compute distribution 
-df1_dist_codfid_ld <- df_1_cli_fid_clean %>%
+df1_p_codfid_ld <- df_1_persone %>%
   group_by(substring(LAST_DT_ACTIVE,1,4)) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT)) %>% 
   rename(Year = `substring(LAST_DT_ACTIVE, 1, 4)`)
 
-df1_dist_codfid_ld
+df1_p_codfid_ld
 
 
 ## plot distribution
 
-plot_df1_dist_codfid_ld <- (
-  ggplot(data=df1_dist_codfid_ld
+plot_df1_p_codfid_ld <- (
+  ggplot(data=df1_p_codfid_ld
          , aes(x=Year, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -270,25 +282,25 @@ plot_df1_dist_codfid_ld <- (
     theme_minimal()
 )
 
-plot_df1_dist_codfid_ld
+plot_df1_p_codfid_ld
 
 
 ### variable FIRST_DT_ACTIVE per MESI ###
 
 ## compute distribution
-df1_dist_codfid_fd <- df_1_cli_fid_clean %>%
+df1_p_codfid_fd <- df_1_persone %>%
   group_by(substring(FIRST_DT_ACTIVE,1,7)) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT)) %>% 
   rename(Mesi = `substring(FIRST_DT_ACTIVE, 1, 7)`)
 
-df1_dist_codfid_fd
+df1_p_codfid_fd
 
 ## plot distribution
 
-plot_df1_dist_codfid_fd <- (
-  ggplot(data=df1_dist_codfid_fd
+plot_df1_p_codfid_fd <- (
+  ggplot(data=df1_p_codfid_fd
          , aes(x=Mesi, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -296,26 +308,26 @@ plot_df1_dist_codfid_fd <- (
     theme_minimal()
 )
 
-plot_df1_dist_codfid_fd
+plot_df1_p_codfid_fd
 
 
 
 ### variable FIRST_DT_ACTIVE per ANNI ###
 
 ## compute distribution
-df1_dist_codfid_fd <- df_1_cli_fid_clean %>%
+df1_p_codfid_fd <- df_1_persone %>%
   group_by(substring(FIRST_DT_ACTIVE,1,4)) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT)) %>% 
   rename(Year = `substring(FIRST_DT_ACTIVE, 1, 4)`)
 
-df1_dist_codfid_fd
+df1_p_codfid_fd
 
 ## plot distribution
 
-plot_df1_dist_codfid_fd <- (
-  ggplot(data=df1_dist_codfid_fd
+plot_df1_p_codfid_fd <- (
+  ggplot(data=df1_p_codfid_fd
          , aes(x=Year, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -329,19 +341,19 @@ plot_df1_dist_codfid_fd
 ### variable LAST_STATUS_FID ###
 
 ## compute distribution
-df1_dist_codfid_status <- df_1_cli_fid_clean %>%
+df1_p_codfid_status <- df_1_persone %>%
   group_by(LAST_STATUS_FID) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
 
-df1_dist_codfid_status
+df1_p_codfid_status
 
 ## plot distribution
 
-plot_df1_dist_codfid_status <- (
-  ggplot(data=df1_dist_codfid_status
+plot_df1_p_codfid_status <- (
+  ggplot(data=df1_dist_p_status
          , aes(x=LAST_STATUS_FID, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -349,24 +361,24 @@ plot_df1_dist_codfid_status <- (
     theme_minimal()
 )
 
-plot_df1_dist_codfid_status
+plot_df1_p_codfid_status
 
 
 ### variable NUM_FIDS ###
 
 ## compute distribution
-df1_dist_codfid_n <- df_1_cli_fid_clean %>%
+df1_p_codfid_n <- df_1_persone%>%
   group_by(NUM_FIDs) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df1_dist_codfid_n
+df1_p_codfid_n
 
 ## plot distribution
 
-plot_df1_dist_codfid_n <- (
-  ggplot(data=df1_dist_codfid_n
+plot_df1_p_codfid_n <- (
+  ggplot(data=df1_p_codfid_n
          , aes(x=NUM_FIDs, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -374,23 +386,23 @@ plot_df1_dist_codfid_n <- (
     theme_minimal()
 )
 
-plot_df1_dist_codfid_n
+plot_df1_p_codfid_n
 
-### variable LAST_TYP_CLI_FID ???? ###
+### variable LAST_TYP_CLI_FID ???? non abbiamo capito che vuol dire ###
 
 ## compute distribution
-df1_dist_codfid_main <- df_1_cli_fid_clean %>%
+df1_p_codfid_main <- df_1_persone %>%
   group_by(LAST_TYP_CLI_FID) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df1_dist_codfid_main
+df1_p_codfid_main
 
 ## plot distribution
 
-plot_df1_dist_codfid_main <- (
-  ggplot(data=df1_dist_codfid_main
+plot_df1_p_codfid_main <- (
+  ggplot(data=df1_p_codfid_main
          , aes(x=LAST_TYP_CLI_FID, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -398,11 +410,17 @@ plot_df1_dist_codfid_main <- (
     theme_minimal()
 )
 
-plot_df1_dist_codfid_main
+plot_df1_p_codfid_main
 
 
 ### variabile Negozio Online / Negozio Fisico ###
 #come visualizzare negozi == 1  e tutti gli altri??
+
+#creo una nuova colonna 0/1 è 1 se si tratta di negozi online, 
+#è 0 se si tratta di negozi fisici
+
+
+
 ## compute distribution
 df1_dist_codfid_neg <- df_1_cli_fid_clean %>%
   group_by(FIRST_ID_NEG) %>%
