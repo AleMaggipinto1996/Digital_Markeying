@@ -17,6 +17,7 @@ library(forcats)
 library(lubridate)
 library(RQuantLib)
 library(rfm)
+
 library(caret)
 library(rpart)
 library(rpart.plot)
@@ -183,17 +184,17 @@ df_1_cli_fid_clean <- df_1_cli_fid_last %>%
               mutate(NUM_FIDs = as.factor(NUM_FIDs))
             , by = 'ID_CLI')
 
-### variabile Negozio Online / Negozio Fisico ###
+### variabile Registrazione Online / Negozio Fisico ###
 
-#creo una nuova colonna 0/1 è 1 se si tratta di negozi online, 
-#è 0 se si tratta di negozi fisici
+#creo una nuova colonna 0/1: è 1 se si tratta di registrazione online, 
+#è 0 se è stata fatta nel negozio
 
-NegOnline <- as.data.frame(df_1_cli_fid_clean$FIRST_ID_NEG)
-colnames(NegOnline)<- "NegOnline"
+RegOnline <- as.data.frame(df_1_cli_fid_clean$FIRST_ID_NEG)
+colnames(RegOnline)<- "RegOnline"
 
-NegOnline <- NegOnline %>% mutate(NegOnline = as.factor(if_else(NegOnline!= 1, "0", as.character(NegOnline))))
+RegOnline <- RegOnline %>% mutate(RegOnline = as.factor(if_else(RegOnline!= 1, "0", as.character(RegOnline))))
 
-df_1_cli_fid_clean$NegOnline <- NegOnline$NegOnline
+df_1_cli_fid_clean$RegOnline <- RegOnline$RegOnline
 
 
 
@@ -240,7 +241,7 @@ df_1_persone <- df_1_cli_fid_clean %>%
 
 #_________________________________________
 
-############# nei vari dataset consideriamo la parte che riguarda le persone fisiche ###########à
+############# consideriamo la parte che riguarda le persone fisiche ###########à
 
 #_________________________________________
 
@@ -518,23 +519,52 @@ cons_idcli_df1_df2
 
 #!!! NOTE: all ID_CLI in df_1 are also in df_2 and vice-versa !!!#
 
-#### considero solo dataset persone ####
+#### divido dataset tra persone e aziende ####
 
-#### EXPLORE COLUMNS of df_2 ####
+df_2_aziende <- df_2_cli_account_clean %>%  
+  filter(TYP_CLI_ACCOUNT == 2)
+
+df_2_persone <- df_2_cli_account_clean %>%  
+  filter(TYP_CLI_ACCOUNT == 4)
+
+
+cons_idcli_df1_df2 <- df_1_persone %>%
+  select(ID_CLI) %>%
+  mutate(is_in_df_1 = 1) %>%
+  distinct() %>%
+  full_join(df_2_persone %>%
+              select(ID_CLI) %>%
+              mutate(is_in_df_2 = 1) %>%
+              distinct()
+            , by = "ID_CLI"
+  ) %>%
+  group_by(is_in_df_1, is_in_df_2) %>%
+  summarize(NUM_ID_CLIs = n_distinct(ID_CLI)) %>%
+  as.data.frame()
+
+cons_idcli_df1_df2
+
+#ci sono 22 casi che nel df2 sono registrati come persone e nel df1 come aziende
+# df2 333656 invece df1 333634
+
+## come gestiamo questi 22 casi? ci sarà un errore, gli eliminiamo?
+
+
+#### EXPLORE COLUMNS of df_2_ PERSONE ####
 
 ### Variable EMAIL_PROVIDER ###
 
 ## compute distribution
-df_2_dist_emailprovider <- df_2_cli_account_clean %>%
+df_2_p_emailprovider <- df_2_persone %>%
   group_by(EMAIL_PROVIDER) %>%
   summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT)) %>%
   as.data.frame()
 
-df_2_dist_emailprovider
+df_2_p_emailprovider
 
-tot_emailproviders <- n_distinct(df_2_dist_emailprovider$EMAIL_PROVIDER)
+tot_emailproviders <- n_distinct(df_2_p_emailprovider$EMAIL_PROVIDER)
 
 tot_emailproviders
 
@@ -546,7 +576,7 @@ tot_emailproviders
 ##mantieni i valori EMAIL_PROVIDER più frequenti e 
 ##aggiungi un livello di fattore comune "ALTRO" per i restanti
 
-df_2_dist_emailprovider %>%
+df_2_p_emailprovider %>%
   arrange(desc(PERCENT)) %>%
   mutate(PERCENT_COVERED = cumsum(TOT_CLIs)/sum(TOT_CLIs)) %>%
   as.data.frame() %>%
@@ -554,7 +584,7 @@ df_2_dist_emailprovider %>%
 
 ## always keep the (missing) level for technical reasons
 ## select levels that cover the 85% of the cases, the remaining 15% 
-clean_email_providers <- df_2_dist_emailprovider %>%
+clean_email_providers <- df_2_p_emailprovider %>%
   arrange(desc(PERCENT)) %>%
   mutate(PERCENT_COVERED = cumsum(TOT_CLIs)/sum(TOT_CLIs)) %>%
   mutate(EMAIL_PROVIDER = as.character(EMAIL_PROVIDER)) %>%
@@ -564,7 +594,7 @@ clean_email_providers <- df_2_dist_emailprovider %>%
 head(clean_email_providers, 20)
 
 ## add clean EMAIL_PROVIDER ##
-df_2_cli_account_clean <- df_2_cli_account_clean %>%
+df_2_persone <- df_2_persone %>%
   mutate(EMAIL_PROVIDER = as.character(EMAIL_PROVIDER)) %>%
   left_join(clean_email_providers %>%
               select(EMAIL_PROVIDER, EMAIL_PROVIDER_CLEAN)
@@ -576,63 +606,63 @@ df_2_cli_account_clean <- df_2_cli_account_clean %>%
 #### EXPLORE NEW COLUMNS EMAIL_PROVIDER_CLEAN in df_2 ####
 
 ## compute distribution
-df2_dist_emailproviderclean <- df_2_cli_account_clean %>%
+df2_p_emailproviderclean <- df_2_persone %>%
   group_by(EMAIL_PROVIDER_CLEAN) %>%
   summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df2_dist_emailproviderclean
+df2_p_emailproviderclean
 
 ## plot distribution
-plot_df2_dist_emailproviderclean <- (
-  ggplot(data=df2_dist_emailproviderclean
+plot_df2_p_emailproviderclean <- (
+  ggplot(data=df2_p_emailproviderclean
          , aes(x=EMAIL_PROVIDER_CLEAN, y=TOT_CLIs)) +
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal()
 )
 
-plot_df2_dist_emailproviderclean
+plot_df2_p_emailproviderclean
 #è usata soprattutto @gmail
 
 #_____________________________________________________
 
-# EXPLORE the remaining df_2_cli_account_clean relevant variables
+# EXPLORE the remaining relevant variables
 
 
 ### variabile occupazione cliente ###
 
-df_2_dist_typJob <- df_2_cli_account_clean %>%
+df_2_p_typJob <- df_2_persone %>%
   group_by(TYP_JOB) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   as.data.frame()
 
-df_2_dist_typJob
+df_2_p_typJob
 
 # la maggior parte della colonna ha dati mancanti
 # uniamo non dichiarati con quelli mancanti
 
-df_2_typJob_miss <- df_2_dist_typJob %>% 
+df_2_typJob_miss <- df_2_p_typJob %>% 
   filter(TYP_JOB == "(missing)")
 
-df_2_typJob_nondic <- df_2_dist_typJob %>% 
+df_2_typJob_nondic <- df_2_p_typJob %>% 
   filter(TYP_JOB == "Non Dichiara") %>%
   mutate(TOT_CLIs = TOT_CLIs + df_2_typJob_miss[, "TOT_CLIs"])
 
-df_2_dist_typJob <- df_2_dist_typJob %>% 
+df_2_p_typJob <- df_2_p_typJob %>% 
   filter(TYP_JOB != "Non Dichiara" & TYP_JOB != "(missing)") %>%
   bind_rows(df_2_typJob_nondic) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs))
 
-df_2_dist_typJob
+df_2_p_typJob
 
-n_cli = sum((df_2_dist_typJob %>% filter(TYP_JOB != "Non Dichiara"))$TOT_CLIs)
+n_cli = sum((df_2_p_typJob %>% filter(TYP_JOB != "Non Dichiara"))$TOT_CLIs)
 
 #mostriamo l'occupazione dei clienti togliendo la percentuale di quelli non dichiarati
 
-plot_df_2_dist_typJob <- df_2_dist_typJob %>%
+plot_df_2_p_typJob <- df_2_p_typJob %>%
   filter(TYP_JOB != "Non Dichiara") %>%
   group_by(TYP_JOB) %>%
   dplyr::summarize(PERCENT = TOT_CLIs / n_cli) %>%
@@ -647,24 +677,26 @@ plot_df_2_dist_typJob <- df_2_dist_typJob %>%
   theme(axis.text = element_text(size = 10, face = "italic")) +
   theme(axis.title = element_text(size = 13))
 
-plot_df_2_dist_typJob
+plot_df_2_p_typJob
+
+
 
 
 ### variabile W_PHONE ###
 
 ## compute distribution
-df_2_cli_phone <- df_2_cli_account_clean %>%
+df_2_p_phone <- df_2_persone %>%
   group_by(W_PHONE) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df_2_cli_phone
+df_2_p_phone
 
 ## plot distribution
 
-plot_df_2_cli_phone <- (
-  ggplot(data=df_2_cli_phone
+plot_df_2_p_phone <- (
+  ggplot(data=df_2_p_phone
          , aes(x=W_PHONE, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -672,24 +704,24 @@ plot_df_2_cli_phone <- (
     theme_minimal()
 )
 
-plot_df_2_cli_phone
+plot_df_2_p_phone
 
 
 ### variabile TYP_ACCOUNT ###
 
 ## compute distribution
-df_2_cli_type <- df_2_cli_account_clean %>%
+df_2_p_type <- df_2_persone %>%
   group_by(TYP_CLI_ACCOUNT) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df_2_cli_type
+df_2_p_type
 
 ## plot distribution
 
-plot_df_2_cli_type <- (
-  ggplot(data=df_2_cli_type
+plot_df_2_p_type <- (
+  ggplot(data=df_2_p_type
          , aes(x=TYP_CLI_ACCOUNT, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -769,8 +801,12 @@ cons_idaddress_df2_df3 <- df_2_cli_account_clean %>%
 
 cons_idaddress_df2_df3
 
+
 #!!! NOTE:  there are ID_ADDRESSes actually not mapped in df_3 !!!#
 #!!!        this issue should be taken into account in joining these two tables !!!#
+
+#### abbiamo l'indirizzo, possiamo estrapolare le persone che hanno l'indirizzo nel df_2
+###se ci servirà 
 
 #### EXPLORE COLUMNS of df_3 ####
 
