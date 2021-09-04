@@ -1261,14 +1261,34 @@ df_6_camp_event_clean_final <- df_sends %>%
 
 ##### consideriamo la categoria persone ######
 
+df_6_persone <- merge( id_persone,df_6_camp_event_clean_final, by="ID_CLI")
 
+cons_idcli_df1_df6 <- df_1_persone %>%
+  select(ID_CLI) %>%
+  distinct() %>%
+  mutate(is_in_df_1 = 1) %>%
+  distinct() %>%
+  full_join(df_6_persone %>%
+              select(ID_CLI) %>%
+              distinct() %>%
+              mutate(is_in_df_6 = 1) %>%
+              distinct()
+            , by = "ID_CLI"
+  ) %>%
+  group_by(is_in_df_1, is_in_df_6) %>%
+  summarize(NUM_ID_CLIs = n_distinct(ID_CLI)) %>%
+  as.data.frame()
+
+cons_idcli_df1_df6
+
+#### anche qui tutte quelle in df_6 sono mappate in df_1, ma non tutte quelle di df_1 sono in df_6
 
 #### EXPLORE VARIABLES in df_6 ####
 
 ### GENERAL OVERVIEW ###
 
 ## compute aggregate
-df6_overview <- df_6_camp_event_clean_final %>% 
+df6_overview <- df_6_persone %>% 
   summarize(MIN_DATE = min(SEND_DATE)
             , MAX_DATE = max(SEND_DATE)
             , TOT_EVENTs = n_distinct(ID_EVENT_S)
@@ -1279,7 +1299,7 @@ df6_overview
 ### GENERAL OVERVIEW by TYP_CAMP ###
 
 ## compute aggregate
-df6_overviewbytyp <- df_6_camp_event_clean_final %>%
+df6_overviewbytyp <- df_6_persone %>%
   group_by(TYP_CAMP) %>%
   summarize(MIN_DATE = min(SEND_DATE)
             , MAX_DATE = max(SEND_DATE)
@@ -1298,10 +1318,12 @@ plot_df6_overviewbytyp <- (
 
 plot_df6_overviewbytyp
 
+###sono state fatte soprattutto campagne nazionali
+
 ### Variable OPENED ###
 
 ## compute aggregate
-df6_dist_opened <- df_6_camp_event_clean_final %>%
+df6_dist_opened <- df_6_persone %>%
   group_by(OPENED) %>%
   summarize(TOT_EVENTs = n_distinct(ID_EVENT_S)
             , TOT_CLIs = n_distinct(ID_CLI)) %>%
@@ -1321,10 +1343,12 @@ plot_df6_dist_opened <- (
 
 plot_df6_dist_opened
 
+### per la maggior parte non sono state aperte
+
 ### Variable OPENED by TYP_CAMP ###
 
 ## compute aggregate
-df6_dist_openedbytyp <- df_6_camp_event_clean_final %>%
+df6_dist_openedbytyp <- df_6_persone %>%
   group_by(TYP_CAMP, OPENED)  %>%
   summarize(TOT_EVENTs = n_distinct(ID_EVENT_S)
             , TOT_CLIs = n_distinct(ID_CLI)) %>%
@@ -1365,10 +1389,13 @@ plot_df6_dist_openedbytyp_percent <- (
 
 plot_df6_dist_openedbytyp_percent
 
+#### sono state aperte di più quelle riferite al prodotto, poi
+### quelle personalizzare, quelle locali e infine quelle nazionali
+
 ### Variable DAYS_TO_OPEN
 
 ## compute aggregate
-df6_dist_daystoopen <- df_6_camp_event_clean_final %>%
+df6_dist_daystoopen <- df_6_persone %>%
   filter(OPENED) %>%
   group_by(ID_CLI) %>%
   summarize(AVG_DAYS_TO_OPEN = floor(mean(DAYS_TO_OPEN))) %>%
@@ -1389,7 +1416,10 @@ plot_df6_dist_daystoopen <- (
 
 plot_df6_dist_daystoopen
 
-### DAYS_TO_OPEN vs CUMULATE PERCENT ###
+#### la maggior parte vengono aperte subito o il giorno dopo
+##più passano i giorni più diminuiscono
+
+### DAYS_TO_OPEN vs CUMULATE PERCENT ### ???????
 
 ## compute aggregate
 df6_dist_daystoopen_vs_cumulate <- df6_dist_daystoopen %>%
