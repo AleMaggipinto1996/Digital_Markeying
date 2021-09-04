@@ -1439,17 +1439,157 @@ plot_df6_dist_daystoopen_vs_cumulate <- (
 
 plot_df6_dist_daystoopen_vs_cumulate
 
-#### ???? TO DO df_6 ???? ####
 # EXPLORE the following relevant variables in df_6_camp_event_clean_final:
+
 # - CLICKED/CLICKED by TYP_CAMP
+
+df6_dist_clickedbytyp <- df_6_persone %>%
+  group_by(TYP_CAMP, CLICKED)  %>%
+  summarize(TOT_EVENTs = n_distinct(ID_EVENT_S)
+                   , TOT_CLIs = n_distinct(ID_CLI)) %>%
+  left_join(df6_overviewbytyp %>%
+              select(TYP_CAMP
+                     , ALL_TOT_EVENTs = TOT_EVENTs
+                     , ALL_TOT_CLIs = TOT_CLIs)
+            , by='TYP_CAMP') %>%
+  mutate(PERCENT_EVENTs = TOT_EVENTs/ALL_TOT_EVENTs
+         , PERCENT_CLIs = TOT_CLIs/ALL_TOT_CLIs) %>%
+  select(TYP_CAMP
+         , CLICKED
+         , TOT_EVENTs
+         , TOT_CLIs
+         , PERCENT_EVENTs
+         , PERCENT_CLIs
+  )
+
+df6_dist_clickedbytyp
+
+## plot aggregate
+plot_df6_dist_clickedbytyp <- (
+  ggplot(data=df6_dist_clickedbytyp
+         , aes(fill=CLICKED, x=TYP_CAMP, y=TOT_EVENTs)) +
+    geom_bar(stat="identity") +
+    theme_minimal()
+)
+
+plot_df6_dist_clickedbytyp
+
+## plot aggregate percent
+plot_df6_dist_clickedbytyp_percent <- (
+  ggplot(data=df6_dist_clickedbytyp
+         , aes(fill=CLICKED, x=TYP_CAMP, y=TOT_EVENTs)) +
+    geom_bar(position="fill", stat="identity") +
+    theme_minimal()
+)
+
+plot_df6_dist_clickedbytyp_percent
+
+# in generale pochissimi click
+#più sui prodotti e quelli nazionali
+
+
 # - FAILED/FAILED by TYP_CAP
+
+## compute aggregate
+df6_dist_failedbytyp <- df_6_persone %>%
+  group_by(TYP_CAMP, FAILED)  %>%
+  summarize(TOT_EVENTs = n_distinct(ID_EVENT_S)
+                   , TOT_CLIs = n_distinct(ID_CLI)) %>%
+  left_join(df6_overviewbytyp %>%
+              select(TYP_CAMP
+                     , ALL_TOT_EVENTs = TOT_EVENTs
+                     , ALL_TOT_CLIs = TOT_CLIs)
+            , by='TYP_CAMP') %>%
+  mutate(PERCENT_EVENTs = TOT_EVENTs/ALL_TOT_EVENTs
+         , PERCENT_CLIs = TOT_CLIs/ALL_TOT_CLIs) %>%
+  select(TYP_CAMP
+         , FAILED
+         , TOT_EVENTs
+         , TOT_CLIs
+         , PERCENT_EVENTs
+         , PERCENT_CLIs
+  )
+
+df6_dist_failedbytyp
+
+## plot aggregate
+plot_df6_dist_failedbytyp <- (
+  ggplot(data=df6_dist_failedbytyp
+         , aes(fill=FAILED, x=TYP_CAMP, y=TOT_EVENTs)) +
+    geom_bar(stat="identity") +
+    theme_minimal()
+)
+
+plot_df6_dist_failedbytyp
+
+## plot aggregate percent
+plot_df6_dist_failedbytyp_percent <- (
+  ggplot(data=df6_dist_failedbytyp
+         , aes(fill=FAILED, x=TYP_CAMP, y=TOT_EVENTs)) +
+    geom_bar(position="fill", stat="identity") +
+    theme_minimal()
+)
+
+plot_df6_dist_failedbytyp_percent
+
+# pochi eventi falliti, ma soprattutto quelli nazionali
+
 # - NUM_OPENs
+
+# compute aggregate
+df6_dist_num_opens <- df_6_persone %>%
+  filter(OPENED) %>%
+  group_by(ID_CLI) %>%
+  summarize(AVG_OPENs = floor(mean(NUM_OPENs))) %>%
+  ungroup() %>%
+  group_by(AVG_OPENs) %>%
+  summarize(TOT_CLIs = n_distinct(ID_CLI))
+
+df6_dist_num_opens 
+
+## plot 
+plot_df6_dist_num_opens <- (
+  ggplot(data=df6_dist_num_opens
+         , aes(x=AVG_OPENs, y=TOT_CLIs)) +
+    geom_bar(stat="identity", fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df6_dist_num_opens
+
+#pochi clienti riaprono più di una volta, molto pochi più di due
+
 # - NUM_CLICKs
+
+# compute aggregate
+df6_num_clicks <- df_6_persone %>%
+  filter(CLICKED) %>%
+  group_by(ID_CLI) %>%
+  summarize(AVG_CLICKs = floor(sum(NUM_CLICKs))) %>%
+  ungroup() 
+df6_dist_num_clicks <- df6_num_clicks %>%
+  group_by(AVG_CLICKs) %>%
+  summarize(TOT_CLIs = n_distinct(ID_CLI))
+
+df6_dist_num_clicks
+
+## plot 
+plot_df6_dist_num_clicks <- (
+  ggplot(data=df6_dist_num_clicks
+         , aes(x=AVG_CLICKs, y=TOT_CLIs)) +
+    geom_bar(stat="identity", fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df6_dist_num_clicks
+
+# per i click sono stati cliccati diverse volte, ma principalemnte sempre una volta
+
 
 #### FINAL REVIEW df_6_clean ####
 
-str(df_6_camp_event_clean_final)
-summary(df_6_camp_event_clean_final)
+str(df_6_persone)
+summary(df_6_persone)
 
 
 
