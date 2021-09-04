@@ -1655,6 +1655,8 @@ df_7_tic_clean_final <- df_7_tic_clean %>%
   )
   )
 
+## aggiunto se è weekend, festivo, giorno della settimana, altro
+## ?????
 
 df_7_persone <- merge( id_persone,df_7_tic_clean_final, by="ID_CLI")
 
@@ -1683,7 +1685,7 @@ cons_idcli_df1_df7
 ### GENERAL OVERVIEW ###
 
 ## compute aggregate
-df7_overview <- df_7_tic_clean_final %>% 
+df7_overview <- df_7_persone %>% 
   summarize(MIN_DATE = min(TIC_DATE)
             , MAX_DATE = max(TIC_DATE)
             , TOT_TICs = n_distinct(ID_SCONTRINO)
@@ -1694,7 +1696,7 @@ df7_overview
 ### Variable DIREZIONE ###
 
 ## compute aggregate
-df7_dist_direction <- df_7_tic_clean_final %>%
+df7_dist_direction <- df_7_persone %>%
   group_by(DIREZIONE) %>%
   summarize(TOT_TICs = n_distinct(ID_SCONTRINO)
             , TOT_CLIs = n_distinct(ID_CLI)) %>%
@@ -1703,10 +1705,13 @@ df7_dist_direction <- df_7_tic_clean_final %>%
 
 df7_dist_direction
 
+
+### molta merce venduta poca rimborsata
+
 ### Variable TIC_HOURS ###
 
 ## compute aggregate
-df7_dist_hour <- df_7_tic_clean_final %>%
+df7_dist_hour <- df_7_persone %>%
   group_by(TIC_HOUR, DIREZIONE) %>%
   summarize(TOT_TICs = n_distinct(ID_SCONTRINO)
             , TOT_CLIs = n_distinct(ID_CLI)) %>%
