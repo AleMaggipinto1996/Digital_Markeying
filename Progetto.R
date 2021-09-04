@@ -468,7 +468,6 @@ summary(df_2_cli_account)
 #ci sono persone che hanno aggiunto telefoni e poi NA,
 #che bisognerebbe convertire in 0
 
-#la maggior parte hanno l'account 4
 
 
 #### START CLEANING df_2 ####
@@ -1419,7 +1418,7 @@ plot_df6_dist_daystoopen
 #### la maggior parte vengono aperte subito o il giorno dopo
 ##più passano i giorni più diminuiscono
 
-### DAYS_TO_OPEN vs CUMULATE PERCENT ### ???????
+### DAYS_TO_OPEN vs CUMULATE PERCENT ### non ho capito cos'è ???????
 
 ## compute aggregate
 df6_dist_daystoopen_vs_cumulate <- df6_dist_daystoopen %>%
@@ -1485,7 +1484,7 @@ plot_df6_dist_clickedbytyp_percent <- (
 plot_df6_dist_clickedbytyp_percent
 
 # in generale pochissimi click
-#più sui prodotti e quelli nazionali
+#più sui prodotti e su quelli nazionali
 
 
 # - FAILED/FAILED by TYP_CAP
@@ -1656,7 +1655,6 @@ df_7_tic_clean_final <- df_7_tic_clean %>%
   )
 
 ## aggiunto se è weekend, festivo, giorno della settimana, altro
-## ?????
 
 df_7_persone <- merge( id_persone,df_7_tic_clean_final, by="ID_CLI")
 
@@ -1751,7 +1749,7 @@ plot_df7_dist_hour_percent
 ### Variable COD_REPARTO ###
 
 ## compute aggregate
-df7_dist_dep <- df_7_tic_clean_final %>%
+df7_dist_dep <- df_7_persone %>%
   group_by(COD_REPARTO, DIREZIONE) %>%
   summarize(TOT_TICs = n_distinct(ID_SCONTRINO)
             , TOT_CLIs = n_distinct(ID_CLI)) %>%
@@ -1790,7 +1788,7 @@ plot_df7_dist_dep_percent
 ### Variable TIC_DATE_TYP ###
 
 ## compute aggregate
-df7_dist_datetyp <- df_7_tic_clean_final %>%
+df7_dist_datetyp <- df_7_persone %>%
   group_by(TIC_DATE_TYP, DIREZIONE) %>%
   summarize(TOT_TICs = n_distinct(ID_SCONTRINO)
             , TOT_CLIs = n_distinct(ID_CLI)) %>%
@@ -1826,10 +1824,14 @@ plot_df7_dist_datetyp_percent <- (
 
 plot_df7_dist_datetyp_percent
 
+## gli acquisti vengono fatti soprattutto nei giorni lavorativi poi nel weekend e poco nei giorni festivi
+## forse perchè essendo negozi fisici sono chiusi. I rimborsi si suddividono in maniera equa
+
 ### Variable average IMPORTO_LORDO and average SCONTO per TICKET ###
+#capire l'utilità e come sono stati scritti ?????
 
 ## compute aggregate
-df7_dist_importosconto <- df_7_tic_clean_final %>%
+df7_dist_importosconto <- df_7_persone %>%
   group_by(ID_SCONTRINO, DIREZIONE) %>%
   summarize(IMPORTO_LORDO = sum(IMPORTO_LORDO)
             , SCONTO = sum(SCONTO)) %>%
@@ -1865,15 +1867,162 @@ plot_df7_dist_sconto <- (
 
 plot_df7_dist_sconto
 
-#### ???? TO DO df_7 ???? ####
 # EXPLORE average IMPORTO_LORDO and average SCONTO by COD_REPARTO
+
+#capire l'utilità e come sono stati scritti ?????
+
+
+## compute aggregate
+df7_dist_importosconto_reparto <- df_7_persone %>%
+  group_by(COD_REPARTO, DIREZIONE) %>%
+  dplyr::summarize(IMPORTO_LORDO = sum(IMPORTO_LORDO)
+                   , SCONTO = sum(SCONTO)) %>%
+  ungroup() %>%
+  as.data.frame()
+
+df7_dist_avgimportosconto_reparto <- df7_dist_importosconto_reparto %>%
+  group_by(DIREZIONE) %>%
+  dplyr::summarize(AVG_IMPORTO_LORDO = mean(IMPORTO_LORDO)
+                   , AVG_SCONTO = mean(SCONTO))
+
+df7_dist_avgimportosconto_reparto
+
+## plot aggregate
+plot_df7_dist_importo_reparto <- (
+  ggplot(data=df7_dist_importosconto_reparto %>%
+           filter()
+         , aes(color=DIREZIONE, x=IMPORTO_LORDO)) +
+    geom_histogram(fill="white", alpha=0.5) +
+    theme_minimal()
+)
+
+plot_df7_dist_importo_reparto
+
+## plot aggregate
+plot_df7_dist_sconto_reparto <- (
+  ggplot(data=df7_dist_importosconto_reparto %>%
+           filter()
+         , aes(color=DIREZIONE, x=SCONTO)) +
+    geom_histogram(fill="white", alpha=0.5) +
+    theme_minimal()
+)
+
+plot_df7_dist_sconto_reparto
+
+
 # EXPLORE ID_ARTICOLO DISTRIBUTIONS (i.e. num TICs by ID_ARTICOLO)
+
+# number of tics per articolo
+df7_dist_tics_articolo <- df_7_persone %>%
+  group_by(ID_ARTICOLO) %>%
+  dplyr::summarize(NUM_TICs = sum(n_distinct(ID_SCONTRINO))) %>%
+  ungroup()
+
+df7_dist_tics_articolo
+
+# distribution of TICs number    ## quante volte sono stati acquistati tot volte articoli diversi
+df7_dist_numtics_articolo <- df7_dist_tics_articolo %>%
+  group_by(NUM_TICs) %>%
+  dplyr::summarize(COUNT_ART = sum(n_distinct(ID_ARTICOLO))) %>%
+  ungroup()
+
+df7_dist_numtics_articolo
+
+# plot aggregate
+plot_df7_dist_numtics_articolo <- df7_dist_numtics_articolo %>%
+  filter(NUM_TICs < 50) %>%
+  ggplot(aes(x = NUM_TICs, y = COUNT_ART)) +
+  geom_histogram(stat = "identity", fill = "#549900") + 
+  ggtitle("Distribution of Numb TICs by ID_ARTICOLO") + 
+  scale_x_continuous(breaks = seq(0, 50, 5)) +
+  xlab("Numb of Articles") +
+  ylab("Numb of transactions") +
+  theme_grey() +
+  theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold")) +
+  theme(axis.text = element_text(size = 10, face = "italic")) +
+  theme(axis.title = element_text(size = 13))
+
+plot_df7_dist_numtics_articolo
+
 # EXPLORE average IMPORTO_LORDO and average SCONTO per ID_CLI
 
+## compute aggregate
+df7_dist_importosconto_cli <- df_7_persone %>%
+  group_by(ID_CLI, DIREZIONE) %>%
+  dplyr::summarize(IMPORTO_LORDO = sum(IMPORTO_LORDO)
+                   , SCONTO = sum(SCONTO)) %>%
+  ungroup() %>%
+  as.data.frame()
+
+df7_dist_avgimportosconto_cli <- df7_dist_importosconto_cli %>%
+  group_by(DIREZIONE) %>%
+  dplyr::summarize(AVG_IMPORTO_LORDO = mean(IMPORTO_LORDO)
+                   , AVG_SCONTO = mean(SCONTO))
+
+df7_dist_avgimportosconto_cli
+
+## plot aggregate
+plot_df7_dist_importo_cli <- (
+  ggplot(data=df7_dist_importosconto_cli %>%
+           filter()
+         , aes(color=DIREZIONE, x=IMPORTO_LORDO)) +
+    geom_histogram(fill="white", alpha=0.5) +
+    theme_minimal()
+)
+
+plot_df7_dist_importo_cli
+
+## plot aggregate
+plot_df7_dist_sconto_cli <- (
+  ggplot(data=df7_dist_importosconto_cli %>%
+           filter()
+         , aes(color=DIREZIONE, x=SCONTO)) +
+    geom_histogram(fill="white", alpha=0.5) +
+    theme_minimal()
+)
+
+plot_df7_dist_sconto_cli
+
+
 # compute the distribution of customers by number of purchases (as described in the slides)
+
+df7_dist_total_purch <- df_7_persone %>%
+  filter(DIREZIONE == 1)                             %>% 
+  group_by(ID_CLI)                                   %>% 
+  summarise(TOT_PURCHASE = n_distinct(ID_SCONTRINO)) %>% 
+  arrange(desc(TOT_PURCHASE))                           
+
+df7_dist_total_purch
+
+
 # compute the days for next purchase curve (as described in the slides)
+
+df_for_next_purchase_curve <- df_7_persone %>%
+  filter(DIREZIONE == 1) %>% 
+  select(ID_CLI,
+         ID_ARTICOLO,
+         TIC_DATE,
+         DIREZIONE)      %>%
+  arrange(ID_CLI)
+
+df_for_next_purchase_curve
+
+
+df_date_diff <- df_for_next_purchase_curve %>%
+  group_by(ID_CLI) %>%
+  mutate(Days_difference = TIC_DATE - lag(TIC_DATE))
+
+df_date_diff
+
+df_days_curve <- as.data.frame(table(df_date_diff$Days_difference))
+colnames(df_days_curve) <- c("Days_diff","Freq")
+df_days_curve <- df_days_curve[-1, ]
+df_days_curve$Perc <- df_days_curve$Freq/sum(df_days_curve$Freq)
+
+df_days_curve
+
 
 #### FINAL REVIEW df_7_clean ####
 
-str(df_7_tic_clean_final)
-summary(df_7_tic_clean_final)
+str(df_7_persone)
+summary(df_7_persone)
