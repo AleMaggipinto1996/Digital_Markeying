@@ -455,8 +455,8 @@ plot_df1_p_codfid_neg
 
 #### FINAL REVIEW df_1_clean ####
 
-str(df_1_cli_fid_clean)
-summary(df_1_cli_fid_clean)
+str(df_1_persone)
+summary(df_1_persone)
 
 #________________________________________________
 
@@ -733,8 +733,8 @@ plot_df_2_cli_type
 
 #### FINAL REVIEW df_2_clean ####
 
-str(df_2_cli_account_clean)
-summary(df_2_cli_account_clean)
+str(df_2_persone)
+summary(df_2_persone)
 
 
 
@@ -805,8 +805,12 @@ cons_idaddress_df2_df3
 #!!! NOTE:  there are ID_ADDRESSes actually not mapped in df_3 !!!#
 #!!!        this issue should be taken into account in joining these two tables !!!#
 
-#### abbiamo l'indirizzo, possiamo estrapolare le persone che hanno l'indirizzo nel df_2
-###se ci servirà 
+#### considerimo le persone utilizzando il dataset df_2_persone ####
+
+id_persone_indirizzo <- as.data.frame(df_2_persone$ID_ADDRESS)
+colnames(id_persone_indirizzo) <- "ID_ADDRESS"
+
+df_3_persone <- merge( df_3_cli_address_clean, id_persone_indirizzo, by="ID_ADDRESS")
 
 #### EXPLORE COLUMNS of df_3 ####
 
@@ -814,68 +818,68 @@ cons_idaddress_df2_df3
 
 ### Variabile REGION ###
 
-df_3_cli_address_clean_region_distrib <- df_3_cli_address_clean %>%
+df_3_persone_region_distrib <- df_3_persone %>%
   group_by(REGION) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_ADDRESS)) %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_3_cli_address_clean_region_distrib
+df_3_persone_region_distrib
 
 ## plot distribution
-plot_df_3_cli_address_clean_region_distrib <- (
-  ggplot(data=df_3_cli_address_clean_region_distrib
+plot_df_3_persone_region_distrib <- (
+  ggplot(data=df_3_persone_region_distrib
          , aes(x=REGION, y=PERCENT)) +
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal()
 )
 
-plot_df_3_cli_address_clean_region_distrib
+plot_df_3_persone_region_distrib
 
 #soprattutto la Lombardia
 
 ### variabile PROVINCIA ###
 
 ## compute distribution
-df_3_cli_address_clean_prv_distrib <- df_3_cli_address_clean %>%
+df_3_persone_prv_distrib <- df_3_persone %>%
   group_by(PRV) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_ADDRESS)) %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_3_cli_address_clean_prv_distrib
+df_3_persone_prv_distrib
 
 ## plot distribution
-plot_df_3_cli_address_clean_prv_distrib <- (
-  ggplot(data=df_3_cli_address_clean_prv_distrib
+plot_df_3_persone_prv_distrib <- (
+  ggplot(data=df_3_persone_prv_distrib
          , aes(x=PRV, y=PERCENT)) +
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal()
 )
 
-plot_df_3_cli_address_clean_prv_distrib
+plot_df_3_persone_prv_distrib
 
 # troppe variabili non è significativo
 
 ### variabile CAP ###
 
 ## compute distribution
-df_3_cli_address_clean_cap_distrib <- df_3_cli_address_clean %>%
+df_3_persone_cap_distrib <- df_3_persone %>%
   group_by(CAP) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_ADDRESS)) %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_3_cli_address_clean_cap_distrib
+df_3_persone_cap_distrib
 
 #anche i CAP ci sono troppe variabili non è utile
 
 #### FINAL REVIEW df_3_clean ####
 
-str(df_3_cli_address_clean)
-summary(df_3_cli_address_clean)
+str(df_3_persone)
+summary(df_3_persone)
 
 
 
@@ -926,6 +930,13 @@ cons_idcli_df1_df4
 
 #!!! NOTE: all ID_CLI in df_1 are also in df_4 and vice-versa !!!#
 
+##### consideriamo solo la categoria persone #####
+
+id_persone <- as.data.frame(df_1_persone$ID_CLI)
+colnames(id_persone) <- "ID_CLI"
+
+df4_persone <- merge(id_persone, df_4_cli_privacy_clean, by="ID_CLI")
+
 #### EXPLORE COLUMNS of df_4 ####
 
 # EXPLORE the df_4_cli_privacy_clean relevant variables
@@ -933,74 +944,74 @@ cons_idcli_df1_df4
 ### variabile Privacy 1 ###
 
 ## compute distribution
-df_4_cli_privacy_clean_flag1_distrib <- df_4_cli_privacy_clean %>%
+df_4_p_flag1_distrib <- df4_persone %>%
   group_by(FLAG_PRIVACY_1) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_4_cli_privacy_clean_flag1_distrib
+df_4_p_flag1_distrib
 
 ## plot distribution
-plot_df_4_cli_privacy_clean_flag1_distrib <- (
-  ggplot(data=df_4_cli_privacy_clean_flag1_distrib
+plot_df_4_p_flag1_distrib <- (
+  ggplot(data=df_4_p_flag1_distrib
          , aes(x=FLAG_PRIVACY_1, y=PERCENT)) +
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal()
 )
 
-plot_df_4_cli_privacy_clean_flag1_distrib
+plot_df_4_p_flag1_distrib
 
 ### Variabile Privacy 2 ###
 
 ## compute distribution
-df_4_cli_privacy_clean_flag2_distrib <- df_4_cli_privacy_clean %>%
+df_4_cli_p_flag2_distrib <- df4_persone %>%
   group_by(FLAG_PRIVACY_2) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_4_cli_privacy_clean_flag2_distrib
+df_4_cli_p_flag2_distrib
 
 ## plot distribution
-plot_df_4_cli_privacy_clean_flag2_distrib <- (
-  ggplot(data=df_4_cli_privacy_clean_flag2_distrib
+plot_df_4_p_flag2_distrib <- (
+  ggplot(data=df_4_p_flag2_distrib
          , aes(x=FLAG_PRIVACY_2, y=PERCENT)) +
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal()
 )
 
-plot_df_4_cli_privacy_clean_flag2_distrib
+plot_df_4_p_flag2_distrib
 
 ### variabile direct_marketing ###
 
 ## compute distribution
-df_4_cli_privacy_clean_flag_mkt_distrib <- df_4_cli_privacy_clean %>%
+df_4_p_flag_mkt_distrib <- df4_persone %>%
   group_by(FLAG_DIRECT_MKT) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_4_cli_privacy_clean_flag_mkt_distrib
+df_4_p_flag_mkt_distrib
 
 ## plot distribution
-plot_df_4_cli_privacy_clean_flag_mkt_distrib <- (
-  ggplot(data=df_4_cli_privacy_clean_flag_mkt_distrib
+plot_df_4_p_flag_mkt_distrib <- (
+  ggplot(data=df_4_p_flag_mkt_distrib
          , aes(x=FLAG_DIRECT_MKT, y=PERCENT)) +
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal()
 )
 
-plot_df_4_cli_privacy_clean_flag_mkt_distrib
+plot_df_4_p_flag_mkt_distrib
 
 
 #### FINAL REVIEW df_4_clean ####
 
-str(df_4_cli_privacy_clean)
-summary(df_4_cli_privacy_clean)
+str(df4_persone)
+summary(df4_persone)
 
 
 
@@ -1247,6 +1258,10 @@ df_6_camp_event_clean_final <- df_sends %>%
          
          , FAILED
   )
+
+##### consideriamo la categoria persone ######
+
+
 
 #### EXPLORE VARIABLES in df_6 ####
 
