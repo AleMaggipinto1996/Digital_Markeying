@@ -1655,6 +1655,29 @@ df_7_tic_clean_final <- df_7_tic_clean %>%
   )
   )
 
+
+df_7_persone <- merge( id_persone,df_7_tic_clean_final, by="ID_CLI")
+
+cons_idcli_df1_df7 <- df_1_cli_fid_clean %>%
+  select(ID_CLI) %>%
+  distinct() %>%
+  mutate(is_in_df_1 = 1) %>%
+  distinct() %>%
+  full_join(df_7_tic_clean %>%
+              select(ID_CLI) %>%
+              distinct() %>%
+              mutate(is_in_df_7 = 1) %>%
+              distinct()
+            , by = "ID_CLI"
+  ) %>%
+  group_by(is_in_df_1, is_in_df_7) %>%
+  summarize(NUM_ID_CLIs = n_distinct(ID_CLI)) %>%
+  as.data.frame()
+
+cons_idcli_df1_df7
+
+### ugualmente alcuni clienti mappati in df_1 non lo sono in df_7
+
 #### EXPLORE VARIABLES in df_7 ####
 
 ### GENERAL OVERVIEW ###
