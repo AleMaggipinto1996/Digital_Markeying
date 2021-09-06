@@ -1,13 +1,13 @@
 #### PREPARAZIONE DEI DATASET ####
 
-### Dataset n°1 ###
+### Dataset n?1 ###
 
 ###primo sguardo al dataset
 
 str(df_1_cli_fid)  #come sono fatti i nostri dati
 summary(df_1_cli_fid)
 
-#si vede che la maggior parte dei clienti hanno un account ed è attivo
+#si vede che la maggior parte dei clienti hanno un account ed Ã¨ attivo
 
 ## START CLEANING df_1 ##
 
@@ -21,7 +21,7 @@ df_1_cli_fid_clean %>% summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
                                  , TOT_ID_CLIFIDs = n_distinct(paste0(as.character(ID_CLI),"-",as.character(ID_FID)))
                                  , TOT_ROWs = n())
 
-#ci sono più registrazioni di carte fedeltà di ciascun cliente e questo non ci sorprende
+#ci sono piÃ¹ registrazioni di carte fedeltÃ  di ciascun cliente e questo non ci sorprende
 
 ### Formattazione delle date 
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
@@ -32,7 +32,7 @@ df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(TYP_CLI_FID = as.factor(TYP_CLI_FID)) %>%
   mutate(STATUS_FID = as.factor(STATUS_FID))
 
-### Numero di programmi fedeltà per numero di clienti ##
+### Numero di programmi fedelt? per numero di clienti ##
 ##quante sottoscrizioni ho per ciascun cliente?
 
 num_fid_x_cli <- df_1_cli_fid_clean %>%
@@ -41,7 +41,7 @@ num_fid_x_cli <- df_1_cli_fid_clean %>%
             , NUM_DATEs = n_distinct(DT_ACTIVE)
   )
 
-#Controllando le date, emerge che vi sono clienti hanno probabilmente sbagliato/cambiato la fidelizzazione più volte
+#Controllando le date, emerge che vi sono clienti hanno probabilmente sbagliato/cambiato la fidelizzazione pi? volte
 #nello stesso giorno
 
 tot_id_cli <- n_distinct(num_fid_x_cli$ID_CLI)
@@ -54,7 +54,7 @@ dist_num_fid_x_cli <- num_fid_x_cli %>%
 
 dist_num_fid_x_cli
 
-## Ci sono clienti con molteplici programmi fedeltà ##
+## Ci sono clienti con molteplici programmi fedelt? ##
 # let examine in details clients with multiple subscriptions#
 
 num_fid_x_cli %>% filter(NUM_FIDs == 3)
@@ -73,7 +73,7 @@ df_1_cli_fid %>% filter(ID_CLI == 320880)
 # from last subscription   --> type of fidelity, status
 # from subscriptions count --> number of subscriptions made
 
-#ID 1 è l'ID relativo alla registrazione online, gli altri sono negozi
+#ID 1 ? l'ID relativo alla registrazione online, gli altri sono negozi
 
 
 df_1_cli_fid_first <- df_1_cli_fid_clean %>%
@@ -114,8 +114,8 @@ df_1_cli_fid_clean <- df_1_cli_fid_last %>%
 
 ### variabile Registrazione Online / Negozio Fisico ###
 
-#creo una nuova colonna 0/1: è 1 se si tratta di registrazione online, 
-#è 0 se è stata fatta nel negozio
+#creo una nuova colonna 0/1: ? 1 se si tratta di registrazione online, 
+#? 0 se ? stata fatta nel negozio
 
 RegOnline <- as.data.frame(df_1_cli_fid_clean$FIRST_ID_NEG)
 colnames(RegOnline)<- "RegOnline"
@@ -157,7 +157,7 @@ plot_df1_dist_codfid
 #biz vuol dire categorizzazione tra clienti business e non
 #ovvero clienti e aziende vere e proprie
 
-#è importante capire il modo migliore per presentare i dati
+#? importante capire il modo migliore per presentare i dati
 
 ##### SEPARIAMO IN DUE DATASET: AZIENDE/PERSONE ####
 
@@ -169,7 +169,7 @@ df_1_persone <- df_1_cli_fid_clean %>%
 
 #_________________________________________
 
-############# consideriamo la parte che riguarda le persone fisiche ###########à
+############# consideriamo la parte che riguarda le persone fisiche ###########?
 
 #_________________________________________
 
