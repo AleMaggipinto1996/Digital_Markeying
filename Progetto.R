@@ -432,7 +432,7 @@ plot_df1_p_codfid_main
 
 ## compute distribution
 df1_p_codfid_neg <- df_1_cli_fid_clean %>%
-  group_by(NegOnline) %>%
+  group_by(RegOnline) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
@@ -2026,3 +2026,65 @@ df_days_curve
 
 str(df_7_persone)
 summary(df_7_persone)
+
+
+
+
+
+#################
+
+# MODELLO RFM
+
+################
+
+
+lastdate = df_7_persone %>% summarise(max(TIC_DATE))
+lastdate=lastdate[1,1]
+## prima data di acquisto risale al 2018-05-01, l'ultima data di acquisto risale al 2019-04-30
+
+#vogliamo trovare i clienti attivi (80%)
+
+#troviamo l'ultimo giorno di acquisto per ogni cliente
+#e quanti giorni sono passati dall'ultimo acquisto in generale
+
+df_last_date <- df_7_persone %>%
+  filter(DIREZIONE == 1)%>%
+  group_by(ID_CLI) %>%
+  summarise(LAST_DATE_PURCH= max(TIC_DATE)) %>%
+  mutate(DIFF_DAYS = as.numeric(difftime(lastdate,LAST_DATE_PURCH,units = "days")))
+
+
+summary(df_last_date)
+boxplot(df_last_date$DIFF_DAYS)
+
+giorni_max=quantile(df_last_date$DIFF_DAYS, probs = c(0.80, 0.85, 0.90))
+giorni_max
+
+#decidiamo di considerare attivi l'ottanta percento dei clienti
+
+giorni_max = giorni_max[1]
+
+clienti_attivi <- df_last_date %>% filter(DIFF_DAYS<=giorni_max)
+
+##Calcolo Recency: l'ultimo acquisto dopo quanto tempo?
+
+quantili<- quantile(clienti_attivi$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
+
+recency = clienti_attivi %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
+                                                     (DIFF_DAYS>=quantili[1]) & (DIFF_DAYS<quant_days[3])~"Medium",
+                                                     (DIFF_DAYS>=quant_days[3])~"High"))
+
+
+recency = mutate(recency,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
+
+##Clacolo Frequency: ogni quanto acquisto?
+
+
+
+
+
+
+
+
+
+
