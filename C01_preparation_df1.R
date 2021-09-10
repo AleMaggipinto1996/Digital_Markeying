@@ -73,7 +73,7 @@ df_1_cli_fid %>% filter(ID_CLI == 320880)
 # from last subscription   --> type of fidelity, status
 # from subscriptions count --> number of subscriptions made
 
-#ID 1 ? l'ID relativo alla registrazione online, gli altri sono negozi
+#ID 1 è quello relativo alla registrazione online, gli altri sono negozi
 
 
 df_1_cli_fid_first <- df_1_cli_fid_clean %>%
@@ -114,8 +114,8 @@ df_1_cli_fid_clean <- df_1_cli_fid_last %>%
 
 ### variabile Registrazione Online / Negozio Fisico ###
 
-#creo una nuova colonna 0/1: ? 1 se si tratta di registrazione online, 
-#? 0 se ? stata fatta nel negozio
+#creo una nuova colonna 0/1: è 1 se si tratta di registrazione online, 
+#è 0 se è stata fatta nel negozio
 
 RegOnline <- as.data.frame(df_1_cli_fid_clean$FIRST_ID_NEG)
 colnames(RegOnline)<- "RegOnline"
@@ -151,13 +151,12 @@ plot_df1_dist_codfid <- (
 
 plot_df1_dist_codfid
 
-#si vede una sproporzione elevata tra quelli che hanno
-#una fidelizzazione standard e quelli premium
+#si vede una sproporzione elevata tra quelli che hanno una fidelizzazione standard e 
+#quelli premium
 
-#biz vuol dire categorizzazione tra clienti business e non
-#ovvero AZIENDE e PERSONE FISICHE
+#Il suffisso BIZ sta ad indicare i clienti business e quindi consente di distinguere
+#tra AZIENDE e PERSONE FISICHE
 
-#? importante capire il modo migliore per presentare i dati
 
 ##### SEPARIAMO IN DUE DATASET: AZIENDE/PERSONE ####
 
@@ -169,7 +168,7 @@ df_1_persone <- df_1_cli_fid_clean %>%
 
 #_________________________________________
 
-############# consideriamo la parte che riguarda le persone fisiche ###########?
+############# consideriamo la parte che riguarda le persone fisiche ###########
 
 #_________________________________________
 
@@ -228,58 +227,6 @@ plot_df1_p_codfid_ld <- (
 plot_df1_p_codfid_ld
 
 
-### variable FIRST_DT_ACTIVE per MESI ###
-
-## compute distribution
-df1_p_codfid_fd <- df_1_persone %>%
-  group_by(substring(FIRST_DT_ACTIVE,1,7)) %>%
-  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
-  arrange(desc(PERCENT)) %>% 
-  rename(Mesi = `substring(FIRST_DT_ACTIVE, 1, 7)`)
-
-df1_p_codfid_fd
-
-## plot distribution
-
-plot_df1_p_codfid_fd <- (
-  ggplot(data=df1_p_codfid_fd
-         , aes(x=Mesi, y=TOT_CLIs)
-  ) +
-    geom_bar(stat="identity"
-             , fill="steelblue") +
-    theme_minimal()
-)
-
-plot_df1_p_codfid_fd
-
-
-
-### variable FIRST_DT_ACTIVE per ANNI ###
-
-## compute distribution
-df1_p_codfid_fd <- df_1_persone %>%
-  group_by(substring(FIRST_DT_ACTIVE,1,4)) %>%
-  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
-  arrange(desc(PERCENT)) %>% 
-  rename(Year = `substring(FIRST_DT_ACTIVE, 1, 4)`)
-
-df1_p_codfid_fd
-
-## plot distribution
-
-plot_df1_p_codfid_fd <- (
-  ggplot(data=df1_p_codfid_fd
-         , aes(x=Year, y=TOT_CLIs)
-  ) +
-    geom_bar(stat="identity"
-             , fill="steelblue") +
-    theme_minimal()
-)
-
-plot_df1_p_codfid_fd
-
 
 ### variable LAST_STATUS_FID ###
 
@@ -291,7 +238,7 @@ df1_p_codfid_status <- df_1_persone %>%
   arrange(desc(PERCENT))
 
 
-df1_p_codfid_status  # il 99.2% dei clienti ha una tessera fedeltà attiva
+df1_p_codfid_status  # il 99.2% dei clienti "persone" ha una tessera fedeltà attiva
 
 ## plot distribution
 
@@ -332,7 +279,7 @@ plot_df1_p_codfid_n <- (
 plot_df1_p_codfid_n
 
 ## variabile LAST_TYP_CLI_FID
-##0 se ? un account secondario, 1 se ? l'account principale
+##0 se è un account secondario, 1 se ? l'account principale
 
 ## compute distribution
 df1_p_codfid_main <- df_1_persone %>%
@@ -372,7 +319,7 @@ df1_p_codfid_neg <- df_1_cli_fid_clean %>%
 df1_p_codfid_neg
 
 ## plot distribution
-
+library(plotly)
 plot_df1_p_codfid_neg <- (
   ggplot(data=df1_p_codfid_neg
          , aes(x=RegOnline, y=TOT_CLIs)
@@ -383,7 +330,7 @@ plot_df1_p_codfid_neg <- (
 )
 
 plot_df1_p_codfid_neg
-
+ggplotly(plot_df1_p_codfid_neg)
 
 #### FINAL REVIEW df_1_clean ####
 
