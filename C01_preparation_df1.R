@@ -155,7 +155,7 @@ plot_df1_dist_codfid
 #una fidelizzazione standard e quelli premium
 
 #biz vuol dire categorizzazione tra clienti business e non
-#ovvero clienti e aziende vere e proprie
+#ovvero AZIENDE e PERSONE FISICHE
 
 #? importante capire il modo migliore per presentare i dati
 
@@ -278,7 +278,7 @@ plot_df1_p_codfid_fd <- (
     theme_minimal()
 )
 
-plot_df1_dist_codfid_fd
+plot_df1_p_codfid_fd
 
 
 ### variable LAST_STATUS_FID ###
@@ -291,12 +291,12 @@ df1_p_codfid_status <- df_1_persone %>%
   arrange(desc(PERCENT))
 
 
-df1_p_codfid_status
+df1_p_codfid_status  # il 99.2% dei clienti ha una tessera fedeltà attiva
 
 ## plot distribution
 
 plot_df1_p_codfid_status <- (
-  ggplot(data=df1_dist_p_status
+  ggplot(data=df1_p_codfid_status
          , aes(x=LAST_STATUS_FID, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
@@ -331,7 +331,8 @@ plot_df1_p_codfid_n <- (
 
 plot_df1_p_codfid_n
 
-### variable LAST_TYP_CLI_FID ???? non abbiamo capito che vuol dire ###
+## variabile LAST_TYP_CLI_FID
+##0 se ? un account secondario, 1 se ? l'account principale
 
 ## compute distribution
 df1_p_codfid_main <- df_1_persone %>%
@@ -340,7 +341,10 @@ df1_p_codfid_main <- df_1_persone %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df1_p_codfid_main
+df1_p_codfid_main #L'ultima tessera fedelt? attivata dai clienti nel 98.4% dei casi
+#? una tessera principale (328388 casi), mentre nell'1.6% dei casi
+#(5246 casi) abbiamo che la tessera attivata ? secondaria
+
 
 ## plot distribution
 
@@ -360,7 +364,7 @@ plot_df1_p_codfid_main
 
 ## compute distribution
 df1_p_codfid_neg <- df_1_cli_fid_clean %>%
-  group_by(NegOnline) %>%
+  group_by(RegOnline) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
@@ -371,7 +375,7 @@ df1_p_codfid_neg
 
 plot_df1_p_codfid_neg <- (
   ggplot(data=df1_p_codfid_neg
-         , aes(x=FIRST_ID_NEG, y=TOT_CLIs)
+         , aes(x=RegOnline, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
              , fill="steelblue") +
@@ -385,102 +389,3 @@ plot_df1_p_codfid_neg
 
 str(df_1_persone)
 summary(df_1_persone)
-
-#________________________________________________
-
-
-##Distribuzione dei clienti sulla base dello STATUS della tessera fedelta'
-##(1 se e' attivo, 0 se o inattivo)
-dist_df1_status <- df_1_cli_fid_clean %>% group_by(LAST_STATUS_FID) %>%
-  summarise(TOT_CLIENTI = n_distinct(ID_CLI)) %>%
-  mutate( PERC_CLIENTI = TOT_CLIENTI/sum(TOT_CLIENTI))
-
-dist_df1_status
-#Il 99.1% delle tessere fedelta' sono attive, solo lo 0.9% non
-#lo sono
-
-plot_dist_df1_status <- ggplot(dist_df1_status,aes(x=LAST_STATUS_FID,y=TOT_CLIENTI)) +
-  xlab("STATO DI ATTIVAZIONE") + theme_minimal() + 
-  geom_bar(stat = "identity",aes(fill=LAST_STATUS_FID)) +
-  scale_fill_manual(values = c("red","darkgreen"),guide=F)
-
-plot_dist_df1_status
-
-##Distribuzione dei clienti sulla base della TIPO DI TESSERA FEDELT?
-##0 se ? un account secondario, 1 se ? l'account principale
-
-dist_df1_typfid <- df_1_cli_fid_clean %>% group_by(LAST_TYP_CLI_FID) %>%
-  summarise(TOT_CLIENTI = n_distinct(ID_CLI)) %>%
-  mutate(PERC_CLIENTI = TOT_CLIENTI/sum(TOT_CLIENTI))
-
-dist_df1_typfid
-#L'ultima tessera fedelt? attivata dai clienti nel 98.5% dei casi
-#? una tessera principale (363862 casi totali), mentre nell'1.5% dei casi
-#(5610 casi totali) abbiamo che la tessera attivata ? secondaria
-
-plot_dist_df1_typfid <- ggplot(dist_df1_typfid,aes(x=LAST_TYP_CLI_FID,y=TOT_CLIENTI)) +
-  xlab("TESSERE NON PRINCIPALI/PRINCIPALI") + theme_minimal() + 
-  geom_bar(stat = "identity",aes(fill=LAST_TYP_CLI_FID)) +
-  scale_fill_manual(values = c("grey","gold"),guide=F)
-
-plot_dist_df1_typfid
-
-### Variabile LAST_DT_ACTIVE###
-##Consideriamo la variabile LAST_DT_ACTIVE, corrispondente al giorno in cui
-##un cliente ha attivato la sua ultima tessera fedelt?.
-##Le attivazioni sono state raggruppate in base ai mesi.
-
-dist_df1_active_by_month <- df_1_cli_fid_clean %>%
-  mutate(MONTH= month(LAST_DT_ACTIVE),
-         YEAR = year(LAST_DT_ACTIVE)) %>%
-  group_by(YEAR,MONTH) %>%
-  summarise(TOT_SUBs = n_distinct(ID_CLI)) %>%
-  mutate(YEAR_MONTH = as.factor(paste0(YEAR,"/",MONTH))) %>%
-  arrange(YEAR,MONTH) %>%
-  mutate(YEAR_MONTH = factor(YEAR_MONTH, levels = c("2018/1","2018/2",
-                                                    "2018/3","2018/4",
-                                                    "2018/5","2018/6",
-                                                    "2018/7","2018/8",
-                                                    "2018/9","2018/10",
-                                                    "2018/11","2018/12",
-                                                    "2019/1","2019/2",
-                                                    "2019/3","2019/4",
-                                                    "2019/5")))
-
-
-dist_df1_active_by_month
-
-plot_dist_df1_active_by_month<- 
-  ggplot(dist_df1_active_by_month,aes(x=YEAR_MONTH,TOT_SUBs)) +
-  xlab("MESE DI ATTIVAZIONE") + theme_minimal() + 
-  geom_bar(stat = "identity",fill="darkgreen")
-
-plot_dist_df1_active_by_month
-
-#I mesi in cui ci sono maggiori sottoscrizioni sono marzo 2018 e novembre 2018
-#da novembre 2018 in poi c'? un crollo sostanziale delle sottoscrizioni.
-#Anche nel 2019 marzo ? il mese che presenta maggiori sottoscrizioni
-
-##Distribuzione numero di clienti per negozio
-df1_dist_neg <- df_1_cli_fid_clean %>%
-  group_by(FIRST_ID_NEG) %>%
-  summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs),
-         FIRST_ID_NEG = as.factor(FIRST_ID_NEG))
-
-df1_dist_neg
-
-plot_df1_dist_neg <- ggplot(df1_dist_neg,aes(FIRST_ID_NEG,TOT_CLIs))+
-  geom_bar(stat = "identity",fill = "orange")
-
-plot_df1_dist_neg
-
-#Il negozio 1 ? quello che presenta un maggior numero di clienti
-#da solo comprende il 15.8% totale della clientela.
-
-#### FINAL REVIEW df_1_clean ####
-
-str(df_1_cli_fid_clean)
-summary(df_1_cli_fid_clean)
-
-
