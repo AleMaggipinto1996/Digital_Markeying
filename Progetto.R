@@ -2071,19 +2071,108 @@ clienti_attivi <- df_last_date %>% filter(DIFF_DAYS<=giorni_max)
 quantili<- quantile(clienti_attivi$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
 
 recency = clienti_attivi %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
-                                                     (DIFF_DAYS>=quantili[1]) & (DIFF_DAYS<quant_days[3])~"Medium",
-                                                     (DIFF_DAYS>=quant_days[3])~"High"))
+                                                     (DIFF_DAYS>=quantili[1]) & (DIFF_DAYS<quantili[3])~"Medium",
+                                                     (DIFF_DAYS>=quantili[3])~"High"))
 
 
 recency = mutate(recency,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
 
-##Clacolo Frequency: ogni quanto acquisto?
+
+##Calcolo Frequency: ogni quanto acquisto?
+
+df_clienti_attivi <- merge( df_7_persone, clienti_attivi, by="ID_CLI")
+
+Frequency <- df_clienti_attivi %>%
+  filter(DIREZIONE==1) %>% group_by(ID_CLI) %>%
+  summarise(N_ACQUISTI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
+  filter(N_ACQUISTI_PER_CLI>0)
+
+boxplot(Frequency$N_ACQUISTI_PER_CLI)
+
+quantili<- quantile(Frequency$N_ACQUISTI_PER_CLI,probs = c(0.50,0.70,0.90))
+quantili
+
+Frequency <- Frequency %>% mutate(CLASS_F=case_when(N_ACQUISTI_PER_CLI<quantili[1] ~ "Low",
+                                                           (N_ACQUISTI_PER_CLI>=quantili[1]) & (N_ACQUISTI_PER_CLI<quantili[3])~"Medium",
+                                                           (N_ACQUISTI_PER_CLI>quantili[3])~"High"))
+Frequency = mutate(Frequency,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
+
+#Monetary Value (differenza tra importo lordo e sconto)
+
+Monetary_Value = df_clienti_attivi %>% filter(DIREZIONE==1) %>%
+  group_by(ID_CLI) %>%
+  summarise(AMOUNT = sum(IMPORTO_LORDO) - sum(SCONTO))
+
+quantili = quantile(Monetary_Value$AMOUNT,probs = c(0.25,0.50,0.75))
+Monetary_Value = Monetary_Value %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
+                                                          (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
+                                                          AMOUNT>quantili[3]~"High"))
+Monetary_Value = mutate(Monetary_Value,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
+
+# Recency-Frequency
+
+RF <- merge(recency, Frequency,by="ID_CLI")
+RF <- RF %>% mutate(CLASS_RF = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
+                                                       (CLASS_F=="Low")&(CLASS_R=="Medium")~"One-Timer",
+                                                       (CLASS_F=="Low")&(CLASS_R=="High")~"Leaving",
+                                                       (CLASS_F=="Medium")&(CLASS_R=="Low")~"Engaged",
+                                                       (CLASS_F=="Medium")&(CLASS_R=="Medium")~"Engaged",
+                                                       (CLASS_F=="Medium")&(CLASS_R=="High")~"Leaving",
+                                                       (CLASS_F=="High")&(CLASS_R=="Low")~"Top",
+                                                       (CLASS_F=="High")&(CLASS_R=="Medium")~"Top",
+                                                       (CLASS_F=="High")&(CLASS_R=="High")~"Leaving Top"))
+
+Fedeltà <- as.data.frame(with(RF,table(CLASS_RF)))
+Fedeltà <- summary_RF %>% mutate(CLASS_RF = factor(CLASS_RF,levels = c("Leaving","One-Timer",
+                                                                                      "Engaged","Leaving Top",
+                                                                                      "Top")))
+Fedeltà_plot <- 
+  ggplot(Fedeltà,aes(CLASS_RF,Freq,fill=CLASS_RF)) + geom_bar(stat = "identity",width = 0.5)+
+  ggtitle("Fedeltà")+ylab("Number of Clients")+xlab("Fedeltà")+
+  scale_fill_brewer(palette = "GnBu")+
+  theme_bw()+theme(panel.grid.major = element_blank(), 
+                   panel.grid.minor = element_blank())+theme(panel.border = element_blank())+theme(panel.background = element_blank())+theme(axis.line = element_line(colour = "black"))
+
+Fedeltà_plot
+
+################### rendere più carino e mettere in percentuale
+
+##### RFM
+
+RFM <- RF %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
+  left_join(Monetary_Value,by="ID_CLI")
+RFM <- mutate(RFM,CLASS_RF=factor(CLASS_RF))
 
 
+RFM <- RFM %>% mutate(CLASSI = case_when((CLASS_M=="Low") & (CLASS_RF=="One-Timer")~"Cheap",
+                                          (CLASS_M=="Low") & (CLASS_RF=="Leaving")~"Tin",
+                                          (CLASS_M=="Low") & (CLASS_RF=="Engaged")~"Copper",
+                                          (CLASS_M=="Low") & (CLASS_RF=="Leaving Top")~"Bronze",
+                                          (CLASS_M=="Low") & (CLASS_RF=="Top")~"Silver",
+                                          (CLASS_M=="Medium") & (CLASS_RF=="One-Timer")~"Tin",
+                                          (CLASS_M=="Medium") & (CLASS_RF=="Leaving")~"Copper",
+                                          (CLASS_M=="Medium") & (CLASS_RF=="Engaged")~"Bronze",
+                                          (CLASS_M=="Medium") & (CLASS_RF=="Leaving Top")~"Silver",
+                                          (CLASS_M=="Medium") & (CLASS_RF=="Top")~"Gold",
+                                          (CLASS_M=="High") & (CLASS_RF=="One-Timer")~"Copper",
+                                          (CLASS_M=="High") & (CLASS_RF=="Leaving")~"Bronze",
+                                          (CLASS_M=="High") & (CLASS_RF=="Engaged")~"Silver",
+                                          (CLASS_M=="High") & (CLASS_RF=="Leaving Top")~"Gold",
+                                          (CLASS_M=="High") & (CLASS_RF=="Top")~"Diamond"))
+RFM = RFM %>% mutate(CLASSI = factor(CLASSI,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
+RFM_TOT <- as.data.frame(with(RFM,table(CLASSI)), percentage_column = Freq / nrow(RFM) * 100)
+
+RFM_TOT$Freq <- (RFM_TOT$Freq / nrow(RFM))* 100
 
 
+#EXPLORATORY ANALYSIS of RFM's dataframe
+RFM_plot <- 
+  ggplot(RFM_TOT,aes(CLASSI,Freq,fill=CLASSI)) + geom_bar(stat = "identity")+
+  labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+
+  scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
+  theme_minimal()
 
-
+RFM_plot
 
 
 
