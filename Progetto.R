@@ -2189,57 +2189,105 @@ RFM_plot
 
 ####  CHURN PREDICTION MODEL
 
-#First STEP:choosing a reference date in the past --> Reference date: 2019-01-01.
+# Decidiamo la data di riferimento nel passato
 
-reference_date <- ymd(20190101)
-lookback_date <- ymd(20181001)
+# Il primo scontrino è stato emesso il 2018-05-01 e l'ultimo scontrino è stato emesso il 2019-04-30
 
-study_period <- df_7_tic_clean_final %>%  
-  filter(TIC_DATE < as.Date("1/1/2019",format = "%d/%m/%Y"),
-         TIC_DATE > as.Date("01/10/2018",format = "%d/%m/%Y")) %>%
-  filter(DIREZIONE==1)                                                
+df_7_persone$TIC_DATE <- as.Date(df_7_persone$TIC_DATE)
+max(df_7_persone$TIC_DATE)
+min(df_7_persone$TIC_DATE)
 
-#The study period starts on 01/10/18 and it ends on 01/01/19.
+df <- df_7_persone
+
+df1 <- df %>% 
+  filter(DIREZIONE==1) %>%
+  group_by(ID_CLI) %>%
+  summarise(N_ACQUISTI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
+  filter(N_ACQUISTI_PER_CLI>1) #quanti acquisti per ogni cliente
+
+df2 <- df %>%
+  filter(DIREZIONE==1) %>%
+  group_by(ID_SCONTRINO) %>% 
+  summarise(ID_CLI = max(ID_CLI),TIC_DATE=max(TIC_DATE))
+
+df3 <- left_join(df1,df2,by="ID_CLI") #aggiungiamo id_scontrino e la data
+
+df4 <- df3 %>% 
+  arrange(desc(TIC_DATE)) %>% 
+  group_by(ID_CLI) %>% 
+  summarise(last=nth(TIC_DATE,1),secondl=nth(TIC_DATE,2)) %>%
+  mutate(DIFF_DAYS = as.numeric(difftime(last,secondl,units = "days")))
 
 
-#Second STEP: Imposing the length of a holdout period after each reference date.
+q <- ggplot(df4, aes(as.numeric(last-secondl), cumsum(stat(count)/nrow(df4)))) +
+  geom_freqpoly(binwidth = 8,alpha=0.8,col="black") +
+  labs(title = "Percentuale cumulativa di riacquisto", x = "days", y = "Cumulative Percentage of Repurchase") +
+  geom_line(data = data.frame(days=1:365,const=0.80),aes(days,const),col="blue") +
+  geom_line(data = data.frame(y=seq(0,1,0.1),x=72),aes(x,y),col="blue") +
+  scale_x_continuous(breaks=seq(0,300,30)) +
+  theme_classic()
 
-holdout_period <- df_7_tic_clean_final %>% 
-  filter(TIC_DATE < as.Date("28/02/2019",format = "%d/%m/%Y"),
-         TIC_DATE > as.Date("01/01/2019",format = "%d/%m/%Y")) %>%
+q
+
+# l'80% dei clienti riacquista entro 72 giorni
+
+plot <- ggplot(df4, aes(x= DIFF_DAYS)) + 
+  geom_histogram(color="#003399", fill="#99CBFF") +
+  geom_vline(aes(xintercept = 72), color="#800000", linetype="dashed", size=1) +
+  labs(title = "Ultimo acquisto - penultimo acquisto", x = "Intervallo di tempo", y = "Frequenza") +
+  scale_x_continuous(breaks=seq(0,300,30)) +
+  theme_minimal()
+
+plot
+
+# consideriamo un cliente come churn i clienti che non riacquistano entro tre mesi (decidiamo di prendere un campione leggermente più largo) ovvero nel periodo di holdout 
+reference_date <- ymd(20190201)
+
+#creiamo la colonna dei churner
+df_churn <- df_7_persone %>%
+  filter(DIREZIONE==1) %>%
+  group_by(ID_CLI) %>%
+  summarize(LAST_PURCHASE_DATE = max(TIC_DATE),
+            TOTAL_PURCHASE = sum(IMPORTO_LORDO),
+            NUMBER_OF_PURCHASE=n())   %>%
+  mutate(CHURN = as.numeric(LAST_PURCHASE_DATE >= as.Date("2019-02-01"))) %>%
+  select(CHURN,ID_CLI,LAST_PURCHASE_DATE,TOTAL_PURCHASE,NUMBER_OF_PURCHASE)
+
+sum(df_churn$CHURN==1)
+sum(df_churn$CHURN==0)
+
+#85829 clienti non sono churn, 103997 sono churn
+
+# the length of a holdout period after each reference date.
+
+holdout_period <- df_7_persone %>% 
+  filter(TIC_DATE >= as.Date("2019-02-01")) %>%
   filter(DIREZIONE==1)                                               
 
-#The holdout period starts on the 2019-01-01 and it ends at the 2019-02-28.
-
-non_churner <- holdout_period$ID_CLI[which(duplicated(holdout_period$ID_CLI)==F)]
-
-
-#In the holdout period, there are 67231 unique customer.
+#The holdout period starts on the 2019-02-01 and it ends at the 2019-04-30.
 
 #Third STEP: Choosing the lenght of a lookback period before the reference date:
-#LOOKBACK PERIOD: 3 months
 
+lookback_period  <- df_7_persone %>% 
+  filter(TIC_DATE < as.Date("2019-02-01") &TIC_DATE >= as.Date("2018-08-01") & DIREZIONE==1)
 
+#quando lo facciamo terminare?? 4 mesi?? o ne facciamo due di modelli churn?
+## No constraints to define this length, but it should be taken into account the purchase time scale
 
-#Fourth STEP  & Fifth STEP : 
-#Assign to each customers a target of 0/1 variable such that 1 is assigned to customer wbo churned in the holdout period
-#Defining a set of potentially relevant predictors variables to ble computed within the lookback period.
+### scegliamo le variabili da inserire
 
-#I choose as predictors the following variables: 
 #RECENCY:
-Recency_churn <- study_period%>% 
-  filter(DIREZIONE==1)%>%
+Recency_churn <- lookback_period%>% 
   group_by(ID_CLI)%>%
   summarise(Last_date=max(TIC_DATE),
-            Recency=as.numeric(difftime(reference_date,Last_date),units="days"))
+  Recency=as.numeric(difftime(reference_date,Last_date),units="days"))
 
 #FREQUENCY:
-Frequency_churn <- study_period %>% filter(DIREZIONE==1) %>%
+Frequency_churn <- lookback_period %>% 
   group_by(ID_CLI) %>% summarise(Frequency=n_distinct(ID_SCONTRINO))
 
 #MONETARY:
-Monetary_churn <- study_period %>% 
-  filter(DIREZIONE==1)%>%
+Monetary_churn <- lookback_period %>% 
   group_by(ID_CLI)%>%
   summarise(Imp_lordo = sum(IMPORTO_LORDO), 
             Sconto = sum(SCONTO), 
@@ -2250,15 +2298,42 @@ Monetary_churn <- study_period %>%
 #These variables concern the customer behaviour.
 Churn <- merge(Recency_churn,Frequency_churn,by="ID_CLI")
 
-#Assign to each customers a target of 0/1 variable such that 1 is assigned to customer wbo churned in the holdout period
-Churn <- left_join(Churn,Monetary_churn) %>% 
-  select(ID_CLI,Recency,Frequency,SPESA_NETTA)%>%
-  mutate(CHURN= ifelse(ID_CLI %in% non_churner,0,1))%>%
-  mutate(CHURN=factor(CHURN))
+Churn <- merge(Churn,Monetary_churn, by="ID_CLI")
 
-#Also, I consider as predictor the RFM classes:
-Churn_final <- Churn %>%  left_join(RFM, by="ID_CLI") %>%
-  select(Recency,Frequency,SPESA_NETTA,CLASSES, CHURN)
+df_churn2 <- df_7_persone %>%
+  filter(TIC_DATE < as.Date("2019-02-01") &TIC_DATE >= as.Date("2018-08-01") & DIREZIONE==1) %>%
+  group_by(ID_CLI) %>%
+  summarize(NUMBER_OF_PURCHASE=n()) %>% 
+  select(ID_CLI,NUMBER_OF_PURCHASE)
+
+Churn2 <- df_churn %>% select(ID_CLI, CHURN)
+
+Churn2 <- merge(df_churn2, Churn2, by= "ID_CLI")
+
+Churn3 <- merge(Churn, Churn2, by= "ID_CLI")
+
+Churn_RFM <- RFM %>% select(ID_CLI, N_ACQUISTI_PER_CLI, CLASS_RF, CLASSI)
+
+#!!!!!!!!!!!!!!!!!!
+#cambiare variabile N_ACQUISTI_PER_CLI in numero transazioni!!!!
+
+
+Churn_4 <- Churn_RFM %>%  right_join (Churn3, by="ID_CLI")
+
+Churn_4$CHURN <- as.factor(Churn_4$CHURN)
+
+df_totale <- df_1_persone %>% 
+  select(ID_CLI, LAST_COD_FID, LAST_STATUS_FID, LAST_DT_ACTIVE, FIRST_ID_NEG, RegOnline) %>%
+  left_join(df_2_persone %>%
+              select(ID_CLI, W_PHONE, ID_ADDRESS, TYP_JOB), by= "ID_CLI") %>%
+  left_join(df4_persone, by = "ID_CLI") %>%
+  left_join(df_3_persone %>% 
+              select(ID_ADDRESS, REGION), by= "ID_ADDRESS")%>%
+  select(-ID_ADDRESS)
+
+df_totale2 <- df_totale %>% right_join(Churn_4, by= "ID_CLI")
+
+
 
 
 
