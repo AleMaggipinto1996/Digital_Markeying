@@ -23,7 +23,7 @@ df_5_camp_cat_type_camp <- df_5_camp_cat_clean %>%
 
 df_5_camp_cat_type_camp
 
-plot_df5_TYP_CAMP_distribution=ggplot(df5_TYP_CAMP_distribution, aes(TYP_CAMP,TOT_TYP_CAMPS))+
+plot_df5_TYP_CAMP_distribution=ggplot(df_5_camp_cat_type_camp, aes(TYP_CAMP,TOT_TYP_CAMPS))+
   geom_bar(stat="identity", fill="steelblue")+
   theme_minimal()+
   labs(y="Numero di campagne attivate", x="Tipologia di Campagna")+

@@ -64,7 +64,7 @@ df_4_p_flag1_distrib <- df4_persone %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_4_p_flag1_distrib
+df_4_p_flag1_distrib  #il 30.9% dei clienti non ha dato il proprio consenso
 
 ## plot distribution
 plot_df_4_p_flag1_distrib <- (
@@ -86,11 +86,11 @@ df_4_cli_p_flag2_distrib <- df4_persone %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_4_cli_p_flag2_distrib
+df_4_cli_p_flag2_distrib   #solo il 7.1% non ha dato il consenso
 
 ## plot distribution
 plot_df_4_p_flag2_distrib <- (
-  ggplot(data=df_4_p_flag2_distrib
+  ggplot(data=df_4_cli_p_flag2_distrib
          , aes(x=FLAG_PRIVACY_2, y=PERCENT)) +
     geom_bar(stat="identity"
              , fill="steelblue") +
@@ -108,7 +108,8 @@ df_4_p_flag_mkt_distrib <- df4_persone %>%
   mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
   arrange(desc(PERCENT))
 
-df_4_p_flag_mkt_distrib
+df_4_p_flag_mkt_distrib #il 29% dei clienti non ha dato il consenso
+# con questi l'azienda non potrà comunicare al meglio
 
 ## plot distribution
 plot_df_4_p_flag_mkt_distrib <- (
@@ -126,3 +127,4 @@ plot_df_4_p_flag_mkt_distrib
 
 str(df4_persone)
 summary(df4_persone)
+

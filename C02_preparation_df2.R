@@ -106,6 +106,9 @@ tot_emailproviders <- n_distinct(df_2_p_emailprovider$EMAIL_PROVIDER)
 tot_emailproviders
 
 #!!! NOTE: too many different values for EMAIL_PROVIDER to be an useful category !!!#
+## inoltre ci sono email_provider che sono errori di battitura evidenti
+## alcuni clienti inseriscono l'email in modo sbagliato 
+## (non rendendo possibili le comunicazioni marketing)
 
 
 #### EMAIL_PROVIDER ####
@@ -161,7 +164,9 @@ plot_df2_p_emailproviderclean <- (
 )
 
 plot_df2_p_emailproviderclean
-#è usata soprattutto @gmail
+#è usata soprattutto @gmail.
+#La terza più frequente è la voce "altro", di cui fanno parte le 
+#email inserite dai clienti con errori di battitura evidenti
 
 #_____________________________________________________
 
@@ -230,8 +235,8 @@ df_2_p_phone <- df_2_persone %>%
 
 df_2_p_phone
 
-#342167 clienti hanno fornito il proprio numero telefonico (il 92.6%)
-#27305 clienti non hanno fornito il loro recapito telefonico (corrispondono al 7.39% dei clienti totali)
+#311108 clienti hanno fornito il proprio numero telefonico (il 93.2%)
+#22548 clienti non hanno fornito il loro recapito telefonico (corrispondono al 6.8% dei clienti)
 
 
 
@@ -250,6 +255,7 @@ plot_df_2_p_phone
 
 
 ### variabile TYP_ACCOUNT ###
+## 2 per le aziende, 4 per le persone fisiche
 
 ## compute distribution
 df_2_p_type <- df_2_persone %>%
@@ -258,7 +264,7 @@ df_2_p_type <- df_2_persone %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df_2_p_type
+df_2_p_type #ovviamente avendo creato il dataset delle persone, la TYP_ACCOUNT è per tutti 4
 
 ## plot distribution
 
@@ -271,72 +277,9 @@ plot_df_2_p_type <- (
     theme_minimal()
 )
 
-plot_df_2_cli_type
+plot_df_2_p_type
 
 #### FINAL REVIEW df_2_clean ####
 
 str(df_2_persone)
 summary(df_2_persone)
-
-
-
-###########IPOTESI 
-
-### Variabile W_PHONE ###
-##Distribuzione dei clienti che possiedono un telefono
-##0 se hanno fornito il loro numero telefonico
-##1 se lo hanno fornito
-
-dist_df2_wphone <- df_2_cli_account_clean %>%
-  group_by(W_PHONE) %>%
-  summarise(TOT_CLIENTI = n_distinct(ID_CLI)) %>%
-  mutate(PERC_CLIENTI = TOT_CLIENTI/sum(TOT_CLIENTI))
-
-
-plot_dist_df2_wphone <- ggplot(dist_df2_wphone,aes(x=W_PHONE,y=TOT_CLIENTI)) +
-  geom_bar(stat = "identity",aes(fill=W_PHONE)) +
-  scale_fill_manual(values = c("darkgreen","red"),guide=F)
-
-plot_dist_df2_wphone
-
-### Variabile TYP_CLI_ACCOUNT ###
-##Calcoliamo la distribuzione di TYP_CLI_ACCOUNT, che pu?
-##assumere valori 2 e 4
-
-dist_df2_tca <- df_2_cli_account_clean %>%
-  group_by(TYP_CLI_ACCOUNT) %>%
-  summarise(TOT_CLIENTI = n_distinct(ID_CLI)) %>%
-  mutate(PERC_CLIENTI = TOT_CLIENTI/sum(TOT_CLIENTI))
-
-dist_df2_tca
-#35816 clienti (pari al 9.69%) hanno un account di tipo 2
-#333656 clienti (pari al 90.31%) hanno un account di tipo 4
-
-plot_dist_df2_tca <- ggplot(dist_df2_tca,aes(TYP_CLI_ACCOUNT,TOT_CLIENTI)) +
-  geom_bar(stat = "identity",fill = "purple")
-
-plot_dist_df2_tca
-
-### Variabile TYP_JOB ###
-##Studio della distribuzione dei clienti in base al lavoro che
-##svolgono
-
-dist_typ_job <- df_2_cli_account_clean %>%
-  group_by(TYP_JOB) %>%
-  summarise(TOT_CLIENTI = n_distinct(ID_CLI)) %>%
-  mutate(PERC_CLIENTI = TOT_CLIENTI/sum(TOT_CLIENTI) )
-
-dist_typ_job
-#Il 97.7% dei clienti non ha fornito informazioni riguardo alla
-#professione che svolge. Tra chi ha fornito indicazioni il lavoro
-#piu' svolto e' il libero professionista
-
-plot_dist_typ_job <- ggplot(dist_typ_job,aes(TYP_JOB,TOT_CLIENTI)) +
-  geom_bar(stat = "identity",fill="darkred")
-
-plot_dist_typ_job
-
-#### FINAL REVIEW df_2_clean ####
-
-str(df_2_cli_account_clean)
-summary(df_2_cli_account_clean)
