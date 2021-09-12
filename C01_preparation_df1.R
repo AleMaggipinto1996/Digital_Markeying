@@ -146,10 +146,9 @@ plot_df1_dist_codfid <- (
   ) +
     geom_bar(stat="identity"
              , fill="steelblue") +
-    theme_minimal()
-)
+    theme_minimal())
 
-plot_df1_dist_codfid
+ggplotly(plot_df1_dist_codfid)
 
 #si vede una sproporzione elevata tra quelli che hanno una fidelizzazione standard e 
 #quelli premium
@@ -197,8 +196,7 @@ plot_df1_persone_codfid_ld <- (
     theme_minimal()
 )
 
-plot_df1_persone_codfid_ld
-
+ggplotly(plot_df1_persone_codfid_ld)
 
 ### variable LAST_DT_ACTIVE per ANNI ###
 
@@ -224,7 +222,7 @@ plot_df1_p_codfid_ld <- (
     theme_minimal()
 )
 
-plot_df1_p_codfid_ld
+ggplotly(plot_df1_p_codfid_ld)
 
 
 
@@ -251,7 +249,7 @@ plot_df1_p_codfid_status <- (
     theme_minimal()
 )
 
-plot_df1_p_codfid_status
+ggplotly(plot_df1_p_codfid_status)
 
 
 ### variable NUM_FIDS ###
@@ -272,11 +270,11 @@ plot_df1_p_codfid_n <- (
          , aes(x=NUM_FIDs, y=TOT_CLIs)
   ) +
     geom_bar(stat="identity"
-             , fill="steelblue") +
+             , fill="steelblue") + 
     theme_minimal()
 )
 
-plot_df1_p_codfid_n
+ggplotly(plot_df1_p_codfid_n)
 
 ## variabile LAST_TYP_CLI_FID
 ##0 se è un account secondario, 1 se ? l'account principale
@@ -304,7 +302,7 @@ plot_df1_p_codfid_main <- (
     theme_minimal()
 )
 
-plot_df1_p_codfid_main
+ggplotly(plot_df1_p_codfid_main)
 
 
 ### variabile Negozio Online / Negozio Fisico ###
@@ -319,7 +317,7 @@ df1_p_codfid_neg <- df_1_cli_fid_clean %>%
 df1_p_codfid_neg
 
 ## plot distribution
-library(plotly)
+
 plot_df1_p_codfid_neg <- (
   ggplot(data=df1_p_codfid_neg
          , aes(x=RegOnline, y=TOT_CLIs)
@@ -329,8 +327,8 @@ plot_df1_p_codfid_neg <- (
     theme_minimal()
 )
 
-plot_df1_p_codfid_neg
 ggplotly(plot_df1_p_codfid_neg)
+
 
 #### FINAL REVIEW df_1_clean ####
 
