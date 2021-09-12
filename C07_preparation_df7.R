@@ -62,7 +62,12 @@ df_7_tic_clean_final <- df_7_tic_clean %>%
 
 ## aggiunto se è weekend, festivo, giorno della settimana, altro
 
-df_7_persone <- merge( id_persone,df_7_tic_clean_final, by="ID_CLI")
+##### consideriamo solo la categoria persone #####
+
+id_persone <- as.data.frame(df_1_persone$ID_CLI)
+colnames(id_persone) <- "ID_CLI"
+
+df_7_persone <- merge(id_persone,df_7_tic_clean_final, by="ID_CLI")
 
 cons_idcli_df1_df7 <- df_1_cli_fid_clean %>%
   select(ID_CLI) %>%
@@ -139,7 +144,7 @@ plot_df7_dist_hour <- (
     theme_minimal()
 )
 
-plot_df7_dist_hour
+ggplotly(plot_df7_dist_hour)
 
 ## plot aggregate percent
 plot_df7_dist_hour_percent <- (
@@ -149,7 +154,7 @@ plot_df7_dist_hour_percent <- (
     theme_minimal()
 )
 
-plot_df7_dist_hour_percent
+ggplotly(plot_df7_dist_hour_percent)
 
 
 ### Variable COD_REPARTO ###
@@ -179,7 +184,7 @@ plot_df7_dist_dep <- (
     theme_minimal()
 )
 
-plot_df7_dist_dep
+ggplotly(plot_df7_dist_dep)
 
 ## plot aggregate percent
 plot_df7_dist_dep_percent <- (
@@ -189,7 +194,7 @@ plot_df7_dist_dep_percent <- (
     theme_minimal()
 )
 
-plot_df7_dist_dep_percent
+ggplotly(plot_df7_dist_dep_percent)
 
 ### Variable TIC_DATE_TYP ###
 
@@ -218,7 +223,7 @@ plot_df7_dist_datetyp <- (
     theme_minimal()
 )
 
-plot_df7_dist_datetyp
+ggplotly(plot_df7_dist_datetyp)
 
 ## plot aggregate percent
 plot_df7_dist_datetyp_percent <- (
@@ -228,14 +233,12 @@ plot_df7_dist_datetyp_percent <- (
     theme_minimal()
 )
 
-plot_df7_dist_datetyp_percent
+ggplotly(plot_df7_dist_datetyp_percent)
 
 ## gli acquisti vengono fatti soprattutto nei giorni lavorativi poi nel weekend e poco nei giorni festivi
 ## forse perchè essendo negozi fisici sono chiusi. I rimborsi si suddividono in maniera equa
 
 ### Variable average IMPORTO_LORDO and average SCONTO per TICKET ###
-#capire l'utilità e come sono stati scritti ?????
-
 ## compute aggregate
 df7_dist_importosconto <- df_7_persone %>%
   group_by(ID_SCONTRINO, DIREZIONE) %>%
@@ -251,6 +254,8 @@ df7_dist_avgimportosconto <- df7_dist_importosconto %>%
 
 df7_dist_avgimportosconto
 
+#L'importo lordo medio degli acquisti è pari a 164 con uno sconto di 11.8
+
 ## plot aggregate
 plot_df7_dist_importo <- (
   ggplot(data=df7_dist_importosconto %>%
@@ -260,7 +265,7 @@ plot_df7_dist_importo <- (
     theme_minimal()
 )
 
-plot_df7_dist_importo
+ggplotly(plot_df7_dist_importo)
 #Prevalgono soprattutto gli acquisti e i resi di basso valore economico
 #All'aumentare dei prezzi gli acquisti ed i resi decrescono esponenzialmente
 
@@ -273,12 +278,9 @@ plot_df7_dist_sconto <- (
     theme_minimal()
 )
 
-plot_df7_dist_sconto
+ggplotly(plot_df7_dist_sconto)
 
 # EXPLORE average IMPORTO_LORDO and average SCONTO by COD_REPARTO
-
-#capire l'utilità e come sono stati scritti ?????
-
 
 ## compute aggregate
 df7_dist_importosconto_reparto <- df_7_persone %>%
@@ -350,7 +352,7 @@ plot_df7_dist_numtics_articolo <- df7_dist_numtics_articolo %>%
   theme(axis.text = element_text(size = 10, face = "italic")) +
   theme(axis.title = element_text(size = 13))
 
-plot_df7_dist_numtics_articolo
+ggplotly(plot_df7_dist_numtics_articolo)
 
 # EXPLORE average IMPORTO_LORDO and average SCONTO per ID_CLI
 
@@ -378,7 +380,7 @@ plot_df7_dist_importo_cli <- (
     theme_minimal()
 )
 
-plot_df7_dist_importo_cli
+ggplotly(plot_df7_dist_importo_cli)
 
 ## plot aggregate
 plot_df7_dist_sconto_cli <- (
@@ -389,7 +391,7 @@ plot_df7_dist_sconto_cli <- (
     theme_minimal()
 )
 
-plot_df7_dist_sconto_cli
+ggplotly(plot_df7_dist_sconto_cli)
 
 
 # compute the distribution of customers by number of purchases (as described in the slides)
