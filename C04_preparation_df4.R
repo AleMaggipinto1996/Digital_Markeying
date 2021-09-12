@@ -61,7 +61,7 @@ df4_persone <- merge(id_persone, df_4_cli_privacy_clean, by="ID_CLI")
 df_4_p_flag1_distrib <- df4_persone %>%
   group_by(FLAG_PRIVACY_1) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)*100) %>%
   arrange(desc(PERCENT))
 
 df_4_p_flag1_distrib  #il 30.9% dei clienti non ha dato il proprio consenso
@@ -75,7 +75,7 @@ plot_df_4_p_flag1_distrib <- (
     theme_minimal()
 )
 
-plot_df_4_p_flag1_distrib
+ggplotly(plot_df_4_p_flag1_distrib)
 
 ### Variabile Privacy 2 ###
 
@@ -83,7 +83,7 @@ plot_df_4_p_flag1_distrib
 df_4_cli_p_flag2_distrib <- df4_persone %>%
   group_by(FLAG_PRIVACY_2) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)*100) %>%
   arrange(desc(PERCENT))
 
 df_4_cli_p_flag2_distrib   #solo il 7.1% non ha dato il consenso
@@ -97,7 +97,7 @@ plot_df_4_p_flag2_distrib <- (
     theme_minimal()
 )
 
-plot_df_4_p_flag2_distrib
+ggplotly(plot_df_4_p_flag2_distrib)
 
 ### variabile direct_marketing ###
 
@@ -105,7 +105,7 @@ plot_df_4_p_flag2_distrib
 df_4_p_flag_mkt_distrib <- df4_persone %>%
   group_by(FLAG_DIRECT_MKT) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)*100) %>%
   arrange(desc(PERCENT))
 
 df_4_p_flag_mkt_distrib #il 29% dei clienti non ha dato il consenso
@@ -120,7 +120,7 @@ plot_df_4_p_flag_mkt_distrib <- (
     theme_minimal()
 )
 
-plot_df_4_p_flag_mkt_distrib
+ggplotly(plot_df_4_p_flag_mkt_distrib)
 
 
 #### FINAL REVIEW df_4_clean ####
