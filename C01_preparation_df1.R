@@ -1,6 +1,6 @@
 #### PREPARAZIONE DEI DATASET ####
 
-### Dataset n?1 ###
+### Dataset n1 ###
 
 ###primo sguardo al dataset
 
@@ -21,7 +21,7 @@ df_1_cli_fid_clean %>% summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
                                  , TOT_ID_CLIFIDs = n_distinct(paste0(as.character(ID_CLI),"-",as.character(ID_FID)))
                                  , TOT_ROWs = n())
 
-#ci sono pi√π registrazioni di carte fedelt√† di ciascun cliente e questo non ci sorprende
+#ci sono piu' registrazioni di carte fedelta' di ciascun cliente e questo non ci sorprende
 
 ### Formattazione delle date 
 df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
@@ -32,7 +32,7 @@ df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(TYP_CLI_FID = as.factor(TYP_CLI_FID)) %>%
   mutate(STATUS_FID = as.factor(STATUS_FID))
 
-### Numero di programmi fedelt? per numero di clienti ##
+### Numero di programmi fedelta' per numero di clienti ##
 ##quante sottoscrizioni ho per ciascun cliente?
 
 num_fid_x_cli <- df_1_cli_fid_clean %>%
@@ -134,7 +134,7 @@ df_1_cli_fid_clean$RegOnline <- RegOnline$RegOnline
 df1_dist_codfid <- df_1_cli_fid_clean %>%
   group_by(LAST_COD_FID) %>%
   summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)*100) %>%
   arrange(desc(PERCENT))
 
 df1_dist_codfid
@@ -142,13 +142,27 @@ df1_dist_codfid
 ## plot distribution
 plot_df1_dist_codfid <- (
   ggplot(data=df1_dist_codfid
-         , aes(x=LAST_COD_FID, y=TOT_CLIs)
+         , aes(x=LAST_COD_FID, y=PERCENT)
   ) +
     geom_bar(stat="identity"
-             , fill="steelblue") +
-    theme_minimal())
+             , fill="steelblue",colour="black") +
+     theme_minimal())
 
 ggplotly(plot_df1_dist_codfid)
+
+
+
+plot_d <- ggplot(data=df1_dist_codfid
+         , aes(x=LAST_COD_FID, y=PERCENT,fill=LAST_COD_FID)) +
+    geom_bar(stat="identity") +
+    scale_fill_manual(values = c("PREMIUM" = "blue4",
+                                 "PREMIUM BIZ" = "green4",
+                                 "STANDARD" = "blue",
+                                 "STANDARD BIZ" = "green"))
+                  
+
+ggplotly(plot_d)
+
 
 #si vede una sproporzione elevata tra quelli che hanno una fidelizzazione standard e 
 #quelli premium
@@ -181,6 +195,7 @@ df1_persone_codfid_ld <- df_1_persone %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT)) %>% 
   rename(Mesi = `substring(LAST_DT_ACTIVE, 1, 7)`)
+
 
 df1_persone_codfid_ld
 
@@ -232,7 +247,7 @@ ggplotly(plot_df1_p_codfid_ld)
 df1_p_codfid_status <- df_1_persone %>%
   group_by(LAST_STATUS_FID) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)*100) %>%
   arrange(desc(PERCENT))
 
 
@@ -242,7 +257,7 @@ df1_p_codfid_status  # il 99.2% dei clienti "persone" ha una tessera fedelt‡ att
 
 plot_df1_p_codfid_status <- (
   ggplot(data=df1_p_codfid_status
-         , aes(x=LAST_STATUS_FID, y=TOT_CLIs)
+         , aes(x=LAST_STATUS_FID, y=PERCENT)
   ) +
     geom_bar(stat="identity"
              , fill="steelblue") +
@@ -277,13 +292,13 @@ plot_df1_p_codfid_n <- (
 ggplotly(plot_df1_p_codfid_n)
 
 ## variabile LAST_TYP_CLI_FID
-##0 se Ë un account secondario, 1 se ? l'account principale
+##0 se Ë un account secondario, 1 se Ë l'account principale
 
 ## compute distribution
 df1_p_codfid_main <- df_1_persone %>%
   group_by(LAST_TYP_CLI_FID) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)*100) %>%
   arrange(desc(PERCENT))
 
 df1_p_codfid_main #L'ultima tessera fedelt? attivata dai clienti nel 98.4% dei casi
@@ -295,7 +310,7 @@ df1_p_codfid_main #L'ultima tessera fedelt? attivata dai clienti nel 98.4% dei c
 
 plot_df1_p_codfid_main <- (
   ggplot(data=df1_p_codfid_main
-         , aes(x=LAST_TYP_CLI_FID, y=TOT_CLIs)
+         , aes(x=LAST_TYP_CLI_FID, y=PERCENT)
   ) +
     geom_bar(stat="identity"
              , fill="steelblue") +
@@ -311,7 +326,7 @@ ggplotly(plot_df1_p_codfid_main)
 df1_p_codfid_neg <- df_1_cli_fid_clean %>%
   group_by(RegOnline) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)*100) %>%
   arrange(desc(PERCENT))
 
 df1_p_codfid_neg
@@ -320,7 +335,7 @@ df1_p_codfid_neg
 
 plot_df1_p_codfid_neg <- (
   ggplot(data=df1_p_codfid_neg
-         , aes(x=RegOnline, y=TOT_CLIs)
+         , aes(x=RegOnline, y=PERCENT)
   ) +
     geom_bar(stat="identity"
              , fill="steelblue") +
