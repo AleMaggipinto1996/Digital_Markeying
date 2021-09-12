@@ -273,7 +273,7 @@ df6_dist_opened <- df_6_persone %>%
   summarize(TOT_EVENTs = n_distinct(ID_EVENT_S)
             , TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(TYP_CAMP = 'ALL') %>%
-  mutate(PERCENT_EVENTs = TOT_EVENTs/df6_overview$TOT_EVENTs
+  mutate(PERCENT_EVENTs = (TOT_EVENTs/df6_overview$TOT_EVENTs)*100
          , PERCENT_CLIs = TOT_CLIs/df6_overview$TOT_CLIs)
 
 df6_dist_opened
@@ -281,12 +281,12 @@ df6_dist_opened
 ## plot aggregate
 plot_df6_dist_opened <- (
   ggplot(data=df6_dist_opened
-         , aes(fill=OPENED, x=TYP_CAMP, y=TOT_EVENTs)) +
+         , aes(fill=OPENED, x=TYP_CAMP, y=PERCENT_EVENTs)) +
     geom_bar(stat="identity", position="fill") +
     theme_minimal()
 )
 
-plot_df6_dist_opened
+ggplotly(plot_df6_dist_opened)
 
 ### per la maggior parte non sono state aperte
 
@@ -322,7 +322,7 @@ plot_df6_dist_openedbytyp <- (
     theme_minimal()
 )
 
-plot_df6_dist_openedbytyp
+ggplotly(plot_df6_dist_openedbytyp)
 
 ## plot aggregate percent
 plot_df6_dist_openedbytyp_percent <- (
@@ -332,7 +332,7 @@ plot_df6_dist_openedbytyp_percent <- (
     theme_minimal()
 )
 
-plot_df6_dist_openedbytyp_percent
+ggplotly(plot_df6_dist_openedbytyp_percent)
 
 #### sono state aperte di più quelle riferite al prodotto, poi
 ### quelle personalizzate, quelle locali e infine quelle nazionali
@@ -383,7 +383,7 @@ plot_df6_dist_daystoopen_vs_cumulate <- (
     theme_minimal()
 )
 
-plot_df6_dist_daystoopen_vs_cumulate
+ggplotly(plot_df6_dist_daystoopen_vs_cumulate)
 
 # EXPLORE the following relevant variables in df_6_camp_event_clean_final:
 
@@ -418,7 +418,7 @@ plot_df6_dist_clickedbytyp <- (
     theme_minimal()
 )
 
-plot_df6_dist_clickedbytyp
+ggplotly(plot_df6_dist_clickedbytyp)
 
 ## plot aggregate percent
 plot_df6_dist_clickedbytyp_percent <- (
@@ -428,7 +428,7 @@ plot_df6_dist_clickedbytyp_percent <- (
     theme_minimal()
 )
 
-plot_df6_dist_clickedbytyp_percent
+ggplotly(plot_df6_dist_clickedbytyp_percent)
 
 # in generale pochissimi click
 #più sui prodotti e su quelli nazionali
@@ -466,7 +466,7 @@ plot_df6_dist_failedbytyp <- (
     theme_minimal()
 )
 
-plot_df6_dist_failedbytyp
+ggplotly(plot_df6_dist_failedbytyp)
 
 ## plot aggregate percent
 plot_df6_dist_failedbytyp_percent <- (
@@ -476,7 +476,7 @@ plot_df6_dist_failedbytyp_percent <- (
     theme_minimal()
 )
 
-plot_df6_dist_failedbytyp_percent
+ggplotly(plot_df6_dist_failedbytyp_percent)
 
 # pochi eventi falliti, ma soprattutto quelli nazionali
 
@@ -501,7 +501,7 @@ plot_df6_dist_num_opens <- (
     theme_minimal()
 )
 
-plot_df6_dist_num_opens
+ggplotly(plot_df6_dist_num_opens)
 
 #pochi clienti riaprono più di una volta, molto pochi più di due
 
@@ -521,7 +521,7 @@ plot_dist_df6_num_opens <- ggplot(dist_df6_num_opens,aes(Var1,Freq)) +
   xlab("Number of openes") + ylab("Number of mails")
 theme_minimal()
 
-plot_dist_df6_num_opens
+ggplotly(plot_dist_df6_num_opens)
 
 # - NUM_CLICKs
 
@@ -545,7 +545,7 @@ plot_df6_dist_num_clicks <- (
     theme_minimal()
 )
 
-plot_df6_dist_num_clicks
+ggplotly(plot_df6_dist_num_clicks)
 
 # per i click sono stati cliccati diverse volte, ma principalmente sempre una volta
 
@@ -563,7 +563,7 @@ plot_dist_df6_num_clicks <- ggplot(dist_df6_num_clicks_prep,aes(TOT_CLIs,AVG_CLI
   xlab("Number of clicks") + ylab("Number of mails")
 theme_minimal()
 
-plot_dist_df6_num_clicks
+ggplotly(plot_dist_df6_num_clicks)
 
 
 #### FINAL REVIEW df_6_clean ####
