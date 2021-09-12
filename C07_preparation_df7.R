@@ -437,105 +437,80 @@ df_days_curve
 str(df_7_persone)
 summary(df_7_persone)
 
-
-
-
-############################## PROPOSTA ########################
-
-# EXPLORE average IMPORTO_LORDO and average SCONTO by COD_REPARTO
-
-df7_dist_avgimprep <- df_7_tic_clean %>% group_by(COD_REPARTO) %>%
-  summarise(IMPORTO_MEDIO = mean(IMPORTO_LORDO))
-df7_dist_avgimprep
-
-df7_dist_avgimprep[which.max(df7_dist_avgimprep$IMPORTO_MEDIO),]
-df7_dist_avgimprep[which.min(df7_dist_avgimprep$IMPORTO_MEDIO),]
-
-
-df7_dist_avgscntrep <- df_7_tic_clean %>% filter(DIREZIONE==1)  %>% group_by(COD_REPARTO) %>%
-  summarise(SCONTO_MEDIO = mean(SCONTO))
-
-df7_dist_avgscntrep[which.max(df7_dist_avgscntrep$SCONTO_MEDIO),]
-df7_dist_avgscntrep[which.min(df7_dist_avgscntrep$SCONTO_MEDIO),]
-
-
-
-ggplot(df7_dist_avgimprep,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+
-  geom_bar(stat = "identity",fill="coral")+
-  theme_minimal()
-
-ggplot(df7_dist_avgscntrep,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+
-  geom_bar(stat = "identity",fill="lightgreen")+
-  theme_minimal()
-
-# EXPLORE ID_ARTICOLO DISTRIBUTIONS (i.e. num TICs by ID_ARTICOLO)
-df7_dist_articolo<-df_7_tic_clean_final %>% group_by(ID_ARTICOLO,DIREZIONE) %>%
+# FIND ID_ARTICOLO WITH MAX num TICs  
+df7_articolo_max_tics<-df_7_persone %>% group_by(ID_ARTICOLO) %>%
   summarise(TOT_SCONTRINI = n_distinct(ID_SCONTRINO),
             TOT_CLIENTI = n_distinct(ID_CLI))
-df7_dist_articolo[which.max(df7_dist_articolo$TOT_SCONTRINI),]
-#L'articolo pi? acquistato ? il 33700716, acquistato 57806 volte
-#da 36273 clienti diversi
+df7_articolo_max_tics[which.max(df7_articolo_max_tics$TOT_SCONTRINI),]
+
+#L'articolo con ID 33700716 è acquistato da 36273 clienti diversi 57806 volte 
 
 
-df7_dist_articolo
+#Average IMPORTO_LORDO and SCONTO by COD_REPARTO
 
-ggplot(df7_dist_articolo,aes(x=ID_ARTICOLO,y=TOT_SCONTRINI))+
-  geom_bar(stat = "identity")
+df7_avgil <- df_7_persone %>% group_by(COD_REPARTO) %>%
+summarise(IMPORTO_MEDIO = mean(IMPORTO_LORDO))
+df7_avgil
 
-# EXPLORE average IMPORTO_LORDO and average SCONTO per ID_CLI
-df7_avgimpscntcli <- df_7_tic_clean_final %>%
-  group_by(ID_CLI,DIREZIONE) %>%
-  summarise(IMPORTO_MEDIO = mean(IMPORTO_LORDO),
-            SCONTO_MEDIO = mean(SCONTO))
+df7_avgil [which.max(df7_avgil$IMPORTO_MEDIO),]
+df7_avgil [which.min(df7_avgil$IMPORTO_MEDIO),]
 
-df7_avgimpscntcli
 
-plot_df7_avgimpcli <- ggplot(df7_avgimpscntcli,aes(x=ID_CLI,y=IMPORTO_MEDIO))+
-  geom_bar(stat = "identity")
-plot_df7_avgimpcli
+df7_avgsc <- df_7_persone %>% filter(DIREZIONE==1)  %>% group_by(COD_REPARTO) %>%
+  summarise(SCONTO_MEDIO = mean(SCONTO))
 
-plot_df7_avgscntcli <- ggplot(df7_avgimpscntcli,aes(x=ID_CLI,y=SCONTO_MEDIO))+ #non va
-  geom_bar(stat = "identity")
-plot_df7_avgscntcli
+df7_avgsc[which.max(df7_avgsc$SCONTO_MEDIO),]
+df7_avgsc[which.min(df7_avgsc$SCONTO_MEDIO),]
 
-# compute the distribution of customers by number of purchases (as described in the slides)
-df7_dist_purch <- df_7_tic_clean_final %>% filter(DIREZIONE == 1) %>%
+IL<-ggplot(df7_avgil,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+
+  geom_bar(stat = "identity",fill="red")+
+  theme_minimal()
+ggplotly(IL)
+
+SC<-ggplot(df7_avgsc,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+
+  geom_bar(stat = "identity",fill="blue")+
+  theme_minimal()
+ggplotly(SC)
+
+
+# compute customers by number of purchases 
+df7_purch <- df_7_persone %>% filter(DIREZIONE == 1) %>%
   group_by(ID_CLI) %>%
   summarise(TOT_ACQUISTI = n_distinct(ID_SCONTRINO)) %>%
   arrange(desc(TOT_ACQUISTI))
 
-df7_dist_purch_cat <- df7_dist_purch %>%
-  mutate(CATEGORIA = case_when((TOT_ACQUISTI>=1) & (TOT_ACQUISTI<5) ~ "meno di 5",
-                               (TOT_ACQUISTI>=5) & (TOT_ACQUISTI<20) ~ "dai 5 ai 20",
-                               (TOT_ACQUISTI>=20) & (TOT_ACQUISTI<50) ~ "dai 20 ai 50",
-                               (TOT_ACQUISTI>=50) & (TOT_ACQUISTI<100) ~ "dai 50 ai 100",
-                               (TOT_ACQUISTI>=100) ~ "pi? di 100"))
+df7_sub_purch <- df7_purch %>%
+  mutate(CATEGORIA = case_when((TOT_ACQUISTI>=1) & (TOT_ACQUISTI<10) ~ "meno di 10",
+                               (TOT_ACQUISTI>=10) & (TOT_ACQUISTI<25) ~ "da 10 a 25",
+                               (TOT_ACQUISTI>=25) & (TOT_ACQUISTI<50) ~ "da 25 a 50",
+                               (TOT_ACQUISTI>=50) & (TOT_ACQUISTI<100) ~ "da 50 a 100",
+                               (TOT_ACQUISTI>=100) ~ "più di 100"))
 
-df7_dist_purch_cat <- df7_dist_purch_cat %>%
-  mutate(CAT = factor(CATEGORIA,levels=c("meno di 5","dai 5 ai 20",
-                                         "dai 20 ai 50","dai 50 ai 100",
-                                         "pi? di 100"))) %>%
+df7_sub_purch <- df7_sub_purch %>%
+  mutate(CAT = factor(CATEGORIA,levels=c("meno di 10","da 10 a 25",
+                                         "da 25 a 50","da 50 a 100",
+                                         "più di 100"))) %>%
   group_by(CAT) %>%
   summarise(TOT = n_distinct(ID_CLI)) %>%
   mutate(PERC_CLIENTI = TOT/sum(TOT),
          CUM_PERC_CLIENTI = cumsum(PERC_CLIENTI))
 
-df7_dist_purch_cat
+df7_sub_purch
 
 
-plot_df7_dist_purch_cat <- ggplot(df7_dist_purch_cat,aes(CAT,TOT))+
-  geom_bar(fill="darkblue",stat = "identity",width=0.4)+
-  xlab("Numero di acquisti")+
-  ylab("Numero di clienti")
+plot_df7_sub_purch <- ggplot(df7_sub_purch,aes(CAT,TOT))+
+  geom_bar(fill="red4",stat = "identity",width=0.4)+
+  xlab("N° acquisti")+
+  ylab("N° clienti")
 
-plot_df7_dist_purch_cat
+plot_df7_sub_purch
 
-# compute the days for next purchase curve (as described in the slides)
-df7_nxtpurch <- df_7_tic_clean_final %>% filter(DIREZIONE==1) %>%
+# compute the days for next purchase curve 
+df7_f_pur <- df_7_persone %>% filter(DIREZIONE==1) %>%
   select(ID_CLI,TIC_DATE) %>%
   unique()
 
-df7_nxtpurch2 <- df7_nxtpurch %>% group_by(ID_CLI) %>%
+df7_f_pur2<- df7_f_pur %>% group_by(ID_CLI) %>%
   summarise(AVG_PURCH_DIFF = round(mean(diff(TIC_DATE))),
             LAST_PURCH = nth(TIC_DATE,1),
             SECOND_LAST = nth(TIC_DATE,2))
@@ -564,6 +539,7 @@ plot_df7_nxtpurch <- ggplot(df7_nxtpurch4,aes(AVG_PURCH_DIFF,CUM_PERC_CLIs))+
   geom_text(aes(x=61, label="80%", y=0.75), colour="#404040", hjust = -0.5)
 
 plot_df7_nxtpurch
+
 #### FINAL REVIEW df_7_clean ####
 
 str(df_7_tic_clean_final)
