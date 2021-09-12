@@ -80,7 +80,7 @@ df_3_persone <- merge( df_3_cli_address_clean, id_persone_indirizzo, by="ID_ADDR
 df_3_persone_region_distrib <- df_3_persone %>%
   group_by(REGION) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_ADDRESS)) %>%
-  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)*100) %>%
   arrange(desc(PERCENT))
 
 df_3_persone_region_distrib
@@ -94,7 +94,7 @@ plot_df_3_persone_region_distrib <- (
     theme_minimal()
 )
 
-plot_df_3_persone_region_distrib
+ggplotly(plot_df_3_persone_region_distrib)
 
 #soprattutto la Lombardia
 
@@ -104,7 +104,7 @@ plot_df_3_persone_region_distrib
 df_3_persone_prv_distrib <- df_3_persone %>%
   group_by(PRV) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_ADDRESS)) %>%
-  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)*100) %>%
   arrange(desc(PERCENT))
 
 df_3_persone_prv_distrib
@@ -118,7 +118,7 @@ plot_df_3_persone_prv_distrib <- (
     theme_minimal()
 )
 
-plot_df_3_persone_prv_distrib
+ggplotly(plot_df_3_persone_prv_distrib)
 
 # troppe variabili non è significativo
 
