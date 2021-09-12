@@ -82,9 +82,8 @@ cons_idcli_df1_df2 <- df_1_persone %>%
 cons_idcli_df1_df2
 
 #ci sono 22 casi che nel df2 sono registrati come persone e nel df1 come aziende
-# df2 333656 invece df1 333634
+# Nel df2 dunque ci sono 333.656, mentre nel df1 sono 333.634
 
-## come gestiamo questi 22 casi? ci sarà un errore, gli eliminiamo?
 
 
 #### EXPLORE COLUMNS of df_2_ PERSONE ####
@@ -149,7 +148,7 @@ df_2_persone <- df_2_persone %>%
 df2_p_emailproviderclean <- df_2_persone %>%
   group_by(EMAIL_PROVIDER_CLEAN) %>%
   summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)*100) %>%
   arrange(desc(PERCENT))
 
 df2_p_emailproviderclean
@@ -157,13 +156,13 @@ df2_p_emailproviderclean
 ## plot distribution
 plot_df2_p_emailproviderclean <- (
   ggplot(data=df2_p_emailproviderclean
-         , aes(x=EMAIL_PROVIDER_CLEAN, y=TOT_CLIs)) +
+         , aes(x=EMAIL_PROVIDER_CLEAN, y=PERCENT)) +
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal()
 )
 
-plot_df2_p_emailproviderclean
+ggplotly(plot_df2_p_emailproviderclean)
 #è usata soprattutto @gmail.
 #La terza più frequente è la voce "altro", di cui fanno parte le 
 #email inserite dai clienti con errori di battitura evidenti
@@ -219,7 +218,7 @@ plot_df_2_p_typJob <- df_2_p_typJob %>%
   theme(axis.text = element_text(size = 10, face = "italic")) +
   theme(axis.title = element_text(size = 13))
 
-plot_df_2_p_typJob
+ggplotly(plot_df_2_p_typJob)
 
 
 
@@ -230,7 +229,7 @@ plot_df_2_p_typJob
 df_2_p_phone <- df_2_persone %>%
   group_by(W_PHONE) %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  mutate(PERCENT = (TOT_CLIs/sum(TOT_CLIs))*100) %>%
   arrange(desc(PERCENT))
 
 df_2_p_phone
@@ -244,14 +243,14 @@ df_2_p_phone
 
 plot_df_2_p_phone <- (
   ggplot(data=df_2_p_phone
-         , aes(x=W_PHONE, y=TOT_CLIs)
+         , aes(x=W_PHONE, y=PERCENT)
   ) +
     geom_bar(stat="identity"
              , fill="steelblue") +
     theme_minimal()
 )
 
-plot_df_2_p_phone
+ggplotly(plot_df_2_p_phone)
 
 
 ### variabile TYP_ACCOUNT ###
