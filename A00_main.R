@@ -5,12 +5,20 @@ set.seed(123456)
 
 #### LIBRARIES ####
 library(dplyr)
-library(magrittr)
 library(ggplot2)
-library(plotly)
+library(ggthemes)
+library(magrittr)
+library(pander)
+library(tidyverse)
+library(wesanderson)
 library(forcats)
 library(lubridate)
 library(RQuantLib)
+library(rfm)
+library(scales)
+library(arules)
+library(arulesViz)
+library(RColorBrewer)
 
 ## add other libraries
 
