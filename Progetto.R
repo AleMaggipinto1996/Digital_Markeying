@@ -2064,75 +2064,79 @@ clienti_attivi <- df_last_date %>% filter(DIFF_DAYS<=giorni_max)
 
 df_clienti_attivi <- merge( df_7_persone, clienti_attivi, by="ID_CLI")
 
-################### MODELLO RFM DAL 2018/09/01 AL 2019/01/31 #######################
+################### MODELLO RFM DAL 2018/08/01 AL 2019/01/31 #######################
 
 df_clienti_attivi1 <- df_clienti_attivi %>% 
-  filter(TIC_DATE <= as.Date("2019-01-31") & TIC_DATE >= as.Date("2018-09-01")) %>%
+  filter(TIC_DATE <= as.Date("2019-01-31") & TIC_DATE >= as.Date("2018-08-01")) %>%
   select(-LAST_DATE_PURCH, - DIFF_DAYS)
 
-df_last_date_1 <- df_clienti_attivi1 %>%
+df_last_date_persone_1 <- df_clienti_attivi1 %>%
   filter(DIREZIONE == 1)%>%
   group_by(ID_CLI) %>%
   summarise(LAST_DATE_PURCH= max(TIC_DATE)) %>%
   mutate(DIFF_DAYS = as.numeric(difftime(lastdate,LAST_DATE_PURCH,units = "days")))
 
 
-summary(df_last_date_1)
-boxplot(df_last_date_1$DIFF_DAYS)
+summary(df_last_date_persone_1)
+boxplot(df_last_date_persone_1$DIFF_DAYS)
 
 
-df_clienti_attivi_1 <- merge(df_clienti_attivi1, df_last_date_1, by="ID_CLI")
+df_clienti_attivi_1 <- merge(df_clienti_attivi1, df_last_date_persone_1, by="ID_CLI")
 
 ##Calcolo Recency: l'ultimo acquisto dopo quanto tempo?
 
-quantili<- quantile(df_last_date_1$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
+quantili<- quantile(df_last_date_persone_1$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
 quantili
 #25% 50% 75% 
-#109 142 179 
+#109 143 181 
 
-recency_1 = df_last_date_1 %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
+Recency_persone_1 = df_last_date_persone_1 %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
                                                       (DIFF_DAYS>=quantili[1]) & (DIFF_DAYS<quantili[3])~"Medium",
                                                       (DIFF_DAYS>=quantili[3])~"High"))
 
 
-recency_1 = mutate(recency_1,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
+Recency_persone_1 = mutate(Recency_persone_1,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
 
 
 ##Calcolo Frequency: ogni quanto acquisto?
 
-Frequency_1 <- df_clienti_attivi_1 %>%
+Frequency_persone_1 <- df_clienti_attivi_1 %>%
   filter(DIREZIONE==1) %>% group_by(ID_CLI) %>%
-  summarise(N_TRANSIZIONI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
-  filter(N_TRANSIZIONI_PER_CLI>0)
+  summarise(N_SCONTRINI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
+  filter(N_SCONTRINI_PER_CLI>0)
 
-boxplot(Frequency_1$N_TRANSIZIONI_PER_CLI)
+boxplot(Frequency_persone_1$N_SCONTRINI_PER_CLI)
 
-quantili<- quantile(Frequency_1$N_TRANSIZIONI_PER_CLI,probs = c(0.50,0.70,0.90))
+quantili<- quantile(Frequency_persone_1$N_SCONTRINI_PER_CLI,probs = c(0.50,0.70,0.90))
 quantili
+#50% 70% 90% 
+#2   4   8 
 
-Frequency_1 <- Frequency_1 %>% mutate(CLASS_F=case_when(N_TRANSIZIONI_PER_CLI<quantili[1] ~ "Low",
-                                                    (N_TRANSIZIONI_PER_CLI>=quantili[1]) & (N_TRANSIZIONI_PER_CLI<quantili[3])~"Medium",
-                                                    (N_TRANSIZIONI_PER_CLI>quantili[3])~"High"))
-Frequency_1 = mutate(Frequency_1,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
+Frequency_persone_1 <- Frequency_persone_1 %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI<quantili[1] ~ "Low",
+                                                    (N_SCONTRINI_PER_CLI>=quantili[1]) & (N_SCONTRINI_PER_CLI<quantili[3])~"Medium",
+                                                    (N_SCONTRINI_PER_CLI>quantili[3])~"High"))
+Frequency_persone_1 = mutate(Frequency_persone_1,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
 
 #Monetary Value (differenza tra importo lordo e sconto)
 
-Monetary_Value_1 = df_clienti_attivi_1 %>% filter(DIREZIONE==1) %>%
+Monetary_Value_persone_1 = df_clienti_attivi_1 %>% filter(DIREZIONE==1) %>%
   group_by(ID_CLI) %>%
   summarise(AMOUNT = sum(IMPORTO_LORDO) - sum(SCONTO))
 
-quantili = quantile(Monetary_Value_1$AMOUNT,probs = c(0.25,0.50,0.75))
+quantili = quantile(Monetary_Value_persone_1$AMOUNT,probs = c(0.25,0.50,0.75))
 quantili
+#     25%      50%      75% 
+#56.5900 163.8900 464.8075 
 
-Monetary_Value_1 = Monetary_Value_1 %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
+Monetary_Value_persone_1 = Monetary_Value_persone_1 %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
                                                                (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
                                                                AMOUNT>quantili[3]~"High"))
-Monetary_Value_1 = mutate(Monetary_Value_1,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
+Monetary_Value_persone_1 = mutate(Monetary_Value_persone_1,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
 
 # Recency-Frequency
 
-RF_1 <- merge(recency_1, Frequency_1,by="ID_CLI")
-RF_1 <- RF_1 %>% mutate(CLASS_RF_1 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
+RF_persone_1 <- merge(Recency_persone_1, Frequency_persone_1,by="ID_CLI")
+RF_persone_1 <- RF_persone_1 %>% mutate(CLASS_RF_persone_1 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
                                          (CLASS_F=="Low")&(CLASS_R=="Medium")~"One-Timer",
                                          (CLASS_F=="Low")&(CLASS_R=="High")~"Leaving",
                                          (CLASS_F=="Medium")&(CLASS_R=="Low")~"Engaged",
@@ -2142,143 +2146,147 @@ RF_1 <- RF_1 %>% mutate(CLASS_RF_1 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")
                                          (CLASS_F=="High")&(CLASS_R=="Medium")~"Top",
                                          (CLASS_F=="High")&(CLASS_R=="High")~"Leaving Top"))
 
-Fedelta_1 <- as.data.frame(with(RF_1,table(CLASS_RF_1)))
-Fedelta_1 <- Fedelta_1 %>% mutate(CLASS_RF_1 = factor(CLASS_RF_1,levels = c("Leaving","One-Timer",
+Fedelta_persone_1 <- as.data.frame(with(RF_persone_1,table(CLASS_RF_persone_1)))
+Fedelta_persone_1 <- Fedelta_persone_1 %>% mutate(CLASS_RF_persone_1 = factor(CLASS_RF_persone_1,levels = c("Leaving","One-Timer",
                                                                        "Engaged","Leaving Top",
                                                                        "Top")))
-Fedelta_1
-summary(Fedelta_1)
+Fedelta_persone_1
+summary(Fedelta_persone_1)
 
-#non ci sono Leaving e Leaving Top, per la maggior parte sono Engaged e One-Timer
+#per la maggior parte sono Engaged e Leaving
 
-Fedelta_1$Freq <- (Fedelta_1$Freq / nrow(RF_1))
+Fedelta_persone_1$Freq <- (Fedelta_persone_1$Freq / nrow(RF_persone_1))
 
-Fedelta_1_plot <- 
-  ggplot(Fedelta_1,aes(CLASS_RF_1,Freq,fill=CLASS_RF_1)) + geom_bar(stat = "identity",width = 0.5)+
+Fedelta_persone_1_plot <- 
+  ggplot(Fedelta_persone_1,aes(CLASS_RF_persone_1,Freq,fill=CLASS_RF_persone_1)) + geom_bar(stat = "identity",width = 0.5)+
   ggtitle("Fedeltà")+ylab("Percentuale di Clienti")+xlab("Fedeltà")+
   scale_fill_brewer(palette = "Reds")+ scale_y_continuous(labels = percent) +
   theme_bw()+theme(panel.grid.major = element_blank(), 
                    panel.grid.minor = element_blank())+theme(panel.border = element_blank())+theme(panel.background = element_blank())+theme(axis.line = element_line(colour = "black"))
 
-Fedelta_1_plot
+Fedelta_persone_1_plot
 
 ################### rendere più carino !!!!!!!!!!!!!!
 
-##### RFM_1
+##### RFM_persone_1
 
-RFM_1 <- RF_1 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
-  left_join(Monetary_Value_1,by="ID_CLI")
-RFM_1 <- mutate(RFM_1,CLASS_RF_1=factor(CLASS_RF_1))
+RFM_persone_1 <- RF_persone_1 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
+  left_join(Monetary_Value_persone_1,by="ID_CLI")
+RFM_persone_1 <- mutate(RFM_persone_1,CLASS_RF_persone_1=factor(CLASS_RF_persone_1))
 
 
-RFM_1 <- RFM_1 %>% mutate(CLASSI_1 = case_when((CLASS_M=="Low") & (CLASS_RF_1=="One-Timer")~"Cheap",
-                                         (CLASS_M=="Low") & (CLASS_RF_1=="Leaving")~"Tin",
-                                         (CLASS_M=="Low") & (CLASS_RF_1=="Engaged")~"Copper",
-                                         (CLASS_M=="Low") & (CLASS_RF_1=="Leaving Top")~"Bronze",
-                                         (CLASS_M=="Low") & (CLASS_RF_1=="Top")~"Silver",
-                                         (CLASS_M=="Medium") & (CLASS_RF_1=="One-Timer")~"Tin",
-                                         (CLASS_M=="Medium") & (CLASS_RF_1=="Leaving")~"Copper",
-                                         (CLASS_M=="Medium") & (CLASS_RF_1=="Engaged")~"Bronze",
-                                         (CLASS_M=="Medium") & (CLASS_RF_1=="Leaving Top")~"Silver",
-                                         (CLASS_M=="Medium") & (CLASS_RF_1=="Top")~"Gold",
-                                         (CLASS_M=="High") & (CLASS_RF_1=="One-Timer")~"Copper",
-                                         (CLASS_M=="High") & (CLASS_RF_1=="Leaving")~"Bronze",
-                                         (CLASS_M=="High") & (CLASS_RF_1=="Engaged")~"Silver",
-                                         (CLASS_M=="High") & (CLASS_RF_1=="Leaving Top")~"Gold",
-                                         (CLASS_M=="High") & (CLASS_RF_1=="Top")~"Diamond"))
-RFM_1 = RFM_1 %>% mutate(CLASSI_1 = factor(CLASSI_1,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
-RFM_TOT1 <- as.data.frame(with(RFM_1,table(CLASSI_1)))
+RFM_persone_1 <- RFM_persone_1 %>% mutate(CLASSI_persone_1 = case_when((CLASS_M=="Low") & (CLASS_RF_persone_1=="One-Timer")~"Cheap",
+                                         (CLASS_M=="Low") & (CLASS_RF_persone_1=="Leaving")~"Tin",
+                                         (CLASS_M=="Low") & (CLASS_RF_persone_1=="Engaged")~"Copper",
+                                         (CLASS_M=="Low") & (CLASS_RF_persone_1=="Leaving Top")~"Bronze",
+                                         (CLASS_M=="Low") & (CLASS_RF_persone_1=="Top")~"Silver",
+                                         (CLASS_M=="Medium") & (CLASS_RF_persone_1=="One-Timer")~"Tin",
+                                         (CLASS_M=="Medium") & (CLASS_RF_persone_1=="Leaving")~"Copper",
+                                         (CLASS_M=="Medium") & (CLASS_RF_persone_1=="Engaged")~"Bronze",
+                                         (CLASS_M=="Medium") & (CLASS_RF_persone_1=="Leaving Top")~"Silver",
+                                         (CLASS_M=="Medium") & (CLASS_RF_persone_1=="Top")~"Gold",
+                                         (CLASS_M=="High") & (CLASS_RF_persone_1=="One-Timer")~"Copper",
+                                         (CLASS_M=="High") & (CLASS_RF_persone_1=="Leaving")~"Bronze",
+                                         (CLASS_M=="High") & (CLASS_RF_persone_1=="Engaged")~"Silver",
+                                         (CLASS_M=="High") & (CLASS_RF_persone_1=="Leaving Top")~"Gold",
+                                         (CLASS_M=="High") & (CLASS_RF_persone_1=="Top")~"Diamond"))
+RFM_persone_1 = RFM_persone_1 %>% mutate(CLASSI_persone_1 = factor(CLASSI_persone_1,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
+RFM_TOT_persone_1 <- as.data.frame(with(RFM_persone_1,table(CLASSI_persone_1)))
 
-RFM_TOT1 #la maggior parte dei clienti appartengono alla categoria Bronze, però troppi
+RFM_TOT_persone_1 #la maggior parte dei clienti appartengono alla categoria Bronze, però troppi
          #clienti appartengono alla categoria cheap e tin.
 
-RFM_TOT1$Freq <- (RFM_TOT1$Freq / nrow(RFM_1))
+RFM_TOT_persone_1$Freq <- (RFM_TOT_persone_1$Freq / nrow(RFM_persone_1))
 
 
 #EXPLORATORY ANALYSIS of RFM's dataframe
-RFM_1_plot <- 
-  ggplot(RFM_TOT1,aes(CLASSI_1,Freq,fill=CLASSI_1)) + geom_bar(stat = "identity")+
+RFM_persone_1_plot <- 
+  ggplot(RFM_TOT_persone_1,aes(CLASSI_persone_1,Freq,fill=CLASSI_persone_1)) + geom_bar(stat = "identity")+
   labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent)+
   scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
   theme_minimal()
 
-RFM_1_plot
+RFM_persone_1_plot
 
 
-################ MODELLO RFM DAL 2018/12/01 AL 2019/04/30 ########################
+################ MODELLO RFM DAL 2018/11/01 AL 2019/04/30 ########################
 
 df_clienti_attivi2 <- df_clienti_attivi %>% 
-  filter(TIC_DATE >= as.Date("2018-12-01")) %>%
+  filter(TIC_DATE >= as.Date("2018-11-01")) %>%
   select(-LAST_DATE_PURCH, - DIFF_DAYS)
 
-df_last_date_2 <- df_clienti_attivi2 %>%
+df_last_date_2_persone <- df_clienti_attivi2 %>%
   filter(DIREZIONE == 1)%>%
   group_by(ID_CLI) %>%
   summarise(LAST_DATE_PURCH= max(TIC_DATE)) %>%
   mutate(DIFF_DAYS = as.numeric(difftime(lastdate,LAST_DATE_PURCH,units = "days")))
 
 
-summary(df_last_date_2)
-boxplot(df_last_date_2$DIFF_DAYS)
+summary(df_last_date_2_persone)
+boxplot(df_last_date_2_persone$DIFF_DAYS)
 
 
-df_clienti_attivi_2 <- merge(df_clienti_attivi2, df_last_date_2, by="ID_CLI")
+df_clienti_attivi_2 <- merge(df_clienti_attivi2, df_last_date_2_persone, by="ID_CLI")
 
 #notiamo cdal numero di righe dei due dataset he i clienti sono aumentati ma le transazioni ovvero il numero 
 #di scontrini sono diminuite-
 
 ##Calcolo Recency: l'ultimo acquisto dopo quanto tempo?
 
-quantili<- quantile(df_last_date_2$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
+quantili<- quantile(df_last_date_2_persone$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
 quantili
 #25% 50% 75% 
-#22  48  92 
+#24  58 114 
 
-recency_2 = df_last_date_2 %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
+Recency_2_persone = df_last_date_2_persone %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
                                                      (DIFF_DAYS>=quantili[1]) & (DIFF_DAYS<quantili[3])~"Medium",
                                                      (DIFF_DAYS>=quantili[3])~"High"))
 
 
-recency_2 = mutate(recency_2,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
+Recency_2_persone = mutate(Recency_2_persone,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
 
 
 ##Calcolo Frequency: ogni quanto acquisto?
 
-Frequency_2 <- df_clienti_attivi_2 %>%
+Frequency_2_persone <- df_clienti_attivi_2 %>%
   filter(DIREZIONE==1) %>% group_by(ID_CLI) %>%
-  summarise(N_ACQUISTI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
-  filter(N_ACQUISTI_PER_CLI>0)
+  summarise(N_SCONTRINI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
+  filter(N_SCONTRINI_PER_CLI>0)
 
-boxplot(Frequency_2$N_ACQUISTI_PER_CLI)
+boxplot(Frequency_2_persone$N_SCONTRINI_PER_CLI)
 
-quantili<- quantile(Frequency_2$N_ACQUISTI_PER_CLI,probs = c(0.50,0.70,0.90))
+quantili<- quantile(Frequency_2_persone$N_SCONTRINI_PER_CLI,probs = c(0.50,0.70,0.90))
 quantili
+#50% 70% 90% 
+#2   3   7 
 
-Frequency_2 <- Frequency_2 %>% mutate(CLASS_F=case_when(N_ACQUISTI_PER_CLI<quantili[1] ~ "Low",
-                                                           (N_ACQUISTI_PER_CLI>=quantili[1]) & (N_ACQUISTI_PER_CLI<quantili[3])~"Medium",
-                                                           (N_ACQUISTI_PER_CLI>quantili[3])~"High"))
-Frequency_2 = mutate(Frequency_2,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
+
+Frequency_2_persone <- Frequency_2_persone %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI<quantili[1] ~ "Low",
+                                                           (N_SCONTRINI_PER_CLI>=quantili[1]) & (N_SCONTRINI_PER_CLI<quantili[3])~"Medium",
+                                                           (N_SCONTRINI_PER_CLI>quantili[3])~"High"))
+Frequency_2_persone = mutate(Frequency_2_persone,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
 
 #Monetary Value (differenza tra importo lordo e sconto)
 
-Monetary_Value_2 = df_clienti_attivi_2 %>% filter(DIREZIONE==1) %>%
+Monetary_Value_2_persone = df_clienti_attivi_2 %>% filter(DIREZIONE==1) %>%
   group_by(ID_CLI) %>%
   summarise(AMOUNT = sum(IMPORTO_LORDO) - sum(SCONTO))
 
-quantili = quantile(Monetary_Value_2$AMOUNT,probs = c(0.25,0.50,0.75))
+quantili = quantile(Monetary_Value_2_persone$AMOUNT,probs = c(0.25,0.50,0.75))
 quantili
-#
+#25%      50%      75% 
+#48.4500 138.5500 388.9975 
 
 
-Monetary_Value_2 = Monetary_Value_2 %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
+Monetary_Value_2_persone = Monetary_Value_2_persone %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
                                                           (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
                                                           AMOUNT>quantili[3]~"High"))
-Monetary_Value_2 = mutate(Monetary_Value_2,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
+Monetary_Value_2_persone = mutate(Monetary_Value_2_persone,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
 
 # Recency-Frequency
 
-RF_2 <- merge(recency_2, Frequency_2,by="ID_CLI")
-RF_2 <- RF_2 %>% mutate(CLASS_RF_2 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
+RF_persone_2 <- merge(Recency_2_persone, Frequency_2_persone,by="ID_CLI")
+RF_persone_2 <- RF_persone_2 %>% mutate(CLASS_RF_persone_2 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
                                                        (CLASS_F=="Low")&(CLASS_R=="Medium")~"One-Timer",
                                                        (CLASS_F=="Low")&(CLASS_R=="High")~"Leaving",
                                                        (CLASS_F=="Medium")&(CLASS_R=="Low")~"Engaged",
@@ -2288,65 +2296,65 @@ RF_2 <- RF_2 %>% mutate(CLASS_RF_2 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")
                                                        (CLASS_F=="High")&(CLASS_R=="Medium")~"Top",
                                                        (CLASS_F=="High")&(CLASS_R=="High")~"Leaving Top"))
 
-Fedelta_2 <- as.data.frame(with(RF_2,table(CLASS_RF_2)))
-Fedelta_2 <- Fedelta_2 %>% mutate(CLASS_RF_2 = factor(CLASS_RF_2,levels = c("Leaving","One-Timer",
+Fedelta_2_persone <- as.data.frame(with(RF_persone_2,table(CLASS_RF_persone_2)))
+Fedelta_2_persone <- Fedelta_2_persone %>% mutate(CLASS_RF_persone_2 = factor(CLASS_RF_persone_2,levels = c("Leaving","One-Timer",
                                                                                       "Engaged","Leaving Top",
                                                                                       "Top")))
 
-Fedelta_2 #ci sono Leaving e Leaving Top, la maggior parte sono Engaged, continuano a esserci molti One_Timer
+Fedelta_2_persone # la maggior parte sono Engaged, continuano a esserci molti One_Timer
 
-Fedelta_2$Freq <- (Fedelta_2$Freq / nrow(RF_2))
+Fedelta_2_persone$Freq <- (Fedelta_2_persone$Freq / nrow(RF_persone_2))
 
-Fedelta_2_plot <- 
-  ggplot(Fedelta_2,aes(CLASS_RF_2,Freq,fill=CLASS_RF_2)) + geom_bar(stat = "identity",width = 0.5)+
+Fedelta_2_persone_plot <- 
+  ggplot(Fedelta_2_persone,aes(CLASS_RF_persone_2,Freq,fill=CLASS_RF_persone_2)) + geom_bar(stat = "identity",width = 0.5)+
   ggtitle("Fedeltà")+ylab("Percentuale di Clienti")+ xlab("Fedeltà")+ scale_y_continuous(labels = percent) +
   scale_fill_brewer(palette = "Reds")+ 
   theme_bw()+theme(panel.grid.major = element_blank(), 
                    panel.grid.minor = element_blank())+theme(panel.border = element_blank())+theme(panel.background = element_blank())+theme(axis.line = element_line(colour = "black"))
 
-Fedelta_2_plot
+Fedelta_2_persone_plot
 
-################### rendere più carino e mettere in percentuale
+################### rendere più carino
 
 ##### RFM
 
-RFM_2 <- RF_2 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
-  left_join(Monetary_Value_2,by="ID_CLI")
-RFM_2 <- mutate(RFM_2,CLASS_RF_2=factor(CLASS_RF_2))
+RFM_2_persone <- RF_persone_2 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
+  left_join(Monetary_Value_2_persone,by="ID_CLI")
+RFM_2_persone <- mutate(RFM_2_persone,CLASS_RF_persone_2=factor(CLASS_RF_persone_2))
 
 
-RFM_2 <- RFM_2 %>% mutate(CLASSI_2 = case_when((CLASS_M=="Low") & (CLASS_RF_2=="One-Timer")~"Cheap",
-                                          (CLASS_M=="Low") & (CLASS_RF_2=="Leaving")~"Tin",
-                                          (CLASS_M=="Low") & (CLASS_RF_2=="Engaged")~"Copper",
-                                          (CLASS_M=="Low") & (CLASS_RF_2=="Leaving Top")~"Bronze",
-                                          (CLASS_M=="Low") & (CLASS_RF_2=="Top")~"Silver",
-                                          (CLASS_M=="Medium") & (CLASS_RF_2=="One-Timer")~"Tin",
-                                          (CLASS_M=="Medium") & (CLASS_RF_2=="Leaving")~"Copper",
-                                          (CLASS_M=="Medium") & (CLASS_RF_2=="Engaged")~"Bronze",
-                                          (CLASS_M=="Medium") & (CLASS_RF_2=="Leaving Top")~"Silver",
-                                          (CLASS_M=="Medium") & (CLASS_RF_2=="Top")~"Gold",
-                                          (CLASS_M=="High") & (CLASS_RF_2=="One-Timer")~"Copper",
-                                          (CLASS_M=="High") & (CLASS_RF_2=="Leaving")~"Bronze",
-                                          (CLASS_M=="High") & (CLASS_RF_2=="Engaged")~"Silver",
-                                          (CLASS_M=="High") & (CLASS_RF_2=="Leaving Top")~"Gold",
-                                          (CLASS_M=="High") & (CLASS_RF_2=="Top")~"Diamond"))
+RFM_2_persone <- RFM_2_persone %>% mutate(CLASSI_2 = case_when((CLASS_M=="Low") & (CLASS_RF_persone_2=="One-Timer")~"Cheap",
+                                          (CLASS_M=="Low") & (CLASS_RF_persone_2=="Leaving")~"Tin",
+                                          (CLASS_M=="Low") & (CLASS_RF_persone_2=="Engaged")~"Copper",
+                                          (CLASS_M=="Low") & (CLASS_RF_persone_2=="Leaving Top")~"Bronze",
+                                          (CLASS_M=="Low") & (CLASS_RF_persone_2=="Top")~"Silver",
+                                          (CLASS_M=="Medium") & (CLASS_RF_persone_2=="One-Timer")~"Tin",
+                                          (CLASS_M=="Medium") & (CLASS_RF_persone_2=="Leaving")~"Copper",
+                                          (CLASS_M=="Medium") & (CLASS_RF_persone_2=="Engaged")~"Bronze",
+                                          (CLASS_M=="Medium") & (CLASS_RF_persone_2=="Leaving Top")~"Silver",
+                                          (CLASS_M=="Medium") & (CLASS_RF_persone_2=="Top")~"Gold",
+                                          (CLASS_M=="High") & (CLASS_RF_persone_2=="One-Timer")~"Copper",
+                                          (CLASS_M=="High") & (CLASS_RF_persone_2=="Leaving")~"Bronze",
+                                          (CLASS_M=="High") & (CLASS_RF_persone_2=="Engaged")~"Silver",
+                                          (CLASS_M=="High") & (CLASS_RF_persone_2=="Leaving Top")~"Gold",
+                                          (CLASS_M=="High") & (CLASS_RF_persone_2=="Top")~"Diamond"))
 
-RFM_2 = RFM_2 %>% mutate(CLASSI_2 = factor(CLASSI_2,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
-RFM_TOT2 <- as.data.frame(with(RFM_2,table(CLASSI_2)))
+RFM_2_persone = RFM_2_persone %>% mutate(CLASSI_2 = factor(CLASSI_2,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
+RFM_TOT2_persone <- as.data.frame(with(RFM_2_persone,table(CLASSI_2)))
 
-RFM_TOT2#per la maggior parte sono bronze e Tin
+RFM_TOT2_persone#per la maggior parte sono bronze e Tin e copper
 
-RFM_TOT2$Freq <- (RFM_TOT2$Freq / nrow(RFM_2))
+RFM_TOT2_persone$Freq <- (RFM_TOT2_persone$Freq / nrow(RFM_2_persone))
 
 
 #EXPLORATORY ANALYSIS of RFM's dataframe
-RFM_2_plot <- 
-  ggplot(RFM_TOT2,aes(CLASSI_2,Freq,fill=CLASSI_2)) + geom_bar(stat = "identity")+
+RFM_2_persone_plot <- 
+  ggplot(RFM_TOT2_persone,aes(CLASSI_2,Freq,fill=CLASSI_2)) + geom_bar(stat = "identity")+
   labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent) +
   scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
   theme_minimal()
 
-RFM_2_plot
+RFM_2_persone_plot
 
 ##################################################################################
 ##################################################################################
@@ -2354,12 +2362,12 @@ RFM_2_plot
 
 ############
 
-# MODELLO RFM per la categoria persone
+# MODELLO RFM per la categoria aziende
 
 ################
 
-lastdate = df_7_persone %>% summarise(max(TIC_DATE))
-lastdate=lastdate[1,1]
+lastdate2 = df_7_aziende %>% summarise(max(TIC_DATE))
+lastdate2=lastdate2[1,1]
 ## prima data di acquisto risale al 2018-05-01, l'ultima data di acquisto risale al 2019-04-30
 
 #vogliamo trovare i clienti attivi (80%)
@@ -2367,96 +2375,100 @@ lastdate=lastdate[1,1]
 #troviamo l'ultimo giorno di acquisto per ogni cliente
 #e quanti giorni sono passati dall'ultimo acquisto in generale
 
-df_last_date <- df_7_persone %>%
+df_last_date_aziende <- df_7_aziende %>%
   filter(DIREZIONE == 1)%>%
   group_by(ID_CLI) %>%
   summarise(LAST_DATE_PURCH= max(TIC_DATE)) %>%
   mutate(DIFF_DAYS = as.numeric(difftime(lastdate,LAST_DATE_PURCH,units = "days")))
 
 
-summary(df_last_date)
-boxplot(df_last_date$DIFF_DAYS)
+summary(df_last_date_aziende)
+boxplot(df_last_date_aziende$DIFF_DAYS)
 
-giorni_max=quantile(df_last_date$DIFF_DAYS, probs = c(0.80, 0.85, 0.90))
+giorni_max=quantile(df_last_date_aziende$DIFF_DAYS, probs = c(0.80, 0.85, 0.90))
 giorni_max
 
 #decidiamo di considerare attivi l'ottanta percento dei clienti
 
 giorni_max = giorni_max[1]
 
-clienti_attivi <- df_last_date %>% filter(DIFF_DAYS<=giorni_max)
+aziende_attive <- df_last_date_aziende %>% filter(DIFF_DAYS<=giorni_max)
 
-df_clienti_attivi <- merge( df_7_persone, clienti_attivi, by="ID_CLI")
+df_aziende_attive <- merge( df_7_aziende, aziende_attive, by="ID_CLI")
 
-################### MODELLO RFM DAL 2018/09/01 AL 2019/01/31 #######################
+################### MODELLO RFM DAL 2018/08/01 AL 2019/01/31 #######################
 
-df_clienti_attivi1 <- df_clienti_attivi %>% 
-  filter(TIC_DATE <= as.Date("2019-01-31") & TIC_DATE >= as.Date("2018-09-01")) %>%
+df_aziende_attive1 <- df_aziende_attive %>% 
+  filter(TIC_DATE <= as.Date("2019-01-31") & TIC_DATE >= as.Date("2018-08-01")) %>%
   select(-LAST_DATE_PURCH, - DIFF_DAYS)
 
-df_last_date_1 <- df_clienti_attivi1 %>%
+df_last_date_aziende_1 <- df_aziende_attive1 %>%
   filter(DIREZIONE == 1)%>%
   group_by(ID_CLI) %>%
   summarise(LAST_DATE_PURCH= max(TIC_DATE)) %>%
   mutate(DIFF_DAYS = as.numeric(difftime(lastdate,LAST_DATE_PURCH,units = "days")))
 
 
-summary(df_last_date_1)
-boxplot(df_last_date_1$DIFF_DAYS)
+summary(df_last_date_aziende_1)
+boxplot(df_last_date_aziende_1$DIFF_DAYS)
 
 
-df_clienti_attivi_1 <- merge(df_clienti_attivi1, df_last_date_1, by="ID_CLI")
+df_aziende_attive_1 <- merge(df_aziende_attive1, df_last_date_aziende_1, by="ID_CLI")
 
 ##Calcolo Recency: l'ultimo acquisto dopo quanto tempo?
 
-quantili<- quantile(df_last_date_1$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
+quantili<- quantile(df_last_date_aziende_1$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
 quantili
 #25% 50% 75% 
-#109 142 179 
+#108 141 176 
 
-recency_1 = df_last_date_1 %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
+Recency_aziende_1 = df_last_date_aziende_1 %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
                                                         (DIFF_DAYS>=quantili[1]) & (DIFF_DAYS<quantili[3])~"Medium",
                                                         (DIFF_DAYS>=quantili[3])~"High"))
 
 
-recency_1 = mutate(recency_1,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
+Recency_aziende_1 = mutate(Recency_aziende_1,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
 
 
 ##Calcolo Frequency: ogni quanto acquisto?
 
-Frequency_1 <- df_clienti_attivi_1 %>%
+Frequency_aziende_1 <- df_aziende_attive_1 %>%
   filter(DIREZIONE==1) %>% group_by(ID_CLI) %>%
-  summarise(N_TRANSIZIONI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
-  filter(N_TRANSIZIONI_PER_CLI>0)
+  summarise(N_SCONTRINI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
+  filter(N_SCONTRINI_PER_CLI>0)
 
-boxplot(Frequency_1$N_TRANSIZIONI_PER_CLI)
+boxplot(Frequency_aziende_1$N_SCONTRINI_PER_CLI)
 
-quantili<- quantile(Frequency_1$N_TRANSIZIONI_PER_CLI,probs = c(0.50,0.70,0.90))
+quantili<- quantile(Frequency_aziende_1$N_SCONTRINI_PER_CLI,probs = c(0.50,0.70,0.90))
 quantili
+#50% 70% 90% 
+#2   4   9 
 
-Frequency_1 <- Frequency_1 %>% mutate(CLASS_F=case_when(N_TRANSIZIONI_PER_CLI<quantili[1] ~ "Low",
-                                                        (N_TRANSIZIONI_PER_CLI>=quantili[1]) & (N_TRANSIZIONI_PER_CLI<quantili[3])~"Medium",
-                                                        (N_TRANSIZIONI_PER_CLI>quantili[3])~"High"))
-Frequency_1 = mutate(Frequency_1,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
+Frequency_aziende_1 <- Frequency_aziende_1 %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI<quantili[1] ~ "Low",
+                                                        (N_SCONTRINI_PER_CLI>=quantili[1]) & (N_SCONTRINI_PER_CLI<quantili[3])~"Medium",
+                                                        (N_SCONTRINI_PER_CLI>quantili[3])~"High"))
+Frequency_aziende_1 = mutate(Frequency_aziende_1,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
 
 #Monetary Value (differenza tra importo lordo e sconto)
 
-Monetary_Value_1 = df_clienti_attivi_1 %>% filter(DIREZIONE==1) %>%
+Monetary_Value_aziende_1 = df_aziende_attive_1 %>% filter(DIREZIONE==1) %>%
   group_by(ID_CLI) %>%
   summarise(AMOUNT = sum(IMPORTO_LORDO) - sum(SCONTO))
 
-quantili = quantile(Monetary_Value_1$AMOUNT,probs = c(0.25,0.50,0.75))
+quantili = quantile(Monetary_Value_aziende_1$AMOUNT,probs = c(0.25,0.50,0.75))
 quantili
+#25%     50%     75% 
+#89.130 251.985 689.870 
 
-Monetary_Value_1 = Monetary_Value_1 %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
+Monetary_Value_aziende_1 = Monetary_Value_aziende_1 %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
                                                                    (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
                                                                    AMOUNT>quantili[3]~"High"))
-Monetary_Value_1 = mutate(Monetary_Value_1,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
+Monetary_Value_aziende_1 = mutate(Monetary_Value_aziende_1,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
 
 # Recency-Frequency
 
-RF_1 <- merge(recency_1, Frequency_1,by="ID_CLI")
-RF_1 <- RF_1 %>% mutate(CLASS_RF_1 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
+RF_aziende_1 <- merge(Recency_aziende_1, Frequency_aziende_1,by="ID_CLI")
+RF_aziende_1 <- RF_aziende_1 %>% mutate(CLASS_RF_aziende_1 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
                                                (CLASS_F=="Low")&(CLASS_R=="Medium")~"One-Timer",
                                                (CLASS_F=="Low")&(CLASS_R=="High")~"Leaving",
                                                (CLASS_F=="Medium")&(CLASS_R=="Low")~"Engaged",
@@ -2466,143 +2478,145 @@ RF_1 <- RF_1 %>% mutate(CLASS_RF_1 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")
                                                (CLASS_F=="High")&(CLASS_R=="Medium")~"Top",
                                                (CLASS_F=="High")&(CLASS_R=="High")~"Leaving Top"))
 
-Fedelta_1 <- as.data.frame(with(RF_1,table(CLASS_RF_1)))
-Fedelta_1 <- Fedelta_1 %>% mutate(CLASS_RF_1 = factor(CLASS_RF_1,levels = c("Leaving","One-Timer",
+Fedelta_aziende_1 <- as.data.frame(with(RF_aziende_1,table(CLASS_RF_aziende_1)))
+Fedelta_aziende_1 <- Fedelta_aziende_1 %>% mutate(CLASS_RF_aziende_1 = factor(CLASS_RF_aziende_1,levels = c("Leaving","One-Timer",
                                                                             "Engaged","Leaving Top",
                                                                             "Top")))
-Fedelta_1
-summary(Fedelta_1)
+Fedelta_aziende_1
+summary(Fedelta_aziende_1)
 
-#non ci sono Leaving e Leaving Top, per la maggior parte sono Engaged e One-Timer
+#per la maggior parte sono Engaged
 
-Fedelta_1$Freq <- (Fedelta_1$Freq / nrow(RF_1))
+Fedelta_aziende_1$Freq <- (Fedelta_aziende_1$Freq / nrow(RF_aziende_1))
 
-Fedelta_1_plot <- 
-  ggplot(Fedelta_1,aes(CLASS_RF_1,Freq,fill=CLASS_RF_1)) + geom_bar(stat = "identity",width = 0.5)+
+Fedelta_aziende_1_plot <- 
+  ggplot(Fedelta_aziende_1,aes(CLASS_RF_aziende_1,Freq,fill=CLASS_RF_aziende_1)) + geom_bar(stat = "identity",width = 0.5)+
   ggtitle("Fedeltà")+ylab("Percentuale di Clienti")+xlab("Fedeltà")+
   scale_fill_brewer(palette = "Reds")+ scale_y_continuous(labels = percent) +
   theme_bw()+theme(panel.grid.major = element_blank(), 
                    panel.grid.minor = element_blank())+theme(panel.border = element_blank())+theme(panel.background = element_blank())+theme(axis.line = element_line(colour = "black"))
 
-Fedelta_1_plot
+Fedelta_aziende_1_plot
 
 ################### rendere più carino !!!!!!!!!!!!!!
 
-##### RFM_1
+##### RFM_aziende_1
 
-RFM_1 <- RF_1 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
-  left_join(Monetary_Value_1,by="ID_CLI")
-RFM_1 <- mutate(RFM_1,CLASS_RF_1=factor(CLASS_RF_1))
+RFM_aziende_1 <- RF_aziende_1 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
+  left_join(Monetary_Value_aziende_1,by="ID_CLI")
+RFM_aziende_1 <- mutate(RFM_aziende_1,CLASS_RF_aziende_1=factor(CLASS_RF_aziende_1))
 
 
-RFM_1 <- RFM_1 %>% mutate(CLASSI_1 = case_when((CLASS_M=="Low") & (CLASS_RF_1=="One-Timer")~"Cheap",
-                                               (CLASS_M=="Low") & (CLASS_RF_1=="Leaving")~"Tin",
-                                               (CLASS_M=="Low") & (CLASS_RF_1=="Engaged")~"Copper",
-                                               (CLASS_M=="Low") & (CLASS_RF_1=="Leaving Top")~"Bronze",
-                                               (CLASS_M=="Low") & (CLASS_RF_1=="Top")~"Silver",
-                                               (CLASS_M=="Medium") & (CLASS_RF_1=="One-Timer")~"Tin",
-                                               (CLASS_M=="Medium") & (CLASS_RF_1=="Leaving")~"Copper",
-                                               (CLASS_M=="Medium") & (CLASS_RF_1=="Engaged")~"Bronze",
-                                               (CLASS_M=="Medium") & (CLASS_RF_1=="Leaving Top")~"Silver",
-                                               (CLASS_M=="Medium") & (CLASS_RF_1=="Top")~"Gold",
-                                               (CLASS_M=="High") & (CLASS_RF_1=="One-Timer")~"Copper",
-                                               (CLASS_M=="High") & (CLASS_RF_1=="Leaving")~"Bronze",
-                                               (CLASS_M=="High") & (CLASS_RF_1=="Engaged")~"Silver",
-                                               (CLASS_M=="High") & (CLASS_RF_1=="Leaving Top")~"Gold",
-                                               (CLASS_M=="High") & (CLASS_RF_1=="Top")~"Diamond"))
-RFM_1 = RFM_1 %>% mutate(CLASSI_1 = factor(CLASSI_1,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
-RFM_TOT1 <- as.data.frame(with(RFM_1,table(CLASSI_1)))
+RFM_aziende_1 <- RFM_aziende_1 %>% mutate(CLASSI_aziende_1 = case_when((CLASS_M=="Low") & (CLASS_RF_aziende_1=="One-Timer")~"Cheap",
+                                               (CLASS_M=="Low") & (CLASS_RF_aziende_1=="Leaving")~"Tin",
+                                               (CLASS_M=="Low") & (CLASS_RF_aziende_1=="Engaged")~"Copper",
+                                               (CLASS_M=="Low") & (CLASS_RF_aziende_1=="Leaving Top")~"Bronze",
+                                               (CLASS_M=="Low") & (CLASS_RF_aziende_1=="Top")~"Silver",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_1=="One-Timer")~"Tin",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_1=="Leaving")~"Copper",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_1=="Engaged")~"Bronze",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_1=="Leaving Top")~"Silver",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_1=="Top")~"Gold",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_1=="One-Timer")~"Copper",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_1=="Leaving")~"Bronze",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_1=="Engaged")~"Silver",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_1=="Leaving Top")~"Gold",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_1=="Top")~"Diamond"))
+RFM_aziende_1 = RFM_aziende_1 %>% mutate(CLASSI_aziende_1 = factor(CLASSI_aziende_1,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
+RFM_TOT_aziende_1 <- as.data.frame(with(RFM_aziende_1,table(CLASSI_aziende_1)))
 
-RFM_TOT1 #la maggior parte dei clienti appartengono alla categoria Bronze, però troppi
-#clienti appartengono alla categoria cheap e tin.
+RFM_TOT_aziende_1 #la maggior parte dei clienti appartengono alla categoria Bronze e TIN e Copper 
 
-RFM_TOT1$Freq <- (RFM_TOT1$Freq / nrow(RFM_1))
+RFM_TOT_aziende_1$Freq <- (RFM_TOT_aziende_1$Freq / nrow(RFM_aziende_1))
 
 
 #EXPLORATORY ANALYSIS of RFM's dataframe
-RFM_1_plot <- 
-  ggplot(RFM_TOT1,aes(CLASSI_1,Freq,fill=CLASSI_1)) + geom_bar(stat = "identity")+
+RFM_aziende_1_plot <- 
+  ggplot(RFM_TOT_aziende_1,aes(CLASSI_aziende_1,Freq,fill=CLASSI_aziende_1)) + geom_bar(stat = "identity")+
   labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent)+
   scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
   theme_minimal()
 
-RFM_1_plot
+RFM_aziende_1_plot
 
 
-################ MODELLO RFM DAL 2018/12/01 AL 2019/04/30 ########################
+################ MODELLO RFM DAL 2018/11/01 AL 2019/04/30 ########################
 
-df_clienti_attivi2 <- df_clienti_attivi %>% 
-  filter(TIC_DATE >= as.Date("2018-12-01")) %>%
+df_aziende_attive2 <- df_aziende_attive %>% 
+  filter(TIC_DATE >= as.Date("2018-11-01")) %>%
   select(-LAST_DATE_PURCH, - DIFF_DAYS)
 
-df_last_date_2 <- df_clienti_attivi2 %>%
+df_last_date_2_aziende <- df_aziende_attive2 %>%
   filter(DIREZIONE == 1)%>%
   group_by(ID_CLI) %>%
   summarise(LAST_DATE_PURCH= max(TIC_DATE)) %>%
   mutate(DIFF_DAYS = as.numeric(difftime(lastdate,LAST_DATE_PURCH,units = "days")))
 
 
-summary(df_last_date_2)
-boxplot(df_last_date_2$DIFF_DAYS)
+summary(df_last_date_2_aziende)
+boxplot(df_last_date_2_aziende$DIFF_DAYS)
 
 
-df_clienti_attivi_2 <- merge(df_clienti_attivi2, df_last_date_2, by="ID_CLI")
+df_clienti_attivi_2 <- merge(df_aziende_attive2, df_last_date_2_aziende, by="ID_CLI")
 
 #notiamo cdal numero di righe dei due dataset he i clienti sono aumentati ma le transazioni ovvero il numero 
 #di scontrini sono diminuite-
 
 ##Calcolo Recency: l'ultimo acquisto dopo quanto tempo?
 
-quantili<- quantile(df_last_date_2$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
+quantili<- quantile(df_last_date_2_aziende$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
 quantili
 #25% 50% 75% 
-#22  48  92 
+#24  57 116
 
-recency_2 = df_last_date_2 %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
+Recency_2_aziende = df_last_date_2_aziende %>% mutate(CLASS_R=case_when(DIFF_DAYS<quantili[1] ~ "Low",
                                                         (DIFF_DAYS>=quantili[1]) & (DIFF_DAYS<quantili[3])~"Medium",
                                                         (DIFF_DAYS>=quantili[3])~"High"))
 
 
-recency_2 = mutate(recency_2,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
+Recency_2_aziende = mutate(Recency_2_aziende,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
 
 
 ##Calcolo Frequency: ogni quanto acquisto?
 
-Frequency_2 <- df_clienti_attivi_2 %>%
+Frequency_2_aziende <- df_clienti_attivi_2 %>%
   filter(DIREZIONE==1) %>% group_by(ID_CLI) %>%
-  summarise(N_ACQUISTI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
-  filter(N_ACQUISTI_PER_CLI>0)
+  summarise(N_SCONTRINI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
+  filter(N_SCONTRINI_PER_CLI>0)
 
-boxplot(Frequency_2$N_ACQUISTI_PER_CLI)
+boxplot(Frequency_2_aziende$N_SCONTRINI_PER_CLI)
 
-quantili<- quantile(Frequency_2$N_ACQUISTI_PER_CLI,probs = c(0.50,0.70,0.90))
+quantili<- quantile(Frequency_2_aziende$N_SCONTRINI_PER_CLI,probs = c(0.50,0.70,0.90))
 quantili
+#50% 70% 90% 
+#2   4   9 
 
-Frequency_2 <- Frequency_2 %>% mutate(CLASS_F=case_when(N_ACQUISTI_PER_CLI<quantili[1] ~ "Low",
-                                                        (N_ACQUISTI_PER_CLI>=quantili[1]) & (N_ACQUISTI_PER_CLI<quantili[3])~"Medium",
-                                                        (N_ACQUISTI_PER_CLI>quantili[3])~"High"))
-Frequency_2 = mutate(Frequency_2,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
+Frequency_2_aziende <- Frequency_2_aziende %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI<quantili[1] ~ "Low",
+                                                        (N_SCONTRINI_PER_CLI>=quantili[1]) & (N_SCONTRINI_PER_CLI<quantili[3])~"Medium",
+                                                        (N_SCONTRINI_PER_CLI>quantili[3])~"High"))
+Frequency_2_aziende = mutate(Frequency_2_aziende,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
 
 #Monetary Value (differenza tra importo lordo e sconto)
 
-Monetary_Value_2 = df_clienti_attivi_2 %>% filter(DIREZIONE==1) %>%
+Monetary_Value_2_aziende = df_clienti_attivi_2 %>% filter(DIREZIONE==1) %>%
   group_by(ID_CLI) %>%
   summarise(AMOUNT = sum(IMPORTO_LORDO) - sum(SCONTO))
 
-quantili = quantile(Monetary_Value_2$AMOUNT,probs = c(0.25,0.50,0.75))
+quantili = quantile(Monetary_Value_2_aziende$AMOUNT,probs = c(0.25,0.50,0.75))
 quantili
-#
+#   25%    50%    75% 
+#  75.0025 224.6700 620.6275 
 
 
-Monetary_Value_2 = Monetary_Value_2 %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
+Monetary_Value_2_aziende = Monetary_Value_2_aziende %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
                                                                    (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
                                                                    AMOUNT>quantili[3]~"High"))
-Monetary_Value_2 = mutate(Monetary_Value_2,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
+Monetary_Value_2_aziende = mutate(Monetary_Value_2_aziende,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
 
 # Recency-Frequency
 
-RF_2 <- merge(recency_2, Frequency_2,by="ID_CLI")
-RF_2 <- RF_2 %>% mutate(CLASS_RF_2 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
+RF_aziende_2 <- merge(Recency_2_aziende, Frequency_2_aziende,by="ID_CLI")
+RF_aziende_2 <- RF_aziende_2 %>% mutate(CLASS_RF_aziende_2 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")~"One-Timer",
                                                (CLASS_F=="Low")&(CLASS_R=="Medium")~"One-Timer",
                                                (CLASS_F=="Low")&(CLASS_R=="High")~"Leaving",
                                                (CLASS_F=="Medium")&(CLASS_R=="Low")~"Engaged",
@@ -2612,65 +2626,65 @@ RF_2 <- RF_2 %>% mutate(CLASS_RF_2 = case_when((CLASS_F=="Low")&(CLASS_R=="Low")
                                                (CLASS_F=="High")&(CLASS_R=="Medium")~"Top",
                                                (CLASS_F=="High")&(CLASS_R=="High")~"Leaving Top"))
 
-Fedelta_2 <- as.data.frame(with(RF_2,table(CLASS_RF_2)))
-Fedelta_2 <- Fedelta_2 %>% mutate(CLASS_RF_2 = factor(CLASS_RF_2,levels = c("Leaving","One-Timer",
+Fedelta_2_aziende <- as.data.frame(with(RF_aziende_2,table(CLASS_RF_aziende_2)))
+Fedelta_2_aziende <- Fedelta_2_aziende %>% mutate(CLASS_RF_aziende_2 = factor(CLASS_RF_aziende_2,levels = c("Leaving","One-Timer",
                                                                             "Engaged","Leaving Top",
                                                                             "Top")))
 
-Fedelta_2 #ci sono Leaving e Leaving Top, la maggior parte sono Engaged, continuano a esserci molti One_Timer
+Fedelta_2_aziende # la maggior parte sono Engaged e leaving, continuano a esserci molti One_Timer
 
-Fedelta_2$Freq <- (Fedelta_2$Freq / nrow(RF_2))
+Fedelta_2_aziende$Freq <- (Fedelta_2_aziende$Freq / nrow(RF_aziende_2))
 
-Fedelta_2_plot <- 
-  ggplot(Fedelta_2,aes(CLASS_RF_2,Freq,fill=CLASS_RF_2)) + geom_bar(stat = "identity",width = 0.5)+
+Fedelta_2_aziende_plot <- 
+  ggplot(Fedelta_2_aziende,aes(CLASS_RF_aziende_2,Freq,fill=CLASS_RF_aziende_2)) + geom_bar(stat = "identity",width = 0.5)+
   ggtitle("Fedeltà")+ylab("Percentuale di Clienti")+ xlab("Fedeltà")+ scale_y_continuous(labels = percent) +
   scale_fill_brewer(palette = "Reds")+ 
   theme_bw()+theme(panel.grid.major = element_blank(), 
                    panel.grid.minor = element_blank())+theme(panel.border = element_blank())+theme(panel.background = element_blank())+theme(axis.line = element_line(colour = "black"))
 
-Fedelta_2_plot
+Fedelta_2_aziende_plot
 
 ################### rendere più carino e mettere in percentuale
 
 ##### RFM
 
-RFM_2 <- RF_2 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
-  left_join(Monetary_Value_2,by="ID_CLI")
-RFM_2 <- mutate(RFM_2,CLASS_RF_2=factor(CLASS_RF_2))
+RFM_2_aziende <- RF_aziende_2 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
+  left_join(Monetary_Value_2_aziende,by="ID_CLI")
+RFM_2_aziende <- mutate(RFM_2_aziende,CLASS_RF_aziende_2=factor(CLASS_RF_aziende_2))
 
 
-RFM_2 <- RFM_2 %>% mutate(CLASSI_2 = case_when((CLASS_M=="Low") & (CLASS_RF_2=="One-Timer")~"Cheap",
-                                               (CLASS_M=="Low") & (CLASS_RF_2=="Leaving")~"Tin",
-                                               (CLASS_M=="Low") & (CLASS_RF_2=="Engaged")~"Copper",
-                                               (CLASS_M=="Low") & (CLASS_RF_2=="Leaving Top")~"Bronze",
-                                               (CLASS_M=="Low") & (CLASS_RF_2=="Top")~"Silver",
-                                               (CLASS_M=="Medium") & (CLASS_RF_2=="One-Timer")~"Tin",
-                                               (CLASS_M=="Medium") & (CLASS_RF_2=="Leaving")~"Copper",
-                                               (CLASS_M=="Medium") & (CLASS_RF_2=="Engaged")~"Bronze",
-                                               (CLASS_M=="Medium") & (CLASS_RF_2=="Leaving Top")~"Silver",
-                                               (CLASS_M=="Medium") & (CLASS_RF_2=="Top")~"Gold",
-                                               (CLASS_M=="High") & (CLASS_RF_2=="One-Timer")~"Copper",
-                                               (CLASS_M=="High") & (CLASS_RF_2=="Leaving")~"Bronze",
-                                               (CLASS_M=="High") & (CLASS_RF_2=="Engaged")~"Silver",
-                                               (CLASS_M=="High") & (CLASS_RF_2=="Leaving Top")~"Gold",
-                                               (CLASS_M=="High") & (CLASS_RF_2=="Top")~"Diamond"))
+RFM_2_aziende <- RFM_2_aziende %>% mutate(CLASSI_2 = case_when((CLASS_M=="Low") & (CLASS_RF_aziende_2=="One-Timer")~"Cheap",
+                                               (CLASS_M=="Low") & (CLASS_RF_aziende_2=="Leaving")~"Tin",
+                                               (CLASS_M=="Low") & (CLASS_RF_aziende_2=="Engaged")~"Copper",
+                                               (CLASS_M=="Low") & (CLASS_RF_aziende_2=="Leaving Top")~"Bronze",
+                                               (CLASS_M=="Low") & (CLASS_RF_aziende_2=="Top")~"Silver",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_2=="One-Timer")~"Tin",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_2=="Leaving")~"Copper",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_2=="Engaged")~"Bronze",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_2=="Leaving Top")~"Silver",
+                                               (CLASS_M=="Medium") & (CLASS_RF_aziende_2=="Top")~"Gold",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_2=="One-Timer")~"Copper",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_2=="Leaving")~"Bronze",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_2=="Engaged")~"Silver",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_2=="Leaving Top")~"Gold",
+                                               (CLASS_M=="High") & (CLASS_RF_aziende_2=="Top")~"Diamond"))
 
-RFM_2 = RFM_2 %>% mutate(CLASSI_2 = factor(CLASSI_2,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
-RFM_TOT2 <- as.data.frame(with(RFM_2,table(CLASSI_2)))
+RFM_2_aziende = RFM_2_aziende %>% mutate(CLASSI_2 = factor(CLASSI_2,levels = c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")))
+RFM_TOT2_aziende <- as.data.frame(with(RFM_2_aziende,table(CLASSI_2)))
 
-RFM_TOT2#per la maggior parte sono bronze e Tin
+RFM_TOT2_aziende#per la maggior parte sono bronze e Tin
 
-RFM_TOT2$Freq <- (RFM_TOT2$Freq / nrow(RFM_2))
+RFM_TOT2_aziende$Freq <- (RFM_TOT2_aziende$Freq / nrow(RFM_2_aziende))
 
 
 #EXPLORATORY ANALYSIS of RFM's dataframe
-RFM_2_plot <- 
-  ggplot(RFM_TOT2,aes(CLASSI_2,Freq,fill=CLASSI_2)) + geom_bar(stat = "identity")+
+RFM_2_aziende_plot <- 
+  ggplot(RFM_TOT2_aziende,aes(CLASSI_2,Freq,fill=CLASSI_2)) + geom_bar(stat = "identity")+
   labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent) +
   scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
   theme_minimal()
 
-RFM_2_plot
+RFM_2_aziende_plot
 
 ##################################################################################
 ##################################################################################
@@ -2694,8 +2708,8 @@ df <- df_7_persone
 df1 <- df %>% 
   filter(DIREZIONE==1) %>%
   group_by(ID_CLI) %>%
-  summarise(N_ACQUISTI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
-  filter(N_ACQUISTI_PER_CLI>1) #quanti acquisti per ogni cliente
+  summarise(N_SCONTRINI_PER_CLI= n_distinct(ID_SCONTRINO)) %>%
+  filter(N_SCONTRINI_PER_CLI>1) #quanti acquisti per ogni cliente
 
 df2 <- df %>%
   filter(DIREZIONE==1) %>%
@@ -2759,7 +2773,7 @@ holdout_period <- df_7_persone %>%
 #The holdout period starts on the 2019-02-01 and it ends at the 2019-04-30.
 
 #Third STEP: Choosing the lenght of a lookback period before the reference date:
-#consideriamo come lunghezza del periodo di lookback sei mesi
+#consideriamo come lunghezza del periodo di lookback di cinque mesi
 
 lookback_period  <- df_7_persone %>% 
   filter(TIC_DATE < as.Date("2019-02-01") &TIC_DATE >= as.Date("2018-08-01") & DIREZIONE==1)
@@ -2804,11 +2818,7 @@ Churn2 <- merge(df_churn2, Churn2, by= "ID_CLI")
 
 Churn3 <- merge(Churn, Churn2, by= "ID_CLI")
 
-Churn_RFM <- RFM %>% select(ID_CLI, N_ACQUISTI_PER_CLI, CLASS_RF, CLASSI)
-
-#!!!!!!!!!!!!!!!!!!
-#cambiare variabile N_ACQUISTI_PER_CLI in numero transazioni!!!!
-
+Churn_RFM <- RFM_persone_1 %>% select(ID_CLI, CLASS_RF_persone_1, CLASSI_persone_1)
 
 Churn_4 <- Churn_RFM %>%  right_join (Churn3, by="ID_CLI")
 
@@ -2822,10 +2832,21 @@ df_totale <- df_1_persone %>%
 
 df_finale<- df_totale %>% right_join(Churn_4, by= "ID_CLI")
 
-## mettere anche il dataset 6? 
+df_6_p <- df_6_persone %>% filter(OPENED == TRUE) %>% group_by(ID_CLI) %>%
+  summarise(N_EMAIL_APERTE= n())
+  
+df_6_p2 <- df_6_persone %>% filter(CLICKED == TRUE) %>% group_by(ID_CLI) %>%
+  summarise(N_EMAIL_CLICCATE= n())
 
-##del dataset 7 vedere magari se i clienti hanno mandato qualcosa 
+df_finale <- df_finale %>% left_join(df_6_p, by= "ID_CLI") %>% left_join(df_6_p2, by="ID_CLI")
+
+df_finale2 <- df_finale %>% mutate(N_EMAIL_APERTE = fct_explicit_na(N_EMAIL_APERTE, "0"))%>% mutate(N_EMAIL_CLICCATE = fct_explicit_na(N_EMAIL_CLICCATE, "0"))
+
+# se i clienti hanno mandato qualcosa 
 #per essere rimborsati??
+
+
+
 
 
 
