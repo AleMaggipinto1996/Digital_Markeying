@@ -17,14 +17,7 @@ library(forcats)
 library(lubridate)
 library(RQuantLib)
 library(rfm)
-library(caret)
-library(rpart)
-library(rpart.plot)
-library(randomForest)
-library(funModeling)
-library(arules)
-library(arulesViz)
-library(tidyr)
+library(scales)
 
 
 #### DIRECTORIES ####
