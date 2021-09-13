@@ -14,7 +14,7 @@ df_3_aziende <- merge( df_3_cli_address_clean, id_aziende_indirizzo, by="ID_ADDR
 df_3_aziende_region_distrib <- df_3_aziende %>%
   group_by(REGION) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_ADDRESS)) %>%
-  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)*100) %>%
   arrange(desc(PERCENT))
 
 df_3_aziende_region_distrib
@@ -28,9 +28,9 @@ plot_df_3_aziende_region_distrib <- (
     theme_minimal()
 )
 
-plot_df_3_aziende_region_distrib
+ggplotly(plot_df_3_aziende_region_distrib)
 
-#soprattutto la Lombardia
+#soprattutto la Lombardia 
 
 ### variabile PROVINCIA ###
 
@@ -38,7 +38,7 @@ plot_df_3_aziende_region_distrib
 df_3_aziende_prv_distrib <- df_3_aziende %>%
   group_by(PRV) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_ADDRESS)) %>%
-  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)*100) %>%
   arrange(desc(PERCENT))
 
 df_3_aziende_prv_distrib
@@ -62,7 +62,7 @@ plot_df_3_aziende_prv_distrib
 df_3_aziende_cap_distrib <- df_3_aziende %>%
   group_by(CAP) %>%
   dplyr::summarize(TOT_IDs = n_distinct(ID_ADDRESS)) %>%
-  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)) %>%
+  mutate(PERCENT = TOT_IDs/sum(TOT_IDs)*100) %>%
   arrange(desc(PERCENT))
 
 df_3_aziende_cap_distrib

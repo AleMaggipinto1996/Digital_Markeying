@@ -55,7 +55,7 @@ plot_df6_az_overviewbytyp <- (
     theme_minimal()
 )
 
-plot_df6_az_overviewbytyp
+ggplotly(plot_df6_az_overviewbytyp)
 
 ###sono state fatte soprattutto campagne nazionali
 
@@ -75,12 +75,12 @@ df6_az_dist_opened
 ## plot aggregate
 plot_df6_az_dist_opened <- (
   ggplot(data=df6_az_dist_opened
-         , aes(fill=OPENED, x=TYP_CAMP, y=TOT_EVENTs)) +
+         , aes(fill=OPENED, x=TYP_CAMP, y=PERCENT_EVENTs)) +
     geom_bar(stat="identity", position="fill") +
     theme_minimal()
 )
 
-plot_df6_az_dist_opened
+ggplotly(plot_df6_az_dist_opened)
 
 ### per la maggior parte non sono state aperte
 
@@ -111,12 +111,12 @@ df6_az_dist_openedbytyp
 ## plot aggregate
 plot_df6_az_dist_openedbytyp <- (
   ggplot(data=df6_az_dist_openedbytyp
-         , aes(fill=OPENED, x=TYP_CAMP, y=TOT_EVENTs)) +
+         , aes(fill=OPENED, x=TYP_CAMP, y=PERCENT_EVENTs)) +
     geom_bar(stat="identity") +
     theme_minimal()
 )
 
-plot_df6_az_dist_openedbytyp
+ggplotly(plot_df6_az_dist_openedbytyp)
 
 ## plot aggregate percent
 plot_df6_az_dist_openedbytyp_percent <- (
@@ -126,7 +126,7 @@ plot_df6_az_dist_openedbytyp_percent <- (
     theme_minimal()
 )
 
-plot_df6_az_dist_openedbytyp_percent
+ggplotly(plot_df6_az_dist_openedbytyp_percent)
 
 #### sono state aperte di più quelle riferite al prodotto, poi
 ### quelle personalizzare, quelle locali e infine quelle nazionali
@@ -153,7 +153,7 @@ plot_df6_az_dist_daystoopen <- (
     theme_minimal()
 )
 
-plot_df6_az_dist_daystoopen
+ggplotly(plot_df6_az_dist_daystoopen)
 
 #### la maggior parte vengono aperte subito o il giorno dopo
 ##più passano i giorni più diminuiscono
@@ -176,7 +176,7 @@ plot_df6_az_dist_daystoopen_vs_cumulate <- (
     theme_minimal()
 )
 
-plot_df6_az_dist_daystoopen_vs_cumulate
+ggplotly(plot_df6_az_dist_daystoopen_vs_cumulate)
 
 # EXPLORE the following relevant variables in df_6_camp_event_clean_final:
 
@@ -206,12 +206,12 @@ df6_az_dist_clickedbytyp
 ## plot aggregate
 plot_df6_az_dist_clickedbytyp <- (
   ggplot(data=df6_az_dist_clickedbytyp
-         , aes(fill=CLICKED, x=TYP_CAMP, y=TOT_EVENTs)) +
+         , aes(fill=CLICKED, x=TYP_CAMP, y=PERCENT_EVENTs)) +
     geom_bar(stat="identity") +
     theme_minimal()
 )
 
-plot_df6_az_dist_clickedbytyp
+ggplotly(plot_df6_az_dist_clickedbytyp)
 
 ## plot aggregate percent
 plot_df6_az_dist_clickedbytyp_percent <- (
@@ -221,7 +221,7 @@ plot_df6_az_dist_clickedbytyp_percent <- (
     theme_minimal()
 )
 
-plot_df6_az_dist_clickedbytyp_percent
+ggplotly(plot_df6_az_dist_clickedbytyp_percent)
 
 # in generale pochissimi click
 #più sui prodotti e su quelli nazionali
@@ -254,12 +254,12 @@ df6_az_dist_failedbytyp
 ## plot aggregate
 plot_df6_az_dist_failedbytyp <- (
   ggplot(data=df6_az_dist_failedbytyp
-         , aes(fill=FAILED, x=TYP_CAMP, y=TOT_EVENTs)) +
+         , aes(fill=FAILED, x=TYP_CAMP, y=PERCENT_EVENTs)) +
     geom_bar(stat="identity") +
     theme_minimal()
 )
 
-plot_df6_az_dist_failedbytyp
+ggplotly(plot_df6_az_dist_failedbytyp)
 
 ## plot aggregate percent
 plot_df6_az_dist_failedbytyp_percent <- (
@@ -269,7 +269,7 @@ plot_df6_az_dist_failedbytyp_percent <- (
     theme_minimal()
 )
 
-plot_df6_az_dist_failedbytyp_percent
+ggplotly(plot_df6_az_dist_failedbytyp_percent)
 
 # pochi eventi falliti, ma soprattutto quelli nazionali
 
@@ -294,7 +294,7 @@ plot_df6_az_dist_num_opens <- (
     theme_minimal()
 )
 
-plot_df6_az_dist_num_opens
+ggplotly(plot_df6_az_dist_num_opens)
 
 #pochi clienti riaprono più di una volta, molto pochi più di due
 
@@ -320,7 +320,7 @@ plot_df6_az_dist_num_clicks <- (
     theme_minimal()
 )
 
-plot_df6_az_dist_num_clicks
+ggplotly(plot_df6_az_dist_num_clicks)
 
 # per i click sono stati cliccati diverse volte, ma principalemnte sempre una volta
 
