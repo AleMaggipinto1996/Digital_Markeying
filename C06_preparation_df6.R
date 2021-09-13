@@ -365,7 +365,6 @@ plot_df6_dist_daystoopen
 ##più passano i giorni più diminuiscono
 
 ### DAYS_TO_OPEN vs CUMULATE PERCENT 
-###################################### non ho capito cos'è ???????
 
 ## compute aggregate
 df6_dist_daystoopen_vs_cumulate <- df6_dist_daystoopen %>%
@@ -384,6 +383,8 @@ plot_df6_dist_daystoopen_vs_cumulate <- (
 )
 
 ggplotly(plot_df6_dist_daystoopen_vs_cumulate)
+
+## Il 90% apre entro 4 giorni
 
 # EXPLORE the following relevant variables in df_6_camp_event_clean_final:
 
@@ -505,24 +506,6 @@ ggplotly(plot_df6_dist_num_opens)
 
 #pochi clienti riaprono più di una volta, molto pochi più di due
 
-##raggruppiamole in 3 categorie: -One-time, -2 times, -More than 2
-dist_df6_num_opens_prep <- df6_dist_num_opens %>%
-  mutate(AVG_OPENs = case_when(AVG_OPENs==1 ~ "One-time",
-                                 (AVG_OPENs==2) ~ "2 times",
-                                 (AVG_OPENs >2)~ "More than 2"))
-
-dist_df6_num_opens <- as.data.frame(table(dist_df6_num_opens_prep$AVG_OPENs))
-
-dist_df6_num_opens
-
-## plot
-plot_dist_df6_num_opens <- ggplot(dist_df6_num_opens,aes(Var1,Freq)) +
-  geom_bar(stat = "identity",fill="steelblue")+
-  xlab("Number of openes") + ylab("Number of mails")
-theme_minimal()
-
-ggplotly(plot_dist_df6_num_opens)
-
 # - NUM_CLICKs
 
 # compute aggregate
@@ -548,22 +531,6 @@ plot_df6_dist_num_clicks <- (
 ggplotly(plot_df6_dist_num_clicks)
 
 # per i click sono stati cliccati diverse volte, ma principalmente sempre una volta
-
-##raggruppiamole in 3 categorie: -One-time, -2-4 clicks, -More than 5
-dist_df6_num_clicks_prep <- df6_dist_num_clicks %>%
-  mutate(AVG_CLICKs = case_when(AVG_CLICKs==1 ~ "One-time",
-                                  (AVG_CLICKs >1 & AVG_CLICKs<=4) ~ "2-4 clicks",
-                                  (AVG_CLICKs >5)~ "More than 5"))
-
-#dist_df6_num_clicks <- as.data.frame(table(dist_df6_num_clicks_prep$TOT_CLIs))
-
-
-plot_dist_df6_num_clicks <- ggplot(dist_df6_num_clicks_prep,aes(TOT_CLIs,AVG_CLICKs)) +
-  geom_bar(stat = "identity",fill="steelblue")+
-  xlab("Number of clicks") + ylab("Number of mails")
-theme_minimal()
-
-ggplotly(plot_dist_df6_num_clicks)
 
 
 #### FINAL REVIEW df_6_clean ####
