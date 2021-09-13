@@ -7,6 +7,7 @@ set.seed(123456)
 library(dplyr)
 library(magrittr)
 library(ggplot2)
+library(plotly)
 library(forcats)
 library(lubridate)
 library(RQuantLib)
@@ -14,7 +15,7 @@ library(RQuantLib)
 
 #### DIRECTORIES ####
 getwd()
-working_dir = "C:/Users/Utente/Desktop/Web_marketing/Script"
+working_dir = "C:/Users/Utente/Documents/GitHub/Progetto_DigitalM"
 data_dir = "C:/Users/Utente/Desktop/Web_marketing/Data"
 setwd(working_dir)
 
