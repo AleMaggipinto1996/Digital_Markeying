@@ -4,7 +4,7 @@ df_1_aziende <- df_1_cli_fid_clean %>%
 
 #_________________________________________
 
-############# consideriamo la parte che riguarda i clienti business ###########?
+############# consideriamo la parte che riguarda i clienti business ###########
 
 #_________________________________________
 
@@ -17,7 +17,7 @@ df1_aziende_codfid_ld <- df_1_aziende %>%
   dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT)) %>% 
-  rename(Mesi = `substring(LAST_DT_ACTIVE, 1, 7)`)
+  rename(Mesi = substring(LAST_DT_ACTIVE,1,7))
 
 df1_aziende_codfid_ld
 
