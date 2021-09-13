@@ -47,9 +47,8 @@ cons_idcli_df1_df7
 #!!! NOTE: all ID_CLI in df_7 are mapped in df_1, but not all ID_CLI in df_1 are mapped in df_7 !!!#  
 
 #### RESHAPING df_7 ####
-
+ ## adding day characterization ##
 df_7_tic_clean_final <- df_7_tic_clean %>%
-  ## adding day characterization ##
   mutate(TIC_DATE_WEEKDAY = wday(TIC_DATE)) %>%
   mutate(TIC_DATE_HOLIDAY = isHoliday("Italy", TIC_DATE)) %>%
   mutate(TIC_DATE_TYP = case_when(
