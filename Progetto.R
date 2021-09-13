@@ -811,6 +811,11 @@ colnames(id_persone_indirizzo) <- "ID_ADDRESS"
 
 df_3_persone <- merge( df_3_cli_address_clean, id_persone_indirizzo, by="ID_ADDRESS")
 
+id_aziende_indirizzo <- as.data.frame(df_2_aziende$ID_ADDRESS)
+colnames(id_aziende_indirizzo) <- "ID_ADDRESS"
+
+df_3_aziende <- merge( df_3_cli_address_clean, id_aziende_indirizzo, by="ID_ADDRESS")
+
 #### EXPLORE COLUMNS of df_3 ####
 
 # EXPLORE the df_3_cli_address_clean relevant variables
@@ -2184,9 +2189,6 @@ RFM_plot
 
 
 
-
-
-
 ####  CHURN PREDICTION MODEL
 
 # Decidiamo la data di riferimento nel passato
@@ -2267,12 +2269,11 @@ holdout_period <- df_7_persone %>%
 #The holdout period starts on the 2019-02-01 and it ends at the 2019-04-30.
 
 #Third STEP: Choosing the lenght of a lookback period before the reference date:
+#consideriamo come lunghezza del periodo di lookback sei mesi
 
 lookback_period  <- df_7_persone %>% 
   filter(TIC_DATE < as.Date("2019-02-01") &TIC_DATE >= as.Date("2018-08-01") & DIREZIONE==1)
 
-#quando lo facciamo terminare?? 4 mesi?? o ne facciamo due di modelli churn?
-## No constraints to define this length, but it should be taken into account the purchase time scale
 
 ### scegliamo le variabili da inserire
 
@@ -2324,20 +2325,18 @@ Churn_4 <- Churn_RFM %>%  right_join (Churn3, by="ID_CLI")
 Churn_4$CHURN <- as.factor(Churn_4$CHURN)
 
 df_totale <- df_1_persone %>% 
-  select(ID_CLI, LAST_COD_FID, LAST_STATUS_FID, LAST_DT_ACTIVE, FIRST_ID_NEG, RegOnline) %>%
+  select(ID_CLI, LAST_COD_FID, LAST_STATUS_FID, LAST_DT_ACTIVE) %>%
   left_join(df_2_persone %>%
-              select(ID_CLI, W_PHONE, ID_ADDRESS, TYP_JOB), by= "ID_CLI") %>%
-  left_join(df4_persone, by = "ID_CLI") %>%
-  left_join(df_3_persone %>% 
-              select(ID_ADDRESS, REGION), by= "ID_ADDRESS")%>%
-  select(-ID_ADDRESS)
+              select(ID_CLI, W_PHONE, TYP_JOB), by= "ID_CLI") %>%
+  left_join(df4_persone, by = "ID_CLI")
 
 df_finale<- df_totale %>% right_join(Churn_4, by= "ID_CLI")
 
 ## mettere anche il dataset 6? 
+
 ##del dataset 7 vedere magari se i clienti hanno mandato qualcosa 
 #per essere rimborsati??
-## creare altre variabili / toglierle???
+
 
 
 library(e1071)
@@ -2403,6 +2402,7 @@ prec_rf <- round(precision(pred_rf,test$CHURN,relevant=1),3)
 f1_rf <- round(F1_Score(pred_rf,test$CHURN),3)
 acc_rf <- round(Accuracy(pred_rf,test$CHURN),3)
 #___________________________________________________________________________________________________________________________________________________
+
 
 
 #2. DECISION TREES
