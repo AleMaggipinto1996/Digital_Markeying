@@ -281,43 +281,29 @@ ggplotly(plot_df7_dist_sconto)
 
 # EXPLORE average IMPORTO_LORDO and average SCONTO by COD_REPARTO
 
-## compute aggregate
-df7_dist_importosconto_reparto <- df_7_persone %>%
-  group_by(COD_REPARTO, DIREZIONE) %>%
-  dplyr::summarize(IMPORTO_LORDO = sum(IMPORTO_LORDO)
-                   , SCONTO = sum(SCONTO)) %>%
-  ungroup() %>%
-  as.data.frame()
+df7_avgil <- df_7_persone %>% group_by(COD_REPARTO) %>%
+  summarise(IMPORTO_MEDIO = mean(IMPORTO_LORDO))
+df7_avgil
 
-df7_dist_avgimportosconto_reparto <- df7_dist_importosconto_reparto %>%
-  group_by(DIREZIONE) %>%
-  dplyr::summarize(AVG_IMPORTO_LORDO = mean(IMPORTO_LORDO)
-                   , AVG_SCONTO = mean(SCONTO))
+df7_avgil [which.max(df7_avgil$IMPORTO_MEDIO),]
+df7_avgil [which.min(df7_avgil$IMPORTO_MEDIO),]
 
-df7_dist_avgimportosconto_reparto
 
-## plot aggregate
-plot_df7_dist_importo_reparto <- (
-  ggplot(data=df7_dist_importosconto_reparto %>%
-           filter()
-         , aes(color=DIREZIONE, x=IMPORTO_LORDO)) +
-    geom_histogram(fill="white", alpha=0.5) +
-    theme_minimal()
-)
+df7_avgsc <- df_7_persone %>% filter(DIREZIONE==1)  %>% group_by(COD_REPARTO) %>%
+  summarise(SCONTO_MEDIO = mean(SCONTO))
 
-plot_df7_dist_importo_reparto
+df7_avgsc[which.max(df7_avgsc$SCONTO_MEDIO),]
+df7_avgsc[which.min(df7_avgsc$SCONTO_MEDIO),]
 
-## plot aggregate
-plot_df7_dist_sconto_reparto <- (
-  ggplot(data=df7_dist_importosconto_reparto %>%
-           filter()
-         , aes(color=DIREZIONE, x=SCONTO)) +
-    geom_histogram(fill="white", alpha=0.5) +
-    theme_minimal()
-)
+IL<-ggplot(df7_avgil,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+
+  geom_bar(stat = "identity",fill="red")+
+  theme_minimal()
+ggplotly(IL)
 
-plot_df7_dist_sconto_reparto
-
+SC<-ggplot(df7_avgsc,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+
+  geom_bar(stat = "identity",fill="blue")+
+  theme_minimal()
+ggplotly(SC)
 
 # EXPLORE ID_ARTICOLO DISTRIBUTIONS (i.e. num TICs by ID_ARTICOLO)
 
@@ -353,6 +339,13 @@ plot_df7_dist_numtics_articolo <- df7_dist_numtics_articolo %>%
 
 ggplotly(plot_df7_dist_numtics_articolo)
 
+# FIND ID_ARTICOLO WITH MAX num TICs  
+df7_articolo_max_tics<-df_7_persone %>% group_by(ID_ARTICOLO) %>%
+  summarise(TOT_SCONTRINI = n_distinct(ID_SCONTRINO),
+            TOT_CLIENTI = n_distinct(ID_CLI))
+df7_articolo_max_tics[which.max(df7_articolo_max_tics$TOT_SCONTRINI),]
+
+#L'articolo con ID 33700716 è acquistato da 36273 clienti diversi 57806 volte
 # EXPLORE average IMPORTO_LORDO and average SCONTO per ID_CLI
 
 ## compute aggregate
@@ -395,84 +388,6 @@ ggplotly(plot_df7_dist_sconto_cli)
 
 # compute the distribution of customers by number of purchases (as described in the slides)
 
-df7_dist_total_purch <- df_7_persone %>%
-  filter(DIREZIONE == 1)                             %>% 
-  group_by(ID_CLI)                                   %>% 
-  summarise(TOT_PURCHASE = n_distinct(ID_SCONTRINO)) %>% 
-  arrange(desc(TOT_PURCHASE))                           
-
-df7_dist_total_purch
-
-
-# compute the days for next purchase curve (as described in the slides)
-
-df_for_next_purchase_curve <- df_7_persone %>%
-  filter(DIREZIONE == 1) %>% 
-  select(ID_CLI,
-         ID_ARTICOLO,
-         TIC_DATE,
-         DIREZIONE)      %>%
-  arrange(ID_CLI)
-
-df_for_next_purchase_curve
-
-
-df_date_diff <- df_for_next_purchase_curve %>%
-  group_by(ID_CLI) %>%
-  mutate(Days_difference = TIC_DATE - lag(TIC_DATE))########################################DA VEDERE PER IL TROPPO TEMPO DI CALC
-
-df_date_diff
-
-df_days_curve <- as.data.frame(table(df_date_diff$Days_difference))
-colnames(df_days_curve) <- c("Days_diff","Freq")
-df_days_curve <- df_days_curve[-1, ]
-df_days_curve$Perc <- df_days_curve$Freq/sum(df_days_curve$Freq)
-
-df_days_curve ########################################DA VEDERE PER IL TROPPO TEMPO DI CALC
-
-
-#### FINAL REVIEW df_7_clean ####
-
-str(df_7_persone)
-summary(df_7_persone)
-
-# FIND ID_ARTICOLO WITH MAX num TICs  
-df7_articolo_max_tics<-df_7_persone %>% group_by(ID_ARTICOLO) %>%
-  summarise(TOT_SCONTRINI = n_distinct(ID_SCONTRINO),
-            TOT_CLIENTI = n_distinct(ID_CLI))
-df7_articolo_max_tics[which.max(df7_articolo_max_tics$TOT_SCONTRINI),]
-
-#L'articolo con ID 33700716 è acquistato da 36273 clienti diversi 57806 volte 
-
-
-#Average IMPORTO_LORDO and SCONTO by COD_REPARTO
-
-df7_avgil <- df_7_persone %>% group_by(COD_REPARTO) %>%
-summarise(IMPORTO_MEDIO = mean(IMPORTO_LORDO))
-df7_avgil
-
-df7_avgil [which.max(df7_avgil$IMPORTO_MEDIO),]
-df7_avgil [which.min(df7_avgil$IMPORTO_MEDIO),]
-
-
-df7_avgsc <- df_7_persone %>% filter(DIREZIONE==1)  %>% group_by(COD_REPARTO) %>%
-  summarise(SCONTO_MEDIO = mean(SCONTO))
-
-df7_avgsc[which.max(df7_avgsc$SCONTO_MEDIO),]
-df7_avgsc[which.min(df7_avgsc$SCONTO_MEDIO),]
-
-IL<-ggplot(df7_avgil,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+
-  geom_bar(stat = "identity",fill="red")+
-  theme_minimal()
-ggplotly(IL)
-
-SC<-ggplot(df7_avgsc,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+
-  geom_bar(stat = "identity",fill="blue")+
-  theme_minimal()
-ggplotly(SC)
-
-
-# compute customers by number of purchases 
 df7_purch <- df_7_persone %>% filter(DIREZIONE == 1) %>%
   group_by(ID_CLI) %>%
   summarise(TOT_ACQUISTI = n_distinct(ID_SCONTRINO)) %>%
@@ -504,7 +419,37 @@ plot_df7_sub_purch <- ggplot(df7_sub_purch,aes(CAT,TOT))+
 
 plot_df7_sub_purch
 
-# compute the days for next purchase curve 
+
+# compute the days for next purchase curve (as described in the slides)
+
+df_for_next_purchase_curve <- df_7_persone %>%
+  filter(DIREZIONE == 1) %>% 
+  select(ID_CLI,
+         ID_ARTICOLO,
+         TIC_DATE,
+         DIREZIONE)      %>%
+  arrange(ID_CLI)
+
+df_for_next_purchase_curve
+
+
+df_date_diff <- df_for_next_purchase_curve %>%
+  group_by(ID_CLI) %>%
+  mutate(Days_difference = TIC_DATE - lag(TIC_DATE))########################################DA VEDERE PER IL TROPPO TEMPO DI CALC
+
+df_date_diff
+
+df_days_curve <- as.data.frame(table(df_date_diff$Days_difference))
+colnames(df_days_curve) <- c("Days_diff","Freq")
+df_days_curve <- df_days_curve[-1, ]
+df_days_curve$Perc <- df_days_curve$Freq/sum(df_days_curve$Freq)
+
+df_days_curve ########################################DA VEDERE PER IL TROPPO TEMPO DI CALC
+
+
+
+
+# compute the days for next purchase curve ###########NEW
 df7_f_pur <- df_7_persone %>% filter(DIREZIONE==1) %>%
   select(ID_CLI,TIC_DATE) %>%
   unique()
