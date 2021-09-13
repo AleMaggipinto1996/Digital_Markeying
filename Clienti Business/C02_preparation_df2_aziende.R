@@ -20,12 +20,10 @@ cons_idcli_df1_df2_aziende <- df_1_aziende %>%
 
 cons_idcli_df1_df2_aziende
 
-#ci sono 22 casi che nel df2 sono registrati come aziende e nel df1 come persone
-# df2 35838 invece df1 35816
-
 ###### cancello il numero di riferimento di ogni personal_mail_provider per
 ###### poter creare successivamente una sola categoria di personal_mail_provider
 ###### (ovvero raggruppare tutte le personal mail provider)
+
 df_2_aziende<-df_2_aziende %>%
   mutate(EMAIL_PROVIDER = as.character(EMAIL_PROVIDER))
 
