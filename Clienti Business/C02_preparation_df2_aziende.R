@@ -1,68 +1,6 @@
-#### FIRST LOOK of df_2 ####
-
-str(df_2_cli_account)
-summary(df_2_cli_account)
-
-#ci sono persone che hanno aggiunto telefoni e poi NA,
-#che bisognerebbe convertire in 0
-
-
-
-#### START CLEANING df_2 ####
-
-df_2_cli_account_clean <- df_2_cli_account
-
-## check for duplicates
-df_2_cli_account_clean %>%
-  summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
-            , TOT_ROWs = n())
-
-## format boolean as factor ##
-df_2_cli_account_clean <- df_2_cli_account_clean %>%
-  mutate(W_PHONE = as.factor(W_PHONE))
-
-## format numerical categories as factor ##
-df_2_cli_account_clean <- df_2_cli_account_clean %>%
-  mutate(TYP_CLI_ACCOUNT = as.factor(TYP_CLI_ACCOUNT))
-
-#### CLEANING MISSING VALUES in df_2 ####
-
-## MISSING VALUES mapped as natural values ##
-df_2_cli_account_clean <- df_2_cli_account_clean %>%
-  mutate(W_PHONE = fct_explicit_na(W_PHONE, "0"))
-
-## MISSING VALUES mapped as new level in categorical columns ##
-df_2_cli_account_clean <- df_2_cli_account_clean %>%  
-  mutate(EMAIL_PROVIDER = fct_explicit_na(EMAIL_PROVIDER, "(missing)")) %>%
-  mutate(TYP_JOB = fct_explicit_na(TYP_JOB, "(missing)"))
-
-#### CONSISTENCY CHECK ID_CLI in df_1/df_2 ####
-
-cons_idcli_df1_df2 <- df_1_cli_fid_clean %>%
-  select(ID_CLI) %>%
-  mutate(is_in_df_1 = 1) %>%
-  distinct() %>%
-  full_join(df_2_cli_account_clean %>%
-              select(ID_CLI) %>%
-              mutate(is_in_df_2 = 1) %>%
-              distinct()
-            , by = "ID_CLI"
-  ) %>%
-  group_by(is_in_df_1, is_in_df_2) %>%
-  summarize(NUM_ID_CLIs = n_distinct(ID_CLI)) %>%
-  as.data.frame()
-
-cons_idcli_df1_df2
-
-#!!! NOTE: all ID_CLI in df_1 are also in df_2 and vice-versa !!!#
-
-#### divido dataset tra persone e aziende ####
 
 df_2_aziende <- df_2_cli_account_clean %>%  
   filter(TYP_CLI_ACCOUNT == 2)
-
-df_2_persone <- df_2_cli_account_clean %>%  
-  filter(TYP_CLI_ACCOUNT == 4)
 
 #### continuo l'analisi solo sui clienti business
 
@@ -84,9 +22,6 @@ cons_idcli_df1_df2_aziende
 
 #ci sono 22 casi che nel df2 sono registrati come aziende e nel df1 come persone
 # df2 35838 invece df1 35816
-
-## come gestiamo questi 22 casi? ci sarà un errore, gli eliminiamo?
-
 
 ###### cancello il numero di riferimento di ogni personal_mail_provider per
 ###### poter creare successivamente una sola categoria di personal_mail_provider
