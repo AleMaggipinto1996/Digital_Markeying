@@ -25,7 +25,7 @@ rules <- sort(rules, by='confidence', decreasing = TRUE)
 inspect(rules)
 # 95,6% of the customers who bought '{32078795,32079082,32842551} also bought {32079103}
 ggplotly(plot(rules,method="two-key plot"))
-#The above plot shows that rules with high lift have low support.
+#The above plot shows that rules with high confidence have low support.
 
 topRules <- rules[1:10]
 
