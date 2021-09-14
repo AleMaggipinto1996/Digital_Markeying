@@ -5,12 +5,20 @@ set.seed(123456)
 
 #### LIBRARIES ####
 library(dplyr)
-library(magrittr)
 library(ggplot2)
-library(plotly)
+library(ggthemes)
+library(magrittr)
+library(pander)
+library(tidyverse)
+library(wesanderson)
 library(forcats)
 library(lubridate)
 library(RQuantLib)
+library(rfm)
+library(scales)
+library(arules)
+library(arulesViz)
+library(RColorBrewer)
 
 ## add other libraries
 
@@ -31,6 +39,14 @@ PIPELINE_scripts <- c(
 , 'C05_preparation_df5.R'
 , 'C06_preparation_df6.R'
 , 'C07_preparation_df7.R'
+, 'C01_preparation_df1_aziende.R'
+, 'C02_preparation_df2_aziende.R'
+, 'C03_preparation_df3_aziende.R'
+, 'C04_preparation_df4_aziende.R'
+, 'C06_preparation_df6_aziende.R'
+, 'C07_preparation_df7_aziende.R'
+, 'MBA_persone.R'
+, 'MBA_aziende.R'
  ## add other scripts
 )
  
