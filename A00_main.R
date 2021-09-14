@@ -19,7 +19,7 @@ library(scales)
 library(arules)
 library(arulesViz)
 library(RColorBrewer)
-
+library(plotly)
 ## add other libraries
 
 #### DIRECTORIES ####
