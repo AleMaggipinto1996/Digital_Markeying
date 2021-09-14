@@ -239,6 +239,58 @@ plot_df1_p_codfid_ld <- (
 
 ggplotly(plot_df1_p_codfid_ld)
 
+### variable FIRST_DT_ACTIVE per MESI ###
+
+## compute distribution
+df1_p_codfid_fd <- df_1_persone %>%
+  group_by(substring(FIRST_DT_ACTIVE,1,7)) %>%
+  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT)) %>% 
+  rename(Mesi = `substring(FIRST_DT_ACTIVE, 1, 7)`)
+
+df1_p_codfid_fd
+
+## plot distribution
+
+plot_df1_p_codfid_fd <- (
+  ggplot(data=df1_p_codfid_fd
+         , aes(x=Mesi, y=TOT_CLIs)
+  ) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df1_p_codfid_fd
+
+
+
+### variable FIRST_DT_ACTIVE per ANNI ###
+
+## compute distribution
+df1_p_codfid_fd <- df_1_persone %>%
+  group_by(substring(FIRST_DT_ACTIVE,1,4)) %>%
+  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
+  arrange(desc(PERCENT)) %>% 
+  rename(Year = `substring(FIRST_DT_ACTIVE, 1, 4)`)
+
+df1_p_codfid_fd
+
+## plot distribution
+
+plot_df1_p_codfid_fd <- (
+  ggplot(data=df1_p_codfid_fd
+         , aes(x=Year, y=TOT_CLIs)
+  ) +
+    geom_bar(stat="identity"
+             , fill="steelblue") +
+    theme_minimal()
+)
+
+plot_df1_p_codfid_fd
+
 
 
 ### variable LAST_STATUS_FID ###
