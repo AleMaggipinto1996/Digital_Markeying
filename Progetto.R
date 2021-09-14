@@ -19,11 +19,14 @@ library(RQuantLib)
 library(rfm)
 library(scales)
 
-
+library(e1071)
 library(caret)
+library(pander)
+library(randomForest)
+
+
 library(rpart)
 library(rpart.plot)
-library(randomForest)
 library(funModeling)
 library(arules)
 library(arulesViz)
@@ -2019,7 +2022,7 @@ df_for_next_purchase_curve
 
 
 
-#### FINAL REVIEW df_7_clean ####
+#### FINAL REVIEW df_7_clean ####   
 
 str(df_7_persone)
 summary(df_7_persone)
@@ -2112,9 +2115,9 @@ quantili
 #50% 70% 90% 
 #2   4   8 
 
-Frequency_persone_1 <- Frequency_persone_1 %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI<quantili[1] ~ "Low",
+Frequency_persone_1 <- Frequency_persone_1 %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI< quantili[1] ~ "Low",
                                                     (N_SCONTRINI_PER_CLI>=quantili[1]) & (N_SCONTRINI_PER_CLI<quantili[3])~"Medium",
-                                                    (N_SCONTRINI_PER_CLI>quantili[3])~"High"))
+                                                    (N_SCONTRINI_PER_CLI>=quantili[3])~"High"))
 Frequency_persone_1 = mutate(Frequency_persone_1,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
 
 #Monetary Value (differenza tra importo lordo e sconto)
@@ -2130,7 +2133,7 @@ quantili
 
 Monetary_Value_persone_1 = Monetary_Value_persone_1 %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
                                                                (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
-                                                               AMOUNT>quantili[3]~"High"))
+                                                               AMOUNT>=quantili[3]~"High"))
 Monetary_Value_persone_1 = mutate(Monetary_Value_persone_1,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
 
 # Recency-Frequency
@@ -2194,7 +2197,7 @@ RFM_persone_1 = RFM_persone_1 %>% mutate(CLASSI_persone_1 = factor(CLASSI_person
 RFM_TOT_persone_1 <- as.data.frame(with(RFM_persone_1,table(CLASSI_persone_1)))
 
 RFM_TOT_persone_1 #la maggior parte dei clienti appartengono alla categoria Bronze, però troppi
-         #clienti appartengono alla categoria cheap e tin.
+         #clienti appartengono alla categoria tin.
 
 RFM_TOT_persone_1$Freq <- (RFM_TOT_persone_1$Freq / nrow(RFM_persone_1))
 
@@ -2263,7 +2266,7 @@ quantili
 
 Frequency_2_persone <- Frequency_2_persone %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI<quantili[1] ~ "Low",
                                                            (N_SCONTRINI_PER_CLI>=quantili[1]) & (N_SCONTRINI_PER_CLI<quantili[3])~"Medium",
-                                                           (N_SCONTRINI_PER_CLI>quantili[3])~"High"))
+                                                           (N_SCONTRINI_PER_CLI>=quantili[3])~"High"))
 Frequency_2_persone = mutate(Frequency_2_persone,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
 
 #Monetary Value (differenza tra importo lordo e sconto)
@@ -2280,7 +2283,7 @@ quantili
 
 Monetary_Value_2_persone = Monetary_Value_2_persone %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
                                                           (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
-                                                          AMOUNT>quantili[3]~"High"))
+                                                          AMOUNT>=quantili[3]~"High"))
 Monetary_Value_2_persone = mutate(Monetary_Value_2_persone,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
 
 # Recency-Frequency
@@ -2446,7 +2449,7 @@ quantili
 
 Frequency_aziende_1 <- Frequency_aziende_1 %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI<quantili[1] ~ "Low",
                                                         (N_SCONTRINI_PER_CLI>=quantili[1]) & (N_SCONTRINI_PER_CLI<quantili[3])~"Medium",
-                                                        (N_SCONTRINI_PER_CLI>quantili[3])~"High"))
+                                                        (N_SCONTRINI_PER_CLI>=quantili[3])~"High"))
 Frequency_aziende_1 = mutate(Frequency_aziende_1,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
 
 #Monetary Value (differenza tra importo lordo e sconto)
@@ -2462,7 +2465,7 @@ quantili
 
 Monetary_Value_aziende_1 = Monetary_Value_aziende_1 %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
                                                                    (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
-                                                                   AMOUNT>quantili[3]~"High"))
+                                                                   AMOUNT>=quantili[3]~"High"))
 Monetary_Value_aziende_1 = mutate(Monetary_Value_aziende_1,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
 
 # Recency-Frequency
@@ -2593,7 +2596,7 @@ quantili
 
 Frequency_2_aziende <- Frequency_2_aziende %>% mutate(CLASS_F=case_when(N_SCONTRINI_PER_CLI<quantili[1] ~ "Low",
                                                         (N_SCONTRINI_PER_CLI>=quantili[1]) & (N_SCONTRINI_PER_CLI<quantili[3])~"Medium",
-                                                        (N_SCONTRINI_PER_CLI>quantili[3])~"High"))
+                                                        (N_SCONTRINI_PER_CLI>=quantili[3])~"High"))
 Frequency_2_aziende = mutate(Frequency_2_aziende,CLASS_F=factor(CLASS_F,levels=c("Low","Medium","High")))
 
 #Monetary Value (differenza tra importo lordo e sconto)
@@ -2610,7 +2613,7 @@ quantili
 
 Monetary_Value_2_aziende = Monetary_Value_2_aziende %>% mutate(CLASS_M = case_when(AMOUNT<quantili[1]~"Low",
                                                                    (AMOUNT>=quantili[1])&(AMOUNT<quantili[3])~"Medium",
-                                                                   AMOUNT>quantili[3]~"High"))
+                                                                   AMOUNT>=quantili[3]~"High"))
 Monetary_Value_2_aziende = mutate(Monetary_Value_2_aziende,CLASS_M=factor(CLASS_M,levels=c("Low","Medium","High")))
 
 # Recency-Frequency
@@ -2756,7 +2759,7 @@ df_churn <- df_7_persone %>%
   summarize(LAST_PURCHASE_DATE = max(TIC_DATE),
             TOTAL_PURCHASE = sum(IMPORTO_LORDO),
             NUMBER_OF_PURCHASE=n())   %>%
-  mutate(CHURN = as.numeric(LAST_PURCHASE_DATE >= as.Date("2019-02-01"))) %>%
+  mutate(CHURN = as.numeric(LAST_PURCHASE_DATE <= as.Date("2019-02-01"))) %>%
   select(CHURN,ID_CLI,LAST_PURCHASE_DATE,TOTAL_PURCHASE,NUMBER_OF_PURCHASE)
 
 sum(df_churn$CHURN==1)
@@ -2824,46 +2827,42 @@ Churn_4 <- Churn_RFM %>%  right_join (Churn3, by="ID_CLI")
 
 Churn_4$CHURN <- as.factor(Churn_4$CHURN)
 
-df_totale <- df_1_persone %>% 
+df_totale <- df_1_persone %>% filter(LAST_DT_ACTIVE< as.Date("2019-02-01") & FIRST_DT_ACTIVE< as.Date("2019-02-01")) %>%
   select(ID_CLI, LAST_COD_FID, LAST_STATUS_FID, LAST_DT_ACTIVE) %>%
   left_join(df_2_persone %>%
-              select(ID_CLI, W_PHONE, TYP_JOB), by= "ID_CLI") %>%
+              select(ID_CLI, W_PHONE), by= "ID_CLI") %>%
   left_join(df4_persone, by = "ID_CLI")
 
-df_finale<- df_totale %>% right_join(Churn_4, by= "ID_CLI")
+df_finale <- merge(df_totale, Churn_4, by= "ID_CLI")
 
-df_6_p <- df_6_persone %>% filter(OPENED == TRUE) %>% group_by(ID_CLI) %>%
+df_6_p <- df_6_persone %>% filter(SEND_DATE< as.Date("2019-02-01") & OPENED == TRUE) %>% group_by(ID_CLI) %>%
   summarise(N_EMAIL_APERTE= n())
-df_6_p$N_EMAIL_APERTE <- factor(df_6_p$N_EMAIL_APERTE)
   
-df_6_p2 <- df_6_persone %>% filter(CLICKED == TRUE) %>% group_by(ID_CLI) %>%
+df_6_p2 <- df_6_persone %>% filter(SEND_DATE< as.Date("2019-02-01") & CLICKED == TRUE) %>% group_by(ID_CLI) %>%
   summarise(N_EMAIL_CLICCATE= n())
-df_6_p2$N_EMAIL_CLICCATE <- factor(df_6_p2$N_EMAIL_CLICCATE)
 
 df_finale2 <- df_finale %>% left_join(df_6_p, by= "ID_CLI") %>% left_join(df_6_p2, by="ID_CLI")
 
-df_finale <- df_finale2 %>% mutate(N_EMAIL_APERTE = fct_explicit_na(N_EMAIL_APERTE, "0")) %>% 
-  mutate(N_EMAIL_CLICCATE = fct_explicit_na(N_EMAIL_CLICCATE, "0"))
+df_rimborsi <- df_7_persone %>%
+  filter(TIC_DATE < as.Date("2019-02-01") &TIC_DATE >= as.Date("2018-08-01") & DIREZIONE== -1) %>%
+  group_by(ID_CLI) %>%
+  summarize(N_DI_RIMBORSI=n()) %>% 
+  select(ID_CLI,N_DI_RIMBORSI)
 
-df_finale$N_EMAIL_APERTE <- as.numeric(df_finale$N_EMAIL_APERTE)
-df_finale$N_EMAIL_CLICCATE <- as.numeric(df_finale$N_EMAIL_CLICCATE)
+df_finale <- df_finale2 %>% left_join(df_rimborsi, by= "ID_CLI")
 
+df_finale$N_DI_RIMBORSI[is.na(df_finale$N_DI_RIMBORSI)] <- 0
+df_finale$N_EMAIL_APERTE[is.na(df_finale$N_EMAIL_APERTE)] <- 0
+df_finale$N_EMAIL_CLICCATE[is.na(df_finale$N_EMAIL_CLICCATE)] <- 0
 
-# se i clienti hanno mandato qualcosa 
-#per essere rimborsati??
-
-
-
-
-
-
-library(e1071)
-library(caret)
-library(pander)
+var_num = c("SPESA_NETTA", "NUMBER_OF_PURCHASE" ,"N_EMAIL_APERTE","N_EMAIL_CLICCATE","N_DI_RIMBORSI")
 
 summary(df_finale)
 
-# 78364 clienti churner, 47620 clienti non churner
+df_finale <- df_finale %>% mutate(CLASS_RF_persone_1 = fct_explicit_na(CLASS_RF_persone_1, "Mancante"))
+
+df_finale <- df_finale %>% mutate(CLASSI_persone_1 = fct_explicit_na(CLASSI_persone_1, "Mancante"))
+
 
 #Train e Test set
 
@@ -2890,9 +2889,13 @@ churn1 <- train %>% filter(CHURN == 1) #contiene 33334 righe
 balance <- churn1[sample(nrow(churn1), nrow(churn0), replace = TRUE),] 
 train_balanced <- rbind(balance, churn0)
 
-table(train_balanced$CHURN) 
+train <- train_balanced
+table(train$CHURN) 
 
 #ora abbiamo una classe bilanciata
+
+train <- train %>% select(- ID_CLI)
+
 
 #Seventh STEP: Implementing classification algorithms.
 #There are several machine learning algorithms that can be used for supervised propensity models.
@@ -2909,85 +2912,120 @@ library(glmnet)
 
 
 #1. RANDOM FOREST
-memory.limit(10000)
-rf <- randomForest(CHURN~.,data=train,ntree=100)
+memory.limit(100000)
+tree_rf <- randomForest(CHURN~.,data=train,ntree=100)
+print(tree_rf)
+
 #Prediction Random Forest
-pred_rf<-predict(rf,test[,-5],type = "class")
-prob_rf <- predict(rf,test[,-5],type = "prob")[,1]
-cm_rf<-confusionMatrix(pred_rf,test$CHURN)
-rec_rf <- round(recall(pred_rf,test$CHURN,relevant=1),3)
-prec_rf <- round(precision(pred_rf,test$CHURN,relevant=1),3)
-f1_rf <- round(F1_Score(pred_rf,test$CHURN),3)
-acc_rf <- round(Accuracy(pred_rf,test$CHURN),3)
+pred_rf<-rpart.predict(tree_rf,test[,-1], type = "class")
+cm_rf <- confusionMatrix(pred_rf, test$CHURN)
+cm_rf
+
+recall_rf <- recall(pred_rf,test$CHURN,relevant=1) #0.75
+
+precision_rf <- precision(pred_rf,test$CHURN,relevant=1) #0.56
+
+f1_Score_rf <- F1_Score(pred_rf,test$CHURN) #0.64
+
+accuracy_rf <- Accuracy(pred_rf,test$CHURN) #0.69
 #___________________________________________________________________________________________________________________________________________________
 
 
 
 #2. DECISION TREES
+
 tree<-rpart(CHURN~.,data = train)
-rpart.plot(tree) #, extra = "auto")
+rpart.plot(tree)
 summary(tree) #num di acquisti è la variabile più importante
 printcp(tree)
 
 
 #prediction Decision Trees
-pred_dt <- predict(dec_tree,test[,-5],type = "class")
-prob_dt <-predict(dec_tree,test[,-5],type = "prob")[,1]
-cm_dt<-confusionMatrix(pred_dt,test$CHURN)
-rec_dt <- round(recall(pred_dt,test$CHURN,relevant=1),3)
-prec_dt <- round(precision(pred_dt,test$CHURN,relevant=1),3)
-f1_dt <- round(F1_Score(pred_dt,test$CHURN),3)
-acc_dt <- round(Accuracy(pred_dt,test$CHURN),3)
+pred_dt <- rpart.predict(tree,test[,-1],type = "class") 
 
+prob_dt <-predict(tree,test[,-1],type = "prob")[,1]
+
+cm_dt<-confusionMatrix(pred_dt,test$CHURN)
+
+rec_dt <- recall(pred_dt,test$CHURN,relevant=1) #0.80
+
+prec_dt <- precision(pred_dt,test$CHURN,relevant=1) #0.53
+
+f1_dt <- F1_Score(pred_dt,test$CHURN, positive = 1) #0.68
+               
+acc_dt <- Accuracy(pred_dt,test$CHURN) #0.66
 
 
 #___________________________________________________________________________________________________________________________________________________
 #3. NAIVE BAYES
+
 naive <- naiveBayes(CHURN~.,data = train)
+
+print(navie)
+
 #prediction Naive Bayes
-pred_naive <- predict(naive,test[,-5])
-prob_naive <- predict(naive,test[,-5], type = "raw")[,1]
+pred_naive <- predict(naive,test[,-1])
+
 cm_nb<-confusionMatrix(test$CHURN,pred_naive)
-rec_nb <- round(recall(pred_naive,test$CHURN,relevant=1),3)
-prec_nb <- round(precision(pred_naive,test$CHURN,relevant=1),3)
-f1_nb <- round(F1_Score(pred_naive,test$CHURN),3)
-acc_nb <- round(Accuracy(pred_naive,test$CHURN),3)
+cm_nb
+
+rec_nb <- recall(pred_naive,test$CHURN,relevant=1)# 0.39
+prec_nb <- precision(pred_naive,test$CHURN,relevant=1)#0.65
+f1_nb <- F1_Score(pred_naive,test$CHURN, positive = 1)#0.78
+acc_nb <- Accuracy(pred_naive,test$CHURN) #0.69
 #___________________________________________________________________________________________________________________________________________________
+
 #4.LOGISTIC REGRESSION
-log<-train(CHURN~.,data = train,method = "glm")
-summary(log)
+gl <- glm(CHURN ~ ., train, family = "binomial")
+summary(gl)
+#non significativi il telefono, flag_privacy_1 e Recency, lo miglioriamo
+
+train2 <- train %>% select(- W_PHONE, -FLAG_PRIVACY_1, - Recency)
+gl2 <- glm(CHURN ~ ., train2, family = "binomial")
+summary(gl2)
+
 #prediction Logistic Regression
-pred_log<- predict(log,test[,-5],type="raw")
-prob_log<-predict(log,test[,-5],type="prob")[,1]
-cm_log<-confusionMatrix(pred_log,test$CHURN)
-rec_log <- round(recall(pred_log,test$CHURN,relevant=1),3)
-prec_log <- round(precision(pred_log,test$CHURN,relevant=1),3)
-f1_log <- round(F1_Score(pred_log,test$CHURN),3)
-acc_log <- round(Accuracy(pred_log,test$CHURN),3)
+p1 = predict(gl2, test)
+pred1 = if_else(p1>0.5,1,0)
+table_gl = table(pred1, test$CHURN)
+pred1 <- as.factor(pred1)
+confusionMatrix(table_gl)
+#evaluate
+rec_glm <- recall(pred1, test$CHURN, relevant = "1") #0.38
+prec_glm <- precision(pred1, test$CHURN, relevant = "1") # 0.85
+f1_glm <- F1_Score(pred1 ,test$CHURN,positive = '1') # 0.53
+acc_glm <- Accuracy(pred1, test$CHURN) #0.57
+
+
+
 #___________________________________________________________________________________________________________________________________________________
 
 #5.BAGGING
+library(ipred)
 
 bag <- bagging(CHURN~.,data = train, nbagg=25)
 
 #prediction Bagging
 
-pred_bag<-as.factor(predict(bag, test[,-5])$class)
+pred_bag<-predict(bag, test[,-1])
 
-prob_bag <- predict(bag, test[,-5])$prob[,1]
 
 cm_bag<-confusionMatrix(pred_bag, test$CHURN)
 
-rec_bag <- round(recall(pred_bag, test$CHURN,relevant=1),3)
+rec_bag <- recall(pred_bag, test$CHURN,relevant=1) #0.73
 
-prec_bag <- round( precision(pred_bag,test$CHURN, relevant=1) ,3)
+prec_bag <-  precision(pred_bag,test$CHURN, relevant=1) #0.54
 
-f1_bag <- round(F1_Score(pred_bag, test$CHURN),3)
+f1_bag <- F1_Score(pred_bag, test$CHURN, positive = 1) #0.70
 
-acc_bag <- round(Accuracy(pred_bag, test$CHURN),3)
+acc_bag <- Accuracy(pred_bag, test$CHURN) #0.67
 
 
 #___________________________________________________________________________________________________________________________________________________
+
+
+
+
 #The best modelling approach is identified by benchmarking the perfomance metrics precisions, recall, recall, F1-score, AUC and lift.
 measure_matrix=matrix(0,ncol = 4,nrow = 5)
 colnames(measure_matrix) <- c("Recall","Precision","F1_Score","Accuracy")
