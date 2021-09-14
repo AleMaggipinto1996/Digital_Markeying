@@ -2834,13 +2834,20 @@ df_finale<- df_totale %>% right_join(Churn_4, by= "ID_CLI")
 
 df_6_p <- df_6_persone %>% filter(OPENED == TRUE) %>% group_by(ID_CLI) %>%
   summarise(N_EMAIL_APERTE= n())
+df_6_p$N_EMAIL_APERTE <- factor(df_6_p$N_EMAIL_APERTE)
   
 df_6_p2 <- df_6_persone %>% filter(CLICKED == TRUE) %>% group_by(ID_CLI) %>%
   summarise(N_EMAIL_CLICCATE= n())
+df_6_p2$N_EMAIL_CLICCATE <- factor(df_6_p2$N_EMAIL_CLICCATE)
 
-df_finale <- df_finale %>% left_join(df_6_p, by= "ID_CLI") %>% left_join(df_6_p2, by="ID_CLI")
+df_finale2 <- df_finale %>% left_join(df_6_p, by= "ID_CLI") %>% left_join(df_6_p2, by="ID_CLI")
 
-df_finale2 <- df_finale %>% mutate(N_EMAIL_APERTE = fct_explicit_na(N_EMAIL_APERTE, "0"))%>% mutate(N_EMAIL_CLICCATE = fct_explicit_na(N_EMAIL_CLICCATE, "0"))
+df_finale <- df_finale2 %>% mutate(N_EMAIL_APERTE = fct_explicit_na(N_EMAIL_APERTE, "0")) %>% 
+  mutate(N_EMAIL_CLICCATE = fct_explicit_na(N_EMAIL_CLICCATE, "0"))
+
+df_finale$N_EMAIL_APERTE <- as.numeric(df_finale$N_EMAIL_APERTE)
+df_finale$N_EMAIL_CLICCATE <- as.numeric(df_finale$N_EMAIL_CLICCATE)
+
 
 # se i clienti hanno mandato qualcosa 
 #per essere rimborsati??
