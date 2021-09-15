@@ -20,6 +20,7 @@ library(arules)
 library(arulesViz)
 library(RColorBrewer)
 library(plotly)
+
 library(randomForest)
 library(ipred)
 library(rpart)
@@ -31,7 +32,6 @@ library(rpart.plot)
 library(MLmetrics)
 library(e1071)
 library(funModeling)
-
 
 #### DIRECTORIES ####
 getwd()
@@ -51,12 +51,12 @@ PIPELINE_scripts <- c(
 , 'C06_preparation_df6.R'
 , 'C07_preparation_df7.R'
 , 'D01_preparation_df1_aziende.R'
-, 'C02_preparation_df2_aziende.R'
-, 'C03_preparation_df3_aziende.R'
-, 'C04_preparation_df4_aziende.R'
-, 'C05_preparation_df5_aziende.R'
-, 'C06_preparation_df6_aziende.R'
-, 'C07_preparation_df7_aziende.R'
+, 'D02_preparation_df2_aziende.R'
+, 'D03_preparation_df3_aziende.R'
+, 'D04_preparation_df4_aziende.R'
+, 'D05_preparation_df5_aziende.R'
+, 'D06_preparation_df6_aziende.R'
+, 'D07_preparation_df7_aziende.R'
 , 'MBA_persone.R'
 , 'MBA_aziende.R'
 , 'RFM.R'
