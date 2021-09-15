@@ -15,6 +15,8 @@ summary(df_1_cli_fid)
 
 df_1_cli_fid_clean <- df_1_cli_fid
 
+summarize <- dplyr::summarize
+
 ### Check for duplicates (non duplicati per CLI-FID)
 df_1_cli_fid_clean %>% summarize(TOT_ID_CLIs = n_distinct(ID_CLI)
                                  , TOT_ID_FIDs = n_distinct(ID_FID)
