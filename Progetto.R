@@ -16,13 +16,16 @@ library(forcats)
 library(lubridate)
 library(ggthemes)
 library(RQuantLib)
-
+library(rpart)
 library(caret)
 library(rpart.plot)
 library(MLmetrics)
 library(e1071)
+
+
+
 library(funModeling)
-library(rpart)
+library(gains)
 
 
 
@@ -3071,18 +3074,6 @@ roc_bag <- roc(test$CHURN ~ as.numeric(unlist(pred_bag)),plot=TRUE,
 legend("right",legend=c("RF", "LOG", "DT", "NB","BAG"),fill =c("blue","red", "cyan", "green", "orange"), 
        cex = .75, inset = .1, bty = "n")
 
-#LIFT Measure: 
-
-lift_class <- as.data.frame(cbind(prob_bag, prob_dt, prob_naive, prob_rf, prob_log))
-lift_class <- cbind(lift_class, test$CHURN)
-colnames(lift_class)[6]="churn"
-
-lift_bag <- gain_lift(data = lift_class, score ="prob_bag" , target = "churn" )
-lift_dt <- gain_lift(data = lift_class, score ="prob_dt" , target = "churn" )
-lift_naive <- gain_lift(data = lift_class, score ="prob_naive" , target = "churn" )
-lift_rf <- gain_lift(data = lift_class, score ="prob_rf" , target = "churn" )
-lift_log <- gain_lift(data = lift_class, score ="prob_log" , target = "churn" )
-
 
 
 ################################################################################
@@ -3474,7 +3465,29 @@ roc_bag_az <- roc(test_az$CHURN ~ as.numeric(unlist(pred_bag_az)),plot=TRUE,
 legend("right",legend=c("RF", "LOG", "DT", "NB","BAG"),fill =c("blue","red", "cyan", "green", "orange"), 
        cex = .75, inset = .1, bty = "n")
 
-#LIFT Measure: 
+
+#######################################################################
+#######################################################################
+#######################################################################
+
+library(funModeling)
+
+
+
+#LIFT Measure per persone
+
+lift_class <- as.data.frame(cbind(prob_bag, prob_dt, prob_naive, prob_rf, prob_log))
+lift_class <- cbind(lift_class, test$CHURN)
+colnames(lift_class)[6]="churn"
+
+lift_bag <- gain_lift(data = lift_class, score ="prob_bag" , target = "churn" )
+lift_dt <- gain_lift(data = lift_class, score ="prob_dt" , target = "churn" )
+lift_naive <- gain_lift(data = lift_class, score ="prob_naive" , target = "churn" )
+lift_rf <- gain_lift(data = lift_class, score ="prob_rf" , target = "churn" )
+lift_log <- gain_lift(data = lift_class, score ="prob_log" , target = "churn" )
+
+
+#LIFT Measure per aziende:
 
 lift_class_az <- as.data.frame(cbind(prob_bag_az, prob_dt_az, prob_naive_az, prob_rf_az, prob_log_az))
 lift_class_az <- cbind(lift_class_az, test_az$CHURN)
