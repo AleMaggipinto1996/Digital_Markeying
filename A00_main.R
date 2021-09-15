@@ -20,7 +20,18 @@ library(arules)
 library(arulesViz)
 library(RColorBrewer)
 library(plotly)
-## add other libraries
+library(randomForest)
+library(ipred)
+library(rpart)
+library(pROC)
+library(forcats)
+library(RQuantLib)
+library(caret)
+library(rpart.plot)
+library(MLmetrics)
+library(e1071)
+library(funModeling)
+
 
 #### DIRECTORIES ####
 getwd()
@@ -41,7 +52,10 @@ PIPELINE_scripts <- c(
 , 'C07_preparation_df7.R'
 , 'MBA_persone.R'
 , 'MBA_aziende.R'
- ## add other scripts
+, 'RFM.R'
+, 'RFM_aziende.R'
+, 'Churn.R'
+, 'Churn_aziende.R'
 )
  
  for(i in PIPELINE_scripts){
