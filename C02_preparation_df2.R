@@ -109,7 +109,7 @@ tot_emailproviders
 
 #### EMAIL_PROVIDER ####
 #______________________________________
-##mantieni i valori EMAIL_PROVIDER pi? frequenti e 
+##mantieni i valori EMAIL_PROVIDER più frequenti e 
 ##aggiungi un livello di fattore comune "ALTRO" per i restanti
 
 df_2_p_emailprovider %>%
@@ -161,7 +161,7 @@ plot_df2_p_emailproviderclean <- (
 
 ggplotly(plot_df2_p_emailproviderclean)
 #? usata soprattutto @gmail.
-#La terza pi? frequente ? la voce "altro", di cui fanno parte le 
+#La terza più frequente è la voce "altro", di cui fanno parte le 
 #email inserite dai clienti con errori di battitura evidenti
 
 #_____________________________________________________
@@ -260,7 +260,7 @@ df_2_p_type <- df_2_persone %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df_2_p_type #ovviamente avendo creato il dataset delle persone, la TYP_ACCOUNT ? per tutti 4
+df_2_p_type #ovviamente avendo creato il dataset delle persone, la TYP_ACCOUNT è per tutti 4
 
 ## plot distribution
 
