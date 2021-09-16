@@ -370,8 +370,7 @@ df_for_next_purchase_curve_az
 
 df_date_diff_az <- df_for_next_purchase_curve_az %>%
   group_by(ID_CLI) %>%
-  mutate(Days_difference = TIC_DATE - lag(TIC_DATE))########################################DA VEDERE PER IL TROPPO TEMPO DI CALC
-
+  mutate(Days_difference = TIC_DATE - lag(TIC_DATE))
 df_date_diff_az
 
 df_days_curve_az <- as.data.frame(table(df_date_diff_az$Days_difference))
@@ -379,45 +378,8 @@ colnames(df_days_curve) <- c("Days_diff","Freq")
 df_days_curve <- df_days_curve[-1, ]
 df_days_curve$Perc <- df_days_curve$Freq/sum(df_days_curve$Freq)
 
-df_days_curve ########################################DA VEDERE PER IL TROPPO TEMPO DI CALC
+df_days_curve 
 
-
-
-
-# compute the days for next purchase curve 
-df7_f_pur_az <- df_7_aziende %>% filter(DIREZIONE==1) %>%
-  select(ID_CLI,TIC_DATE) %>%
-  unique()
-
-df7_f_pur2_az<- df7_f_pur %>% group_by(ID_CLI) %>%
-  summarise(AVG_PURCH_DIFF = round(mean(diff(TIC_DATE))),
-            LAST_PURCH = nth(TIC_DATE,1),
-            SECOND_LAST = nth(TIC_DATE,2))
-
-#Omitting the NA values
-df7_nxtpurch3_az <- df7_nxtpurch2 %>% mutate(AVG_PURCH_DIFF = as.numeric(AVG_PURCH_DIFF))
-df7_nxtpurch3_az <- df7_nxtpurch3[complete.cases(df7_nxtpurch3),]
-
-df7_nxtpurch4_az <- df7_nxtpurch3_az %>% group_by(AVG_PURCH_DIFF) %>%
-  summarise(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(ALL_CLIs = sum(TOT_CLIs),
-         CUM_CLIs = cumsum(TOT_CLIs))
-
-df7_nxtpurch4_az <- df7_nxtpurch4_az %>% mutate(
-  PERC_CLIS = TOT_CLIs/ALL_CLIs,
-  CUM_PERC_CLIs = CUM_CLIs/ALL_CLIs
-)
-
-df7_nxtpurch4_az[which(df7_nxtpurch4_az$CUM_PERC_CLIs > 0.8)[1],]
-#The 80% of the customers repurchase within 61 days
-
-plot_df7_nxtpurch_az <- ggplot(df7_nxtpurch4_az,aes(AVG_PURCH_DIFF,CUM_PERC_CLIs))+
-  geom_line(stat = "identity",size=1.4) +
-  geom_vline(xintercept=61, linetype="dashed", color = "red", size = 0.5)+
-  geom_hline(yintercept=0.8, linetype="dashed", color = "red", size = 0.5)+
-  geom_text(aes(x=61, label="80%", y=0.75), colour="#404040", hjust = -0.5)
-
-plot_df7_nxtpurch_az
 
 #### FINAL REVIEW df_7_clean ####
 
