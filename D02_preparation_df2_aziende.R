@@ -55,7 +55,7 @@ tot_emailproviders
 
 #### EMAIL_PROVIDER ####
 #______________________________________
-##mantieni i valori EMAIL_PROVIDER più frequenti e 
+##mantieni i valori EMAIL_PROVIDER piÃ¹ frequenti e 
 ##aggiungi un livello di fattore comune "ALTRO" per i restanti
 
 df_2_az_emailprovider %>%
@@ -107,7 +107,7 @@ plot_df2_az_emailproviderclean <- (
 )
 
 plot_df2_az_emailproviderclean
-#è usata soprattutto @gmail; 
+#Ã¨ usata soprattutto @gmail; 
 #la categoria personal_mail_providers rappresenta la 2a piu frequente (27.7%)
 #others il 13% (in questa ci sono molti errori di battitura dei clienti)
 
@@ -127,7 +127,7 @@ df_2_az_typJob <- df_2_aziende %>%
 df_2_az_typJob
 
 # tutte le aziende clienti non hanno inserito nulla in questa voce 
-# uniamo non dichiarati con quelli mancanti ##############NON C'è BISOGNO DI FARE QUESTA OPERAZIONE###
+# uniamo non dichiarati con quelli mancanti ##############NON C'Ã¨ BISOGNO DI FARE QUESTA OPERAZIONE###
 
 
 ### variabile W_PHONE ###
@@ -159,8 +159,6 @@ plot_df_2_az_phone <- (
 
 plot_df_2_az_phone
 
-
-### variabile TYP_ACCOUNT ###    -> ### non so se è utile 
 
 ## compute distribution
 df_2_az_type <- df_2_aziende %>%
