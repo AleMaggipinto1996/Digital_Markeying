@@ -435,7 +435,7 @@ df_for_next_purchase_curve
 
 df_date_diff <- df_for_next_purchase_curve %>%
   group_by(ID_CLI) %>%
-  mutate(Days_difference = TIC_DATE - lag(TIC_DATE))########################################DA VEDERE PER IL TROPPO TEMPO DI CALC
+  mutate(Days_difference = TIC_DATE - lag(TIC_DATE))
 
 df_date_diff
 
@@ -444,12 +444,9 @@ colnames(df_days_curve) <- c("Days_diff","Freq")
 df_days_curve <- df_days_curve[-1, ]
 df_days_curve$Perc <- df_days_curve$Freq/sum(df_days_curve$Freq)
 
-df_days_curve ########################################DA VEDERE PER IL TROPPO TEMPO DI CALC
+df_days_curve
 
-
-
-
-# compute the days for next purchase curve ###########NEW
+# compute the days for next purchase curve 
 df7_f_pur <- df_7_persone %>% filter(DIREZIONE==1) %>%
   select(ID_CLI,TIC_DATE) %>%
   unique()
