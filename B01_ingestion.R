@@ -1,5 +1,6 @@
 #### INGESTION df_1 customers fidelity subscriptions ####
 
+
 df_1_cli_fid <- read.csv2(
   file.path(data_dir,"raw_1_cli_fid.csv")
   , na.strings = c("NA", "")
@@ -14,7 +15,7 @@ df_2_cli_account <- read.csv2(
 #### INGESTION df_3 customers addresses ####
 df_3_cli_address <- read.csv2(
   file.path(data_dir,"raw_3_cli_address.csv")
-  , na.strings = c("")
+  , na.strings = c("NA", "")
   )
 
 #### INGESTION df_4 customers privacy data ####
