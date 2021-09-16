@@ -333,6 +333,12 @@ New_class <- RFM_2_persone %>% mutate(NUOVA_CLASSE = CLASSI_2) %>% select(ID_CLI
 Confronto_RFM <- New_class %>% left_join(Old_class, by= "ID_CLI")
 Confronto_RFM <- Confronto_RFM%>% mutate(VECCHIA_CLASSE = fct_explicit_na(VECCHIA_CLASSE,"Clienti_futuri"))
 
+Nuovi_clientiRFm <- Confronto_RFM %>% filter(VECCHIA_CLASSE == "Clienti_futuri") %>% select(-VECCHIA_CLASSE)
+Nuovi_clientiRFm2 <- Nuovi_clientiRFm %>% group_by(NUOVA_CLASSE) %>% summarise(COUNT = n())
+Nuovi_clientiRFm2 <- Nuovi_clientiRFm2 %>% mutate(PERC = percent(COUNT/sum(COUNT)))
+
+#la percentuale dei nuovi clienti: più del 50% fa parte della categoria Tin e Cheap
+
 matrice_classi=matrix(0,ncol = 7,nrow = 2)
 colnames(matrice_classi) <- c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")
 rownames(matrice_classi) <- c("Old_Clients","New_Clients")
