@@ -228,15 +228,15 @@ df7_avgsc_az <- df_7_aziende %>% filter(DIREZIONE==1)  %>% group_by(COD_REPARTO)
 df7_avgsc_az[which.max(df7_avgsc_az$SCONTO_MEDIO),]
 df7_avgsc_az[which.min(df7_avgsc_az$SCONTO_MEDIO),]
 
-IL<-ggplot(df7_avgil_az,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+
-  geom_bar(stat = "identity",fill="red")+
+IL_az<-ggplot(df7_avgil_az,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+
+  geom_bar(stat = "identity",fill="green")+
   theme_minimal()
-ggplotly(IL)
+ggplotly(IL_az)
 
-SC<-ggplot(df7_avgsc_az,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+
+SC_az<-ggplot(df7_avgsc_az,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+
   geom_bar(stat = "identity",fill="blue")+
   theme_minimal()
-ggplotly(SC)
+ggplotly(SC_az)
 
 
 # EXPLORE ID_ARTICOLO DISTRIBUTIONS (i.e. num TICs by ID_ARTICOLO)
