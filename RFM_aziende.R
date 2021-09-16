@@ -4,7 +4,7 @@
 # MODELLO RFM per la categoria aziende
 
 ################
-
+summarize <- dplyr::summarize
 lastdate2 = df_7_aziende %>% summarise(max(TIC_DATE))
 lastdate2=lastdate2[1,1]
 ## prima data di acquisto risale al 2018-05-01, l'ultima data di acquisto risale al 2019-04-30
@@ -172,7 +172,7 @@ RFM_TOT_aziende_1$Freq <- (RFM_TOT_aziende_1$Freq / nrow(RFM_aziende_1))
 #EXPLORATORY ANALYSIS of RFM's dataframe
 RFM_aziende_1_plot <- 
   ggplot(RFM_TOT_aziende_1,aes(CLASSI_aziende_1,Freq,fill=CLASSI_aziende_1)) + geom_bar(stat = "identity")+
-  labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent)+
+  labs(title = "RFM 2018/08/01 - 2019/01/31",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent)+
   scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
   theme_minimal()
 
@@ -319,7 +319,7 @@ RFM_TOT2_aziende$Freq <- (RFM_TOT2_aziende$Freq / nrow(RFM_2_aziende))
 #EXPLORATORY ANALYSIS of RFM's dataframe
 RFM_2_aziende_plot <- 
   ggplot(RFM_TOT2_aziende,aes(CLASSI_2,Freq,fill=CLASSI_2)) + geom_bar(stat = "identity")+
-  labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent) +
+  labs(title = "RFM 2018/11/01 - 2019/04/30",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent) +
   scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
   theme_minimal()
 
