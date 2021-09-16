@@ -109,7 +109,7 @@ df_4_p_flag_mkt_distrib <- df4_persone %>%
   arrange(desc(PERCENT))
 
 df_4_p_flag_mkt_distrib #il 29% dei clienti non ha dato il consenso
-# con questi l'azienda non potr‡ comunicare al meglio
+# con questi l'azienda non potr√† comunicare al meglio
 
 ## plot distribution
 plot_df_4_p_flag_mkt_distrib <- (
@@ -120,7 +120,7 @@ plot_df_4_p_flag_mkt_distrib <- (
     theme_minimal()
 )
 
-ggplotly(plot_df_4_p_flag_mkt_distrib)
+plot_df_4_p_flag_mkt_distrib
 
 
 #### FINAL REVIEW df_4_clean ####
