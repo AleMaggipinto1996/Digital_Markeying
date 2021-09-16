@@ -398,7 +398,7 @@ df7_sub_purch <- df7_purch %>%
                                (TOT_ACQUISTI>=10) & (TOT_ACQUISTI<25) ~ "da 10 a 25",
                                (TOT_ACQUISTI>=25) & (TOT_ACQUISTI<50) ~ "da 25 a 50",
                                (TOT_ACQUISTI>=50) & (TOT_ACQUISTI<100) ~ "da 50 a 100",
-                               (TOT_ACQUISTI>=100) ~ "più di 100"))
+                               (TOT_ACQUISTI>=100) ~ "piu' di 100"))
 
 df7_sub_purch <- df7_sub_purch %>%
   mutate(CAT = factor(CATEGORIA,levels=c("meno di 10","da 10 a 25",
@@ -413,7 +413,7 @@ df7_sub_purch
 
 
 plot_df7_sub_purch <- ggplot(df7_sub_purch,aes(CAT,TOT))+
-  geom_bar(fill="red4",stat = "identity",width=0.4)+
+  geom_bar(fill="red",stat = "identity",width=0.4)+
   xlab("N acquisti")+
   ylab("N clienti")
 
