@@ -109,18 +109,7 @@ df_3_persone_prv_distrib <- df_3_persone %>%
 
 df_3_persone_prv_distrib
 
-## plot distribution
-plot_df_3_persone_prv_distrib <- (
-  ggplot(data=df_3_persone_prv_distrib
-         , aes(x=PRV, y=PERCENT)) +
-    geom_bar(stat="identity"
-             , fill="steelblue") +
-    theme_minimal()
-)
-
-ggplotly(plot_df_3_persone_prv_distrib)
-
-# troppe variabili non è significativo
+# troppe variabili non Ã¨ significativo
 
 ### variabile CAP ###
 
@@ -133,7 +122,7 @@ df_3_persone_cap_distrib <- df_3_persone %>%
 
 df_3_persone_cap_distrib
 
-#anche i CAP ci sono troppe variabili non è utile
+#anche i CAP ci sono troppe variabili non ? utile
 
 #### FINAL REVIEW df_3_clean ####
 
