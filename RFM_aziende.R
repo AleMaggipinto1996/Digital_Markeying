@@ -352,3 +352,9 @@ Confronto_RFM2_az <- Confronto_RFM_az %>% filter(VECCHIA_CLASSE != "Clienti_futu
 Confronto_RFM3_az <- Confronto_RFM2_az %>% group_by(VECCHIA_CLASSE, NUOVA_CLASSE) %>% summarise(CONTO = n())
 
 
+Nuovi_clientiRFm_az<- Confronto_RFM_az %>% filter(VECCHIA_CLASSE == "Clienti_futuri") %>% select(-VECCHIA_CLASSE)
+Nuovi_clientiRFm2_az <- Nuovi_clientiRFm_az %>% group_by(NUOVA_CLASSE) %>% summarise(COUNT = n())
+Nuovi_clientiRFm2_az <- Nuovi_clientiRFm2_az %>% mutate(PERC = percent(COUNT/sum(COUNT)))
+
+#la percentuale dei nuovi clienti: più del 50% fa parte della categoria Tin e Cheap
+
