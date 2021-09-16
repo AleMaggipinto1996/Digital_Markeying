@@ -54,7 +54,7 @@ plot_df_3_aziende_prv_distrib <- (
 
 plot_df_3_aziende_prv_distrib
 
-# troppe variabili non è significativo
+# troppe variabili non Ã¨ significativo
 
 ### variabile CAP ###
 
@@ -67,7 +67,7 @@ df_3_aziende_cap_distrib <- df_3_aziende %>%
 
 df_3_aziende_cap_distrib
 
-#anche i CAP ci sono troppe variabili non è utile
+#anche i CAP ci sono troppe variabili non Ã¨ utile
 
 #### FINAL REVIEW df_3_clean ####
 
