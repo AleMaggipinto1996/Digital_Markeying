@@ -324,3 +324,31 @@ RFM_2_aziende_plot <-
   theme_minimal()
 
 RFM_2_aziende_plot
+
+Old_class_az <- RFM_aziende_1 %>% mutate(VECCHIA_CLASSE = CLASSI_aziende_1) %>% select(ID_CLI, VECCHIA_CLASSE)
+
+New_class_az <- RFM_2_aziende %>% mutate(NUOVA_CLASSE = CLASSI_2) %>% select(ID_CLI, NUOVA_CLASSE)
+
+Confronto_RFM_az <- New_class_az %>% left_join(Old_class_az, by= "ID_CLI")
+Confronto_RFM_az <- Confronto_RFM_az%>% mutate(VECCHIA_CLASSE = fct_explicit_na(VECCHIA_CLASSE,"Clienti_futuri"))
+
+matrice_classi_az=matrix(0,ncol = 7,nrow = 2)
+colnames(matrice_classi_az) <- c("Cheap","Tin","Copper","Bronze","Silver","Gold","Diamond")
+rownames(matrice_classi_az) <- c("Old_Clients","New_Clients")
+
+Confronto_RFM_V_az <- Confronto_RFM_az %>% group_by(VECCHIA_CLASSE) %>% summarise(CLI_TOT_vecchi = n()) %>% mutate(CLASSE = VECCHIA_CLASSE) %>% select(- VECCHIA_CLASSE)
+
+Confronto_RFM_N_az <- Confronto_RFM_az %>% group_by(NUOVA_CLASSE) %>% summarise(CLI_TOT_nuovi = n()) %>% mutate(CLASSE = NUOVA_CLASSE) %>% select(- NUOVA_CLASSE)
+
+Confronto_RFM_TOT_az <- Confronto_RFM_V_az %>% right_join(Confronto_RFM_N_az, by="CLASSE")
+
+matrice_classi_az[1,] <- c(Confronto_RFM_TOT_az$CLI_TOT_vecchi[1],Confronto_RFM_TOT_az$CLI_TOT_vecchi[2],Confronto_RFM_TOT_az$CLI_TOT_vecchi[3],Confronto_RFM_TOT_az$CLI_TOT_vecchi[4],Confronto_RFM_TOT_az$CLI_TOT_vecchi[5],Confronto_RFM_TOT_az$CLI_TOT_vecchi[6],Confronto_RFM_TOT_az$CLI_TOT_vecchi[7])
+matrice_classi_az[2,] <- c(Confronto_RFM_TOT_az$CLI_TOT_nuovi[1],Confronto_RFM_TOT_az$CLI_TOT_nuovi[2],Confronto_RFM_TOT_az$CLI_TOT_nuovi[3],Confronto_RFM_TOT_az$CLI_TOT_nuovi[4],Confronto_RFM_TOT_az$CLI_TOT_nuovi[5],Confronto_RFM_TOT_az$CLI_TOT_nuovi[6],Confronto_RFM_TOT_az$CLI_TOT_nuovi[7])
+df_matrice_classi_az <- as.data.frame(matrice_classi_az)
+
+
+Confronto_RFM2_az <- Confronto_RFM_az %>% filter(VECCHIA_CLASSE != "Clienti_futuri")
+
+Confronto_RFM3_az <- Confronto_RFM2_az %>% group_by(VECCHIA_CLASSE, NUOVA_CLASSE) %>% summarise(CONTO = n())
+
+
