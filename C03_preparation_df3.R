@@ -122,7 +122,7 @@ df_3_persone_cap_distrib <- df_3_persone %>%
 
 df_3_persone_cap_distrib
 
-#anche i CAP ci sono troppe variabili non ? utile
+#anche i CAP ci sono troppe variabili non è utile
 
 #### FINAL REVIEW df_3_clean ####
 
