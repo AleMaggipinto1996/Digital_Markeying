@@ -172,11 +172,11 @@ RFM_TOT_persone_1$Freq <- (RFM_TOT_persone_1$Freq / nrow(RFM_persone_1))
 #EXPLORATORY ANALYSIS of RFM's dataframe
 RFM_persone_1_plot <- 
   ggplot(RFM_TOT_persone_1,aes(CLASSI_persone_1,Freq,fill=CLASSI_persone_1)) + geom_bar(stat = "identity")+
-  labs(title = "RFM 2018/08/01 - 2019/01/31",size=18)+ylab("Percentuale clienti") + scale_y_continuous(labels = percent)+
+  labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent)+
   scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
   theme_minimal()
 
-ggplotly(RFM_persone_1_plot)
+RFM_persone_1_plot
 
 
 ################ MODELLO RFM DAL 2018/11/01 AL 2019/04/30 ########################
@@ -320,8 +320,8 @@ RFM_TOT2_persone$Freq <- (RFM_TOT2_persone$Freq / nrow(RFM_2_persone))
 #EXPLORATORY ANALYSIS of RFM's dataframe
 RFM_2_persone_plot <- 
   ggplot(RFM_TOT2_persone,aes(CLASSI_2,Freq,fill=CLASSI_2)) + geom_bar(stat = "identity")+
-  labs(title = "RFM 2018/11/01 - 2019/04/30",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent) +
+  labs(title = "Customer's distribution",size=18)+ylab("Percentuale clienti")+ scale_y_continuous(labels = percent) +
   scale_fill_manual(values=c("black","#2F4F4F","#801818","#CD7F32","#C0C0C0","gold","#B0E0E6"),guide=F)+
   theme_minimal()
 
-ggplotly(RFM_2_persone_plot)
+RFM_2_persone_plot
