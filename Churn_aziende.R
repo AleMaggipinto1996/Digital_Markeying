@@ -386,27 +386,6 @@ legend("right",legend=c("RF", "LOG", "DT", "NB","BAG"),fill =c("blue","red", "cy
        cex = .75, inset = .1, bty = "n")
 
 
-#######################################################################
-#######################################################################
-#######################################################################
-
-library(funModeling)
-
-
-
-#LIFT Measure per persone
-
-lift_class <- as.data.frame(cbind(prob_bag, prob_dt, prob_naive, prob_rf, prob_log))
-lift_class <- cbind(lift_class, test$CHURN)
-colnames(lift_class)[6]="churn"
-
-lift_bag <- gain_lift(data = lift_class, score ="prob_bag" , target = "churn" )
-lift_dt <- gain_lift(data = lift_class, score ="prob_dt" , target = "churn" )
-lift_naive <- gain_lift(data = lift_class, score ="prob_naive" , target = "churn" )
-lift_rf <- gain_lift(data = lift_class, score ="prob_rf" , target = "churn" )
-lift_log <- gain_lift(data = lift_class, score ="prob_log" , target = "churn" )
-
-
 #LIFT Measure per aziende:
 
 lift_class_az <- as.data.frame(cbind(prob_bag_az, prob_dt_az, prob_naive_az, prob_rf_az, prob_log_az))
@@ -418,6 +397,3 @@ lift_dt_az <- gain_lift(data = lift_class_az, score ="prob_dt_az" , target = "ch
 lift_naive_az <- gain_lift(data = lift_class_az, score ="prob_naive_az" , target = "churn" )
 lift_rf_az <- gain_lift(data = lift_class_az, score ="prob_rf_az" , target = "churn" )
 lift_log_az <- gain_lift(data = lift_class_az, score ="prob_log_az" , target = "churn" )
-
-
-#aggiustare grafici
