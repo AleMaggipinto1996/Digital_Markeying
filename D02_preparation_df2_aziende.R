@@ -127,7 +127,7 @@ df_2_az_typJob <- df_2_aziende %>%
 df_2_az_typJob
 
 # tutte le aziende clienti non hanno inserito nulla in questa voce 
-# uniamo non dichiarati con quelli mancanti ##############NON C'è BISOGNO DI FARE QUESTA OPERAZIONE###
+
 
 
 ### variabile W_PHONE ###
