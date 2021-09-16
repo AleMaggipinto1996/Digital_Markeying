@@ -23,14 +23,14 @@ df2_aziende <- df_a %>%
 
 df3_aziende <- left_join(df1_aziende,df2_aziende,by="ID_CLI") #aggiungiamo id_scontrino e la data
 
-df4_aziende <- df3_aziende %>% 
+df4_az <- df3_aziende %>% 
   arrange(desc(TIC_DATE)) %>% 
   group_by(ID_CLI) %>% 
   summarise(last=nth(TIC_DATE,1),secondl=nth(TIC_DATE,2)) %>%
   mutate(DIFF_DAYS = as.numeric(difftime(last,secondl,units = "days")))
 
 
-q_aziende <- ggplot(df4_aziende, aes(as.numeric(last-secondl), cumsum(stat(count)/nrow(df4_aziende)))) +
+q_aziende <- ggplot(df4_az, aes(as.numeric(last-secondl), cumsum(stat(count)/nrow(df4_az)))) +
   geom_freqpoly(binwidth = 8,alpha=0.8,col="black") +
   labs(title = "Percentuale cumulativa di riacquisto", x = "days", y = "Cumulative Percentage of Repurchase") +
   geom_line(data = data.frame(days=1:365,const=0.80),aes(days,const),col="blue") +
@@ -42,7 +42,7 @@ q_aziende
 
 # l'80% dei clienti riacquista entro 68 giorni
 
-plot_a <- ggplot(df4_aziende, aes(x= DIFF_DAYS)) + 
+plot_a <- ggplot(df4_az, aes(x= DIFF_DAYS)) + 
   geom_histogram(color="#003399", fill="#99CBFF") +
   geom_vline(aes(xintercept = 72), color="#800000", linetype="dashed", size=1) +
   labs(title = "Ultimo acquisto - penultimo acquisto", x = "Intervallo di tempo", y = "Frequenza") +
@@ -135,7 +135,7 @@ df_totale_az <- df_1_aziende %>% filter(LAST_DT_ACTIVE< as.Date("2019-02-01") & 
   select(ID_CLI, LAST_COD_FID, LAST_STATUS_FID, LAST_DT_ACTIVE) %>%
   left_join(df_2_aziende %>%
               select(ID_CLI, W_PHONE), by= "ID_CLI") %>%
-  left_join(df_4_aziende, by = "ID_CLI")
+  left_join(df4_aziende, by = "ID_CLI")
 
 df_finale_az <- merge(df_totale_az, Churn_4_az, by= "ID_CLI")
 
