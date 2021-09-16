@@ -25,7 +25,7 @@ library(e1071)
 
 
 library(funModeling)
-library(gains)
+
 
 
 
@@ -2896,8 +2896,14 @@ table(train$CHURN)
 
 #1. RANDOM FOREST
 memory.limit(100000)
-tree_rf <- randomForest(CHURN~.,data=train,ntree=100)
+tree_rf <- randomForest(CHURN~.,data=train,ntree=100, importance=TRUE)
 print(tree_rf)
+
+model <- randomForest(CHURN ~ funding_rate+exchange_rate, 
+                      data = df, importance=TRUE) 
+
+#Conditional=True, adjusts for correlations between predictors.
+i_scores <- varImp(tree_rf, conditional=TRUE)
 
 #Prediction Random Forest
 pred_rf<-rpart.predict(tree_rf, test[,-15], type = "class")
@@ -3493,6 +3499,8 @@ lift_class_az <- as.data.frame(cbind(prob_bag_az, prob_dt_az, prob_naive_az, pro
 lift_class_az <- cbind(lift_class_az, test_az$CHURN)
 colnames(lift_class_az)[6]="churn"
 
+library(funModeling)
+
 lift_bag_az <- gain_lift(data = lift_class_az, score ="prob_bag_az" , target = "churn" )
 lift_dt_az <- gain_lift(data = lift_class_az, score ="prob_dt_az" , target = "churn" )
 lift_naive_az <- gain_lift(data = lift_class_az, score ="prob_naive_az" , target = "churn" )
@@ -3501,10 +3509,3 @@ lift_log_az <- gain_lift(data = lift_class_az, score ="prob_log_az" , target = "
 
 
 #aggiustare grafici
-
-
-
-
-
-
-
