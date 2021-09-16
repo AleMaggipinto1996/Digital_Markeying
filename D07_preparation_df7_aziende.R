@@ -187,7 +187,7 @@ df7_dist_avgimportosconto_az <- df7_dist_importosconto_az %>%
 
 df7_dist_avgimportosconto_az
 
-#L'importo lordo medio degli acquisti Ë pari a 187 con uno sconto di 12.9
+#L'importo lordo medio degli acquisti √® pari a 187 con uno sconto di 12.9
 
 ## plot aggregate
 plot_df7_dist_importo_az <- (
@@ -279,7 +279,7 @@ df7_articolo_max_tics_az<-df_7_aziende %>% group_by(ID_ARTICOLO) %>%
             TOT_CLIENTI = n_distinct(ID_CLI))
 df7_articolo_max_tics_az[which.max(df7_articolo_max_tics_az$TOT_SCONTRINI),]
 
-#L'articolo con ID 33700716 Ë acquistato da 4789 clienti diversi 9197 volte 
+#L'articolo con ID 33700716 √® acquistato da 4789 clienti diversi 9197 volte 
 
 
 # EXPLORE average IMPORTO_LORDO and average SCONTO per ID_CLI
@@ -334,12 +334,12 @@ df7_sub_purch_az <- df7_purch_az %>%
                                (TOT_ACQUISTI>=10) & (TOT_ACQUISTI<25) ~ "da 10 a 25",
                                (TOT_ACQUISTI>=25) & (TOT_ACQUISTI<50) ~ "da 25 a 50",
                                (TOT_ACQUISTI>=50) & (TOT_ACQUISTI<100) ~ "da 50 a 100",
-                               (TOT_ACQUISTI>=100) ~ "pi˘ di 100"))
+                               (TOT_ACQUISTI>=100) ~ "pi√π di 100"))
 
 df7_sub_purch_az <- df7_sub_purch_az %>%
   mutate(CAT = factor(CATEGORIA,levels=c("meno di 10","da 10 a 25",
                                          "da 25 a 50","da 50 a 100",
-                                         "pi˘ di 100"))) %>%
+                                         "pi√π di 100"))) %>%
   group_by(CAT) %>%
   summarise(TOT = n_distinct(ID_CLI)) %>%
   mutate(PERC_CLIENTI = TOT/sum(TOT),
@@ -350,8 +350,8 @@ df7_sub_purch_az
 
 plot_df7_sub_purch_az <- ggplot(df7_sub_purch_az,aes(CAT,TOT))+
   geom_bar(fill="red4",stat = "identity",width=0.4)+
-  xlab("N∞ acquisti")+
-  ylab("N∞ clienti")
+  xlab("N acquisti")+
+  ylab("N clienti")
 
 plot_df7_sub_purch_az
 
