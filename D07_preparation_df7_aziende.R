@@ -276,7 +276,8 @@ ggplotly(plot_df7_dist_numtics_articolo_az)
 # ARTICOLO WITH MAX num TICs  
 df7_articolo_max_tics_az<-df_7_aziende %>% group_by(ID_ARTICOLO) %>%
   summarise(TOT_SCONTRINI = n_distinct(ID_SCONTRINO),
-            TOT_CLIENTI = n_distinct(ID_CLI))
+            TOT_CLIENTI = n_distinct(ID_CLI))%>%arrange(desc(TOT_SCONTRINI))
+
 df7_articolo_max_tics_az[which.max(df7_articolo_max_tics_az$TOT_SCONTRINI),]
 
 #L'articolo con ID 33700716 è acquistato da 4789 clienti diversi 9197 volte 
