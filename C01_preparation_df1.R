@@ -35,7 +35,7 @@ df_1_cli_fid_clean <- df_1_cli_fid_clean %>%
   mutate(STATUS_FID = as.factor(STATUS_FID))
 
 ### Numero di programmi fedelta' per numero di clienti ##
-##quante sottoscrizioni ho per ciascun cliente?
+##quante sottoscrizioni ho per ciascun cliente
 
 num_fid_x_cli <- df_1_cli_fid_clean %>%
   group_by(ID_CLI) %>%
@@ -43,8 +43,9 @@ num_fid_x_cli <- df_1_cli_fid_clean %>%
             , NUM_DATEs = n_distinct(DT_ACTIVE)
   )
 
-#Controllando le date, emerge che vi sono clienti hanno probabilmente sbagliato/cambiato la fidelizzazione pi? volte
+#Controllando le date, emerge che vi sono clienti hanno probabilmente sbagliato/cambiato la fidelizzazione pi√π volte
 #nello stesso giorno
+
 
 tot_id_cli <- n_distinct(num_fid_x_cli$ID_CLI)
 
@@ -56,7 +57,7 @@ dist_num_fid_x_cli <- num_fid_x_cli %>%
 
 dist_num_fid_x_cli
 
-## Ci sono clienti con molteplici programmi fedelt? ##
+## Ci sono clienti con molteplici programmi fedelt√† ##
 # let examine in details clients with multiple subscriptions#
 
 num_fid_x_cli %>% filter(NUM_FIDs == 3)
@@ -75,7 +76,7 @@ df_1_cli_fid %>% filter(ID_CLI == 320880)
 # from last subscription   --> type of fidelity, status
 # from subscriptions count --> number of subscriptions made
 
-#ID 1 Ë quello relativo alla registrazione online, gli altri sono negozi
+#ID 1 √® quello relativo alla registrazione online, gli altri sono negozi
 
 
 df_1_cli_fid_first <- df_1_cli_fid_clean %>%
@@ -116,8 +117,8 @@ df_1_cli_fid_clean <- df_1_cli_fid_last %>%
 
 ### variabile Registrazione Online / Negozio Fisico ###
 
-#creo una nuova colonna 0/1: Ë 1 se si tratta di registrazione online, 
-#Ë 0 se Ë stata fatta nel negozio
+#creo una nuova colonna 0/1: √® 1 se si tratta di registrazione online, 
+#0 se stata fatta nel negozio
 
 RegOnline <- as.data.frame(df_1_cli_fid_clean$FIRST_ID_NEG)
 colnames(RegOnline)<- "RegOnline"
@@ -305,7 +306,7 @@ df1_p_codfid_status <- df_1_persone %>%
   arrange(desc(PERCENT))
 
 
-df1_p_codfid_status  # il 99.2% dei clienti "persone" ha una tessera fedelt‡ attiva
+df1_p_codfid_status  # il 99.2% dei clienti "persone" ha una tessera fedelt√† attiva
 
 ## plot distribution
 
@@ -346,7 +347,7 @@ plot_df1_p_codfid_n <- (
 ggplotly(plot_df1_p_codfid_n)
 
 ## variabile LAST_TYP_CLI_FID
-##0 se Ë un account secondario, 1 se Ë l'account principale
+##0 se un account secondario, 1 se l'account principale
 
 ## compute distribution
 df1_p_codfid_main <- df_1_persone %>%
@@ -355,9 +356,9 @@ df1_p_codfid_main <- df_1_persone %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)*100) %>%
   arrange(desc(PERCENT))
 
-df1_p_codfid_main #L'ultima tessera fedelt? attivata dai clienti nel 98.4% dei casi
-#? una tessera principale (328388 casi), mentre nell'1.6% dei casi
-#(5246 casi) abbiamo che la tessera attivata ? secondaria
+df1_p_codfid_main #L'ultima tessera fedelt√† attivata dai clienti nel 98.4% dei casi
+#√® una tessera principale (328388 casi), mentre nell'1.6% dei casi
+#(5246 casi) abbiamo che la tessera attivata √® secondaria
 
 
 ## plot distribution
