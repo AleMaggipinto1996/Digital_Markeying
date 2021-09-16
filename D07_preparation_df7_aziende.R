@@ -228,15 +228,15 @@ df7_avgsc_az <- df_7_aziende %>% filter(DIREZIONE==1)  %>% group_by(COD_REPARTO)
 df7_avgsc_az[which.max(df7_avgsc_az$SCONTO_MEDIO),]
 df7_avgsc_az[which.min(df7_avgsc_az$SCONTO_MEDIO),]
 
-IL<-ggplot(df7_avgil_az,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+
-  geom_bar(stat = "identity",fill="red")+
+IL_az<-ggplot(df7_avgil_az,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+labs(title = "Clienti Aziende",size=18)+
+  geom_bar(stat = "identity",fill="green")+
   theme_minimal()
-ggplotly(IL)
+ggplotly(IL_az)
 
-SC<-ggplot(df7_avgsc_az,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+
+SC_az<-ggplot(df7_avgsc_az,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+labs(title = "Clienti Aziende",size=18)+
   geom_bar(stat = "identity",fill="blue")+
   theme_minimal()
-ggplotly(SC)
+ggplotly(SC_az)
 
 
 # EXPLORE ID_ARTICOLO DISTRIBUTIONS (i.e. num TICs by ID_ARTICOLO)
@@ -276,7 +276,8 @@ ggplotly(plot_df7_dist_numtics_articolo_az)
 # ARTICOLO WITH MAX num TICs  
 df7_articolo_max_tics_az<-df_7_aziende %>% group_by(ID_ARTICOLO) %>%
   summarise(TOT_SCONTRINI = n_distinct(ID_SCONTRINO),
-            TOT_CLIENTI = n_distinct(ID_CLI))
+            TOT_CLIENTI = n_distinct(ID_CLI))%>%arrange(desc(TOT_SCONTRINI))
+
 df7_articolo_max_tics_az[which.max(df7_articolo_max_tics_az$TOT_SCONTRINI),]
 
 #L'articolo con ID 33700716 è acquistato da 4789 clienti diversi 9197 volte 
@@ -334,12 +335,12 @@ df7_sub_purch_az <- df7_purch_az %>%
                                (TOT_ACQUISTI>=10) & (TOT_ACQUISTI<25) ~ "da 10 a 25",
                                (TOT_ACQUISTI>=25) & (TOT_ACQUISTI<50) ~ "da 25 a 50",
                                (TOT_ACQUISTI>=50) & (TOT_ACQUISTI<100) ~ "da 50 a 100",
-                               (TOT_ACQUISTI>=100) ~ "più di 100"))
+                               (TOT_ACQUISTI>=100) ~ "piu' di 100"))
 
 df7_sub_purch_az <- df7_sub_purch_az %>%
   mutate(CAT = factor(CATEGORIA,levels=c("meno di 10","da 10 a 25",
                                          "da 25 a 50","da 50 a 100",
-                                         "più di 100"))) %>%
+                                         "piu' di 100"))) %>%
   group_by(CAT) %>%
   summarise(TOT = n_distinct(ID_CLI)) %>%
   mutate(PERC_CLIENTI = TOT/sum(TOT),
@@ -349,7 +350,7 @@ df7_sub_purch_az
 
 
 plot_df7_sub_purch_az <- ggplot(df7_sub_purch_az,aes(CAT,TOT))+
-  geom_bar(fill="red4",stat = "identity",width=0.4)+
+  geom_bar(fill="blue",stat = "identity",width=0.4)+
   xlab("N acquisti")+
   ylab("N clienti")
 
