@@ -58,14 +58,13 @@ dist_num_fid_x_cli <- num_fid_x_cli %>%
 dist_num_fid_x_cli
 
 ## Ci sono clienti con molteplici programmi fedeltà ##
-# let examine in details clients with multiple subscriptions#
 
 num_fid_x_cli %>% filter(NUM_FIDs == 3)
 
-#andiamo a vedere nel dettaglio per esempio un cliente#
-# each subscription can have different dates
+#andiamo a vedere nel dettaglio per esempio due clienti, ognuno ha una "storia" diversa#
+
 df_1_cli_fid %>% filter(ID_CLI == 621814)
-# there could be subscriptions at the same dates [possibly for technical reasons]
+
 df_1_cli_fid %>% filter(ID_CLI == 320880)
 
 #### RESHAPING df_1 ####
@@ -117,7 +116,7 @@ df_1_cli_fid_clean <- df_1_cli_fid_last %>%
 
 ### variabile Registrazione Online / Negozio Fisico ###
 
-#creo una nuova colonna 0/1: è 1 se si tratta di registrazione online, 
+#creo una nuova colonna 0/1: 1 se si tratta di registrazione online, 
 #0 se stata fatta nel negozio
 
 RegOnline <- as.data.frame(df_1_cli_fid_clean$FIRST_ID_NEG)
@@ -397,7 +396,7 @@ plot_df1_p_codfid_neg <- (
     theme_minimal()
 )
 
-ggplotly(plot_df1_p_codfid_neg)
+plot_df1_p_codfid_neg
 
 
 #### FINAL REVIEW df_1_clean ####
