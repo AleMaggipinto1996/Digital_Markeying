@@ -59,7 +59,7 @@ df_7_tic_clean_final <- df_7_tic_clean %>%
   )
   )
 
-## aggiunto se Ë weekend, festivo, giorno della settimana, altro
+## aggiunto se √® weekend, festivo, giorno della settimana, altro
 
 ##### consideriamo solo la categoria persone #####
 
@@ -235,7 +235,7 @@ plot_df7_dist_datetyp_percent <- (
 ggplotly(plot_df7_dist_datetyp_percent)
 
 ## gli acquisti vengono fatti soprattutto nei giorni lavorativi poi nel weekend e poco nei giorni festivi
-## forse perchË essendo negozi fisici sono chiusi. I rimborsi si suddividono in maniera equa
+## forse perch√© essendo negozi fisici sono chiusi. I rimborsi si suddividono in maniera equa
 
 ### Variable average IMPORTO_LORDO and average SCONTO per TICKET ###
 ## compute aggregate
@@ -253,7 +253,7 @@ df7_dist_avgimportosconto <- df7_dist_importosconto %>%
 
 df7_dist_avgimportosconto
 
-#L'importo lordo medio degli acquisti Ë pari a 164 con uno sconto di 11.8
+#L'importo lordo medio degli acquisti √® pari a 164 con uno sconto di 11.8
 
 ## plot aggregate
 plot_df7_dist_importo <- (
@@ -345,7 +345,7 @@ df7_articolo_max_tics<-df_7_persone %>% group_by(ID_ARTICOLO) %>%
             TOT_CLIENTI = n_distinct(ID_CLI))
 df7_articolo_max_tics[which.max(df7_articolo_max_tics$TOT_SCONTRINI),]
 
-#L'articolo con ID 33700716 Ë acquistato da 36273 clienti diversi 57806 volte
+#L'articolo con ID 33700716 √® acquistato da 36273 clienti diversi 57806 volte
 # EXPLORE average IMPORTO_LORDO and average SCONTO per ID_CLI
 
 ## compute aggregate
@@ -398,12 +398,12 @@ df7_sub_purch <- df7_purch %>%
                                (TOT_ACQUISTI>=10) & (TOT_ACQUISTI<25) ~ "da 10 a 25",
                                (TOT_ACQUISTI>=25) & (TOT_ACQUISTI<50) ~ "da 25 a 50",
                                (TOT_ACQUISTI>=50) & (TOT_ACQUISTI<100) ~ "da 50 a 100",
-                               (TOT_ACQUISTI>=100) ~ "pi˘ di 100"))
+                               (TOT_ACQUISTI>=100) ~ "pi√π di 100"))
 
 df7_sub_purch <- df7_sub_purch %>%
   mutate(CAT = factor(CATEGORIA,levels=c("meno di 10","da 10 a 25",
                                          "da 25 a 50","da 50 a 100",
-                                         "pi˘ di 100"))) %>%
+                                         "pi√π di 100"))) %>%
   group_by(CAT) %>%
   summarise(TOT = n_distinct(ID_CLI)) %>%
   mutate(PERC_CLIENTI = TOT/sum(TOT),
@@ -414,8 +414,8 @@ df7_sub_purch
 
 plot_df7_sub_purch <- ggplot(df7_sub_purch,aes(CAT,TOT))+
   geom_bar(fill="red4",stat = "identity",width=0.4)+
-  xlab("N∞ acquisti")+
-  ylab("N∞ clienti")
+  xlab("N acquisti")+
+  ylab("N clienti")
 
 plot_df7_sub_purch
 
