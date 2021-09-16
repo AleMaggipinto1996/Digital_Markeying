@@ -14,10 +14,10 @@ df_1_aziende <- df_1_cli_fid_clean %>%
 ## compute distribution 
 df1_aziende_codfid_ld <- df_1_aziende %>%
   group_by(substring(LAST_DT_ACTIVE,1,7)) %>%
-  dplyr::summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
+  summarize(TOT_CLIs = n_distinct(ID_CLI)) %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT)) %>% 
-  rename(Mesi = substring(LAST_DT_ACTIVE,1,7))
+  rename(Mesi = `substring(LAST_DT_ACTIVE, 1, 7)`)
 
 df1_aziende_codfid_ld
 
