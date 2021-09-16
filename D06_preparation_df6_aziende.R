@@ -128,7 +128,7 @@ plot_df6_az_dist_openedbytyp_percent <- (
 
 ggplotly(plot_df6_az_dist_openedbytyp_percent)
 
-#### sono state aperte di più quelle riferite al prodotto, poi
+#### sono state aperte di piÃ¹ quelle riferite al prodotto, poi
 ### quelle personalizzare, quelle locali e infine quelle nazionali
 
 ### Variable DAYS_TO_OPEN
@@ -156,7 +156,7 @@ plot_df6_az_dist_daystoopen <- (
 ggplotly(plot_df6_az_dist_daystoopen)
 
 #### la maggior parte vengono aperte subito o il giorno dopo
-##più passano i giorni più diminuiscono
+##piÃ¹ passano i giorni piÃ¹ diminuiscono
 
 ### DAYS_TO_OPEN vs CUMULATE PERCENT ### 
 
@@ -224,7 +224,7 @@ plot_df6_az_dist_clickedbytyp_percent <- (
 ggplotly(plot_df6_az_dist_clickedbytyp_percent)
 
 # in generale pochissimi click
-#più sui prodotti e su quelli nazionali
+#piÃ¹ sui prodotti e su quelli nazionali
 
 
 # - FAILED/FAILED by TYP_CAP
@@ -296,7 +296,7 @@ plot_df6_az_dist_num_opens <- (
 
 ggplotly(plot_df6_az_dist_num_opens)
 
-#pochi clienti riaprono più di una volta, molto pochi più di due
+#pochi clienti riaprono piÃ¹ di una volta, molto pochi piÃ¹ di due
 
 # - NUM_CLICKs
 
