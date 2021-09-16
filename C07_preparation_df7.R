@@ -296,11 +296,11 @@ df7_avgsc[which.max(df7_avgsc$SCONTO_MEDIO),]
 df7_avgsc[which.min(df7_avgsc$SCONTO_MEDIO),]
 
 IL<-ggplot(df7_avgil,aes(x=COD_REPARTO,y=IMPORTO_MEDIO))+
-  geom_bar(stat = "identity",fill="red")+
+  geom_bar(stat = "identity",fill="red")+labs(title = "Clienti Persone",size=18)+
   theme_minimal()
 ggplotly(IL)
 
-SC<-ggplot(df7_avgsc,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+
+SC<-ggplot(df7_avgsc,aes(x=COD_REPARTO,y=SCONTO_MEDIO))+labs(title = "Clienti Persone",size=18)+
   geom_bar(stat = "identity",fill="blue")+
   theme_minimal()
 ggplotly(SC)
