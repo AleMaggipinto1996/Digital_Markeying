@@ -6,7 +6,7 @@ summary(df_2_cli_account)
 #ci sono persone che hanno aggiunto telefoni e poi NA,
 #che bisognerebbe convertire in 0
 
-
+summarize <- dplyr::summarize
 
 #### START CLEANING df_2 ####
 
@@ -46,8 +46,7 @@ cons_idcli_df1_df2 <- df_1_cli_fid_clean %>%
               select(ID_CLI) %>%
               mutate(is_in_df_2 = 1) %>%
               distinct()
-            , by = "ID_CLI"
-  ) %>%
+            , by = "ID_CLI") %>%
   group_by(is_in_df_1, is_in_df_2) %>%
   summarize(NUM_ID_CLIs = n_distinct(ID_CLI)) %>%
   as.data.frame()
@@ -72,9 +71,7 @@ cons_idcli_df1_df2 <- df_1_persone %>%
   full_join(df_2_persone %>%
               select(ID_CLI) %>%
               mutate(is_in_df_2 = 1) %>%
-              distinct()
-            , by = "ID_CLI"
-  ) %>%
+              distinct(), by = "ID_CLI" ) %>%
   group_by(is_in_df_1, is_in_df_2) %>%
   summarize(NUM_ID_CLIs = n_distinct(ID_CLI)) %>%
   as.data.frame()
@@ -112,7 +109,7 @@ tot_emailproviders
 
 #### EMAIL_PROVIDER ####
 #______________________________________
-##mantieni i valori EMAIL_PROVIDER più frequenti e 
+##mantieni i valori EMAIL_PROVIDER pi? frequenti e 
 ##aggiungi un livello di fattore comune "ALTRO" per i restanti
 
 df_2_p_emailprovider %>%
@@ -163,8 +160,8 @@ plot_df2_p_emailproviderclean <- (
 )
 
 ggplotly(plot_df2_p_emailproviderclean)
-#è usata soprattutto @gmail.
-#La terza più frequente è la voce "altro", di cui fanno parte le 
+#? usata soprattutto @gmail.
+#La terza pi? frequente ? la voce "altro", di cui fanno parte le 
 #email inserite dai clienti con errori di battitura evidenti
 
 #_____________________________________________________
@@ -263,7 +260,7 @@ df_2_p_type <- df_2_persone %>%
   mutate(PERCENT = TOT_CLIs/sum(TOT_CLIs)) %>%
   arrange(desc(PERCENT))
 
-df_2_p_type #ovviamente avendo creato il dataset delle persone, la TYP_ACCOUNT è per tutti 4
+df_2_p_type #ovviamente avendo creato il dataset delle persone, la TYP_ACCOUNT ? per tutti 4
 
 ## plot distribution
 
