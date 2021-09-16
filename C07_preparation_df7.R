@@ -403,7 +403,7 @@ df7_sub_purch <- df7_purch %>%
 df7_sub_purch <- df7_sub_purch %>%
   mutate(CAT = factor(CATEGORIA,levels=c("meno di 10","da 10 a 25",
                                          "da 25 a 50","da 50 a 100",
-                                         "più di 100"))) %>%
+                                         "piu' di 100"))) %>%
   group_by(CAT) %>%
   summarise(TOT = n_distinct(ID_CLI)) %>%
   mutate(PERC_CLIENTI = TOT/sum(TOT),
