@@ -287,7 +287,7 @@ confusionMatrix(table_gl_az)
 
 
 log_az<-train(CHURN~.,data = train_az2,method = "glm")
-prob_log_az<-predict(log,test_az2[,-12],type="prob")[,1]
+prob_log_az<-predict(log_az,test_az2[,-12],type="prob")[,1]
 
 #evaluate
 rec_glm_az <- recall(pred1_az, test_az2$CHURN, relevant = "1") #0.44
