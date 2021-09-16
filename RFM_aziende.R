@@ -54,7 +54,7 @@ boxplot(df_last_date_aziende_1$DIFF_DAYS)
 
 df_aziende_attive_1 <- merge(df_aziende_attive1, df_last_date_aziende_1, by="ID_CLI")
 
-##Calcolo Recency: l'ultimo acquisto dopo quanto tempo?
+##Calcolo Recency: l'ultimo acquisto dopo quanto tempo
 
 quantili<- quantile(df_last_date_aziende_1$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
 quantili
@@ -69,7 +69,7 @@ Recency_aziende_1 = df_last_date_aziende_1 %>% mutate(CLASS_R=case_when(DIFF_DAY
 Recency_aziende_1 = mutate(Recency_aziende_1,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
 
 
-##Calcolo Frequency: ogni quanto acquisto?
+##Calcolo Frequency: ogni quanto acquisto
 
 Frequency_aziende_1 <- df_aziende_attive_1 %>%
   filter(DIREZIONE==1) %>% group_by(ID_CLI) %>%
@@ -201,7 +201,7 @@ df_clienti_attivi_2 <- merge(df_aziende_attive2, df_last_date_2_aziende, by="ID_
 #notiamo cdal numero di righe dei due dataset he i clienti sono aumentati ma le transazioni ovvero il numero 
 #di scontrini sono diminuite-
 
-##Calcolo Recency: l'ultimo acquisto dopo quanto tempo?
+##Calcolo Recency: l'ultimo acquisto dopo quanto tempo
 
 quantili<- quantile(df_last_date_2_aziende$DIFF_DAYS, probs = c(0.25, 0.50, 0.75))
 quantili
@@ -216,7 +216,7 @@ Recency_2_aziende = df_last_date_2_aziende %>% mutate(CLASS_R=case_when(DIFF_DAY
 Recency_2_aziende = mutate(Recency_2_aziende,CLASS_R=factor(CLASS_R,levels=c("Low","Medium","High")))
 
 
-##Calcolo Frequency: ogni quanto acquisto?
+##Calcolo Frequency: ogni quanto acquisto
 
 Frequency_2_aziende <- df_clienti_attivi_2 %>%
   filter(DIREZIONE==1) %>% group_by(ID_CLI) %>%
