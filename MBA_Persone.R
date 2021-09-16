@@ -27,7 +27,7 @@ inspect(rules)
 ggplotly(plot(rules,method="two-key plot"))
 #The above plot shows that rules with high confidence have low support.
 
-topRules <- rules[1:10]
+topRules <-rules[1:6]
 
 plot(topRules, method="graph",engine = "htmlwidget")
 plot(topRules, method = "grouped")
