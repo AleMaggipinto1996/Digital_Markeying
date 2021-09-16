@@ -446,40 +446,6 @@ df_days_curve$Perc <- df_days_curve$Freq/sum(df_days_curve$Freq)
 
 df_days_curve
 
-# compute the days for next purchase curve 
-df7_f_pur <- df_7_persone %>% filter(DIREZIONE==1) %>%
-  select(ID_CLI,TIC_DATE) %>%
-  unique()
-
-df7_f_pur2<- df7_f_pur %>% group_by(ID_CLI) %>%
-  summarise(AVG_PURCH_DIFF = round(mean(diff(TIC_DATE))),
-            LAST_PURCH = nth(TIC_DATE,1),
-            SECOND_LAST = nth(TIC_DATE,2))
-
-#Omitting the NA values
-df7_nxtpurch3 <- df7_nxtpurch2 %>% mutate(AVG_PURCH_DIFF = as.numeric(AVG_PURCH_DIFF))
-df7_nxtpurch3 <- df7_nxtpurch3[complete.cases(df7_nxtpurch3),]
-
-df7_nxtpurch4 <- df7_nxtpurch3 %>% group_by(AVG_PURCH_DIFF) %>%
-  summarise(TOT_CLIs = n_distinct(ID_CLI)) %>%
-  mutate(ALL_CLIs = sum(TOT_CLIs),
-         CUM_CLIs = cumsum(TOT_CLIs))
-
-df7_nxtpurch4 <- df7_nxtpurch4 %>% mutate(
-  PERC_CLIS = TOT_CLIs/ALL_CLIs,
-  CUM_PERC_CLIs = CUM_CLIs/ALL_CLIs
-)
-
-df7_nxtpurch4[which(df7_nxtpurch4$CUM_PERC_CLIs > 0.8)[1],]
-#The 80% of the customers repurchase within 61 days
-
-plot_df7_nxtpurch <- ggplot(df7_nxtpurch4,aes(AVG_PURCH_DIFF,CUM_PERC_CLIs))+
-  geom_line(stat = "identity",size=1.4) +
-  geom_vline(xintercept=61, linetype="dashed", color = "red", size = 0.5)+
-  geom_hline(yintercept=0.8, linetype="dashed", color = "red", size = 0.5)+
-  geom_text(aes(x=61, label="80%", y=0.75), colour="#404040", hjust = -0.5)
-
-plot_df7_nxtpurch
 
 #### FINAL REVIEW df_7_clean ####
 
