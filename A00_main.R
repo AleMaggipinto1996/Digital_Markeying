@@ -6,27 +6,18 @@ set.seed(123456)
 #### LIBRARIES ####
 library(dplyr)
 library(ggplot2)
-library(ggthemes)
-library(magrittr)
-library(pander)
-library(tidyverse)
-library(wesanderson)
 library(forcats)
 library(lubridate)
 library(RQuantLib)
-library(rfm)
 library(scales)
 library(arules)
 library(arulesViz)
 library(RColorBrewer)
 library(plotly)
-
 library(randomForest)
 library(ipred)
 library(rpart)
 library(pROC)
-library(forcats)
-library(RQuantLib)
 library(caret)
 library(rpart.plot)
 library(MLmetrics)
@@ -34,9 +25,8 @@ library(e1071)
 library(funModeling)
 
 #### DIRECTORIES ####
-getwd()
-working_dir = "C:/Users/Utente/Documents/GitHub/Progetto_DigitalM"
-data_dir = "C:/Users/Utente/Desktop/Web_marketing/Data"
+working_dir = "/Users/alessandramaggipinto/Documents/GitHub/Progetto_DigitalM"
+data_dir = "/Users/alessandramaggipinto/Documents/DMktg_DSLab_Data_1"
 setwd(working_dir)
 
 #### EXECUTION FULL PIPELINE ####
@@ -54,7 +44,6 @@ PIPELINE_scripts <- c(
 , 'D02_preparation_df2_aziende.R'
 , 'D03_preparation_df3_aziende.R'
 , 'D04_preparation_df4_aziende.R'
-, 'D05_preparation_df5_aziende.R'
 , 'D06_preparation_df6_aziende.R'
 , 'D07_preparation_df7_aziende.R'
 , 'MBA_persone.R'
@@ -69,4 +58,3 @@ PIPELINE_scripts <- c(
  source(i, echo = TRUE)
  }
 
-#writeLines(capture.output(sessionInfo()), "sessionInfo.txt")
