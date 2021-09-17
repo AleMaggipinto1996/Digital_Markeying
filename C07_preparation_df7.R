@@ -346,7 +346,7 @@ df7_articolo_max_tics<-df_7_persone %>% group_by(ID_ARTICOLO) %>%
 
 df7_articolo_max_tics[which.max(df7_articolo_max_tics$TOT_SCONTRINI),]
 
-#L'articolo con ID 33700716 e'¨ acquistato da 31484 clienti diversi 48813  volte
+#L'articolo con ID 33700716 e' acquistato da 31484 clienti diversi 48813  volte
 
 # EXPLORE average IMPORTO_LORDO and average SCONTO per ID_CLI
 
@@ -453,5 +453,9 @@ df_days_curve
 
 str(df_7_tic_clean_final)
 summary(df_7_tic_clean_final)
+
+
+
+
 
 
