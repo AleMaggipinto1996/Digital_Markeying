@@ -136,8 +136,6 @@ Fedelta_persone_1_plot <-
 
 Fedelta_persone_1_plot
 
-################### rendere più carino !!!!!!!!!!!!!!
-
 ##### RFM_persone_1
 
 RFM_persone_1 <- RF_persone_1 %>% select(-c("LAST_DATE_PURCH","CLASS_R","CLASS_F")) %>% 
@@ -199,7 +197,7 @@ boxplot(df_last_date_2_persone$DIFF_DAYS)
 df_clienti_attivi_2 <- merge(df_clienti_attivi2, df_last_date_2_persone, by="ID_CLI")
 
 #notiamo cdal numero di righe dei due dataset he i clienti sono aumentati ma le transazioni ovvero il numero 
-#di scontrini sono diminuite-
+#di scontrini sono diminuite
 
 ##Calcolo Recency: l'ultimo acquisto dopo quanto tempo
 
@@ -284,7 +282,6 @@ Fedelta_2_persone_plot <-
 
 Fedelta_2_persone_plot
 
-################### rendere più carino
 
 ##### RFM
 
