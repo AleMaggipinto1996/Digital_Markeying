@@ -69,16 +69,13 @@ sum(df_churn_aziende$CHURN==0)
 
 #10146 clienti non sono churn, 12152 sono churn
 
-# the length of a holdout period after each reference date.
+# il periodo di holdout va dal 2019-02-01 al 2019-04-30.
 
 holdout_period_az <- df_7_aziende %>% 
   filter(TIC_DATE >= as.Date("2019-02-01")) %>%
   filter(DIREZIONE==1)                                               
 
-#The holdout period starts on the 2019-02-01 and it ends at the 2019-04-30.
-
-#Third STEP: Choosing the lenght of a lookback period before the reference date:
-#consideriamo come lunghezza del periodo di lookback di cinque mesi
+#consideriamo come lunghezza del periodo di lookback di sei mesi
 
 lookback_period_az  <- df_7_aziende %>% 
   filter(TIC_DATE < as.Date("2019-02-01") &TIC_DATE >= as.Date("2018-08-01") & DIREZIONE==1)
@@ -105,7 +102,6 @@ Monetary_churn_az <- lookback_period_az %>%
   select(ID_CLI, SPESA_NETTA)
 
 
-#These variables concern the customer behaviour.
 Churn_az <- merge(Recency_churn_az,Frequency_churn_az,by="ID_CLI")
 
 Churn_az <- merge(Churn_az,Monetary_churn_az, by="ID_CLI")
@@ -184,8 +180,7 @@ ggplot(data=df_finale_az, aes(x=CHURN)) +
        title="Sbilanciamento Classi") +
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+theme(panel.border = element_blank())+theme(panel.background = element_blank())+theme(axis.line = element_line(colour = "black"))
 
-#The churn phenomenon is a classification problem with class imbalance.
-#We need to solve classes imbalance problem
+#abbiamo un problema di classi sbilanciate
 
 churn0_az <- train_az %>% filter(CHURN == 0) 
 churn1_az <- train_az %>% filter(CHURN == 1) 
@@ -322,9 +317,7 @@ acc_bag_az <- Accuracy(pred_bag_az, test_az$CHURN) #0.67
 
 #___________________________________________________________________________________________________________________________________________________
 
-
-
-#The best modelling approach is identified by benchmarking the perfomance metrics precisions, recall, recall, F1-score, AUC and lift.
+#per capire il modello migliore consideriamo le metrice: precisions, recall, recall, F1-score, AUC and lift.
 
 measure_matrix_az =matrix(0,ncol = 4,nrow = 5)
 colnames(measure_matrix_az) <- c("Recall","Precision","F1_Score","Accuracy")
@@ -348,7 +341,7 @@ plot_accuracy_az<-ggplot(accuracy_df_az,aes(x=Method,y=Value,fill=Method)) +
   ggtitle("ACCURACY PLOT")+
   theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+theme(panel.border = element_blank())+theme(panel.background = element_blank())+theme(axis.line = element_line(colour = "black"))
 
-plot_accuracy_az #da aggiustare e fare più carino
+plot_accuracy_az 
 
 #F1-score PLOT:
 F1_score_df_az <- as.data.frame(cbind(rownames(measure_df_az),measure_df_az$F1_Score))
