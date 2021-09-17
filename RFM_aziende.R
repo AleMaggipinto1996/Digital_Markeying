@@ -137,7 +137,6 @@ Fedelta_aziende_1_plot <-
 
 Fedelta_aziende_1_plot
 
-################### rendere più carino !!!!!!!!!!!!!!
 
 ##### RFM_aziende_1
 
@@ -199,7 +198,7 @@ boxplot(df_last_date_2_aziende$DIFF_DAYS)
 df_clienti_attivi_2 <- merge(df_aziende_attive2, df_last_date_2_aziende, by="ID_CLI")
 
 #notiamo cdal numero di righe dei due dataset he i clienti sono aumentati ma le transazioni ovvero il numero 
-#di scontrini sono diminuite-
+#di scontrini sono diminuite
 
 ##Calcolo Recency: l'ultimo acquisto dopo quanto tempo
 
@@ -283,7 +282,6 @@ Fedelta_2_aziende_plot <-
 
 Fedelta_2_aziende_plot
 
-################### rendere più carino e mettere in percentuale
 
 ##### RFM
 
@@ -356,5 +354,5 @@ Nuovi_clientiRFm_az<- Confronto_RFM_az %>% filter(VECCHIA_CLASSE == "Clienti_fut
 Nuovi_clientiRFm2_az <- Nuovi_clientiRFm_az %>% group_by(NUOVA_CLASSE) %>% summarise(COUNT = n())
 Nuovi_clientiRFm2_az <- Nuovi_clientiRFm2_az %>% mutate(PERC = percent(COUNT/sum(COUNT)))
 
-#la percentuale dei nuovi clienti: più del 50% fa parte della categoria Tin e Cheap
+#la percentuale dei nuovi clienti: meno del 50% fa parte della categoria Tin e Cheap, un 23% è Bronze e un 15% è Silver
 
